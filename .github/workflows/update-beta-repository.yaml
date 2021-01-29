@@ -1,0 +1,18 @@
+name: Build kernels on push, cron but only if there are changes
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron:  '0 */15 * * *'
+
+jobs:
+
+  build:
+    runs-on: [self-hosted, runner2, x64]
+
+    steps:
+      - name: Run script
+        run: |
+          pwd
