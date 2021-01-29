@@ -1,4 +1,4 @@
-name: Check & build kernels
+name: Check & build kernels at push
 on:
   push:
     branches:

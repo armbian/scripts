@@ -1,4 +1,4 @@
-name: Check & build kernels
+name: Check & build kernels in cron
 on:
   schedule:
     - cron:  '*/15 * * * *' 
