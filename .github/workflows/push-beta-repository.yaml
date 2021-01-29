@@ -10,6 +10,4 @@ jobs:
       - name: Run script
         shell: bash {0}
         run: |
-          pwd
-          ls -l 
           bash beta-repository.sh
