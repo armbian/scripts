@@ -9,4 +9,4 @@ jobs:
       - name: Run script
         shell: bash {0}
         run: |
-          bash beta-repository.sh
+          run-one bash beta-repository.sh
