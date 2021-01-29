@@ -16,4 +16,4 @@ jobs:
         shell: bash {0}
         run: |
           pwd
-          beta-repository.sh
+          ls -l 
