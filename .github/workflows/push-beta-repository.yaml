@@ -1,0 +1,15 @@
+name: Check & build kernels
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build: 
+    runs-on: [runner2]
+    steps:
+      - name: Run script
+        shell: bash {0}
+        run: |
+          pwd
+          ls -l 
+          bash beta-repository.sh
