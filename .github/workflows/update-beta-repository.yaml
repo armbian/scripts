@@ -1,14 +1,11 @@
 name: Check & build kernels
-
 on:
   push:
     branches:
       - master
   schedule:
-      - cron:  '0 */15 * * *'
-
+    - cron: '0 */15 * * *'
 jobs:
-
   build: 
     runs-on: [runner2]
     steps:
