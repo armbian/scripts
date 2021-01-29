@@ -9,9 +9,8 @@ on:
 
 jobs:
 
-  build:
-    runs-on: [self-hosted, runner2, x64]
-
+  build: 
+    runs-on: [runner2]
     steps:
       - name: Run script
         run: |
