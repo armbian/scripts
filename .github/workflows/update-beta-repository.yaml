@@ -13,5 +13,6 @@ jobs:
     runs-on: [runner2]
     steps:
       - name: Run script
+        shell: bash {0}
         run: |
           beta-repository.sh
