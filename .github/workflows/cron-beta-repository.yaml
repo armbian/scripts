@@ -1,7 +1,7 @@
 name: Check & build kernels
 on:
   schedule:
-    - cron:  '*/5 * * * *' 
+    - cron:  '*/15 * * * *' 
 jobs:
   build: 
     runs-on: [runner2]
@@ -9,4 +9,4 @@ jobs:
       - name: Run script
         shell: bash {0}
         run: |
-          run-one bash beta-repository.sh
+          run-one ./beta-repository.sh
