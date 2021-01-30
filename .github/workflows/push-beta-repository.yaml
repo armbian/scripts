@@ -1,4 +1,4 @@
-name: Check & build kernels at push
+name: Build and push kernels to beta repository
 on:
   push:
     branches:

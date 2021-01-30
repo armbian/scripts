@@ -1,4 +1,4 @@
-name: Check & build kernels in cron
+name: Build and push kernels to beta repository
 on:
   schedule:
     - cron:  '0 * * * *' 
