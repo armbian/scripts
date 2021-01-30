@@ -1,7 +1,7 @@
 name: Check & build kernels in cron
 on:
   schedule:
-    - cron:  '*/15 * * * *' 
+    - cron:  '0 * * * *' 
 jobs:
   build: 
     runs-on: [runner2]
