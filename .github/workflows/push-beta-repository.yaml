@@ -1,4 +1,4 @@
-name: Build and push kernels to beta repository
+name: Update beta repo on push
 on:
   push:
     branches:
