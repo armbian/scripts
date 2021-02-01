@@ -1,7 +1,9 @@
 name: Update beta repo on cron
 on:
+  push:
+    branches: master
   schedule:
-    - cron:  '0 * * * *' 
+    - cron:  '*/5 * * * *' 
 jobs:
   build: 
     runs-on: [runner2]
