@@ -1,4 +1,4 @@
-name: Update beta repo on cron
+name: Update beta repository
 on:
   push:
     branches: master
