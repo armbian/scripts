@@ -7,6 +7,7 @@ MAKEFORALLAPPS="no"                   # yes = make all app combinations. It migh
 PARALLEL_BUILDS=12                    # choose how many you can run in parallel - depends on your hardware
 USE_SCREEN="no"                       # run commands in screen
 FORCE_RELEASE="hirsute bullseye"      # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
+FORCE_DESKTOP="deepin"                # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
 
 
 # load config file to override default values
@@ -111,6 +112,7 @@ function variants
     local variants=(cli_1 cli_2)
     if [[ -d config/desktop ]]; then
         local variants+=($(find -L config/desktop/$1/environments/ -name support -exec grep -l 'supported' {} \; | cut -d"/" -f5))
+        [[ -n $FORCE_DESKTOP ]] && local variants+=($FORCE_DESKTOP)
     else
         local variants+=(xfce)
     fi
