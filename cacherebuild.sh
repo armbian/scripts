@@ -229,6 +229,10 @@ else
     #[[ -n $diff ]] && echo -e "Subject: Problem with cache rebuild\n\n$diff was not finished"
     #| ssmtp igor@armbian.com
 
+    # sign in parallel
+    #cd ${BLTPATH}cache/rootfs/
+    #find *.lz4 -type f | parallel 'echo $GPG_PASS | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes {}'
+
     [[ $UPLOAD != "yes" ]] && exit
 
     rsync -arP --info=progress2 --info=name0 ${BLTPATH}cache/rootfs/. igorp@10.0.10.2:/tank/armbian/dl.armbian.com/_rootfs
