@@ -7,7 +7,7 @@ MAKEFORALLAPPS="no"                   # yes = make all app combinations. It migh
 PARALLEL_BUILDS=12                    # choose how many you can run in parallel - depends on your hardware
 USE_SCREEN="no"                       # run commands in screen
 FORCE_RELEASE="hirsute bullseye"      # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
-FORCE_DESKTOP="deepin"                # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
+FORCE_DESKTOP=""                      # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
 
 
 # load config file to override default values
