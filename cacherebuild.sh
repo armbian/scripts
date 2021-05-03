@@ -332,7 +332,7 @@ fi
 if [[ $DAYINMONTH -lt 7 ]]; then
 
     display_alert "First seven (7) days we clean files of previous month" "cleaning files older then 14 days" "info"
-    find ${BLTPATH}cache/rootfs/ -type f -mtime +14 -exec rm -f {} \;
+    find ${BLTPATH}cache/rootfs/ -type f -mtime +14 -exec sudo rm -f {} \;
 
 fi
 
