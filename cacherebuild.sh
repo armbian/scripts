@@ -301,7 +301,7 @@ display_alert "System memory" "$(($MEM_INFO/1024))Gb" "info"
 
 if [[ -z ${PARALLEL_BUILDS} ]]; then
 
-    PARALLEL_BUILDS=$(awk '{printf("%d",$1/2500)}' <<<${MEM_INFO})
+    PARALLEL_BUILDS=$(awk '{printf("%d",$1/5000)}' <<<${MEM_INFO})
     display_alert "Calculated parallel builds" "$PARALLEL_BUILDS" "info"
 
 else
