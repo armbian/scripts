@@ -43,7 +43,7 @@ function boards
         fi
         PARAMETER+=" DESKTOP_ENVIRONMENT_CONFIG_NAME=\"$4\" DESKTOP_APPGROUPS_SELECTED=\"$5\" "
         PARAMETER+=" ROOT_FS_CREATE_ONLY=\"${FORCE}\" KERNEL_ONLY=\"no\" KERNEL_CONFIGURE=\"no\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\""
-        PARAMETER+=" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\""
+        PARAMETER+=" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\""
 
         [[ $USE_SCREEN != yes ]] && PARAMETER+=" &"
         r=$(( r + 1 ))
