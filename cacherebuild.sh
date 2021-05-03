@@ -10,41 +10,42 @@ FORCE_RELEASE="hirsute bullseye"      # we only build supported releases caches.
 FORCE_DESKTOP=""                      # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
 
 
-# load config file to override default values
-[[ -f cacherebuild.conf ]] && source cacherebuild.conf
 
 
 
-
+#
+# Fancy status display
+#
 display_alert()
 {
-	# log function parameters to install.log
-	[[ -n "${DEST}" ]] && echo "Displaying message: $@" >> "${DEST}"/debug/output.log
 
-	local tmp=""
-	[[ -n $2 ]] && tmp="[\e[0;33m $2 \x1B[0m]"
+    local tmp=""
+    [[ -n $2 ]] && tmp="[\e[0;33m $2 \x1B[0m]"
 
-	case $3 in
-		err)
-		echo -e "[\e[0;31m error \x1B[0m] $1 $tmp"
-		;;
+    case $3 in
 
-		wrn)
-		echo -e "[\e[0;35m warn \x1B[0m] $1 $tmp"
-		;;
+        err)
+        echo -e "[\e[0;31m error \x1B[0m] $1 $tmp"
+        ;;
 
-		ext)
-		echo -e "[\e[0;32m o.k. \x1B[0m] \e[1;32m$1\x1B[0m $tmp"
-		;;
+        wrn)
+        echo -e "[\e[0;35m warn \x1B[0m] $1 $tmp"
+        ;;
 
-		info)
-		echo -e "[\e[0;32m o.k. \x1B[0m] $1 $tmp"
-		;;
+        ext)
+        echo -e "[\e[0;32m o.k. \x1B[0m] \e[1;32m$1\x1B[0m $tmp"
+        ;;
 
-		*)
-		echo -e "[\e[0;32m .... \x1B[0m] $1 $tmp"
-		;;
-	esac
+        info)
+        echo -e "[\e[0;32m o.k. \x1B[0m] $1 $tmp"
+        ;;
+
+        *)
+        echo -e "[\e[0;32m .... \x1B[0m] $1 $tmp"
+        ;;
+
+    esac
+
 }
 
 
@@ -60,21 +61,28 @@ function boards
     local TARGETS=(lepotato bananapi)
     for h in "${TARGETS[@]}"
     do
+
         PARAMETER=""
 
         [[ $PARALLEL -gt 1 && $USE_SCREEN == yes ]] && PARAMETER="screen -dmSL ${h}$1 "
 
         PARAMETER+="${BLTPATH}compile.sh BOARD=\"$h\" BRANCH=\"current\" RELEASE=\"$1\""
         if [[ $2 == cli* ]]; then
+
             PARAMETER+=" BUILD_MINIMAL=\"$4\" BUILD_DESKTOP=\"no\" DESKTOP_ENVIRONMENT=\"\""
+
             else
+
             PARAMETER+=" BUILD_MINIMAL=\"no\" BUILD_DESKTOP=\"yes\" DESKTOP_ENVIRONMENT=\"$2\""
+
         fi
-        PARAMETER+=" DESKTOP_ENVIRONMENT_CONFIG_NAME=\"$4\" DESKTOP_APPGROUPS_SELECTED=\"$5\" "
-        PARAMETER+=" ROOT_FS_CREATE_ONLY=\"${FORCE}\" KERNEL_ONLY=\"no\" KERNEL_CONFIGURE=\"no\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\""
-        PARAMETER+=" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\""
+
+        PARAMETER+=" DESKTOP_ENVIRONMENT_CONFIG_NAME=\"$4\" DESKTOP_APPGROUPS_SELECTED=\"$5\" ROOT_FS_CREATE_ONLY=\"${FORCE}\" KERNEL_ONLY=\"no\" "
+        PARAMETER+=" KERNEL_CONFIGURE=\"no\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\" REPOSITORY_"
+        PARAMETER+=" INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\""
 
         [[ $USE_SCREEN != yes ]] && PARAMETER+=" &"
+
         r=$(( r + 1 ))
         vari=$2
 
@@ -82,8 +90,11 @@ function boards
         [[ ! -d config/desktop && $2 == cli_1 ]] && vari=cli
         [[ ! -d config/desktop && $2 == cli_2 ]] && vari=minimal
         [[ ! -d config/desktop && $2 == xfce ]] && vari=xfce-desktop
+
         CURRENT_TIME=$(date +%s)
+
         [[ $h == "lepotato" ]] && build_architec="arm64" || build_architec="armhf"
+
         if [[ ${DISPLAY_STAT} == yes ]]; then
             echo "Rebuilding cache: $(( CURRENT_TIME - START_TIME ))"
             echo "[ ${r}. $1_${build_architec}_$2" "$3" "$4" "$5 ]"
@@ -91,17 +102,20 @@ function boards
         fi
 
         eval "$PARAMETER"
-        echo "$1-$vari">> $TEMP_DIR/in.txt
+
         while :
         do
             sleep 1.2
             CURRENT_TIME=$(date +%s)
             CONCURENT=$(df | grep /.tmp | wc -l)
             FREE_MEM=$(free | grep Mem | awk '{print $4/$2 * 100}' | awk '{print int($1+0.5)}')
+
             if [[ ${CONCURENT} -le ${PARALLEL_BUILDS} ]]; then
                 break
             fi
+
         done
+
     done
 
 }
@@ -110,21 +124,27 @@ function boards
 
 
 #
-#   Cycle or scan for releases we use
+# Cycle or scan for releases we use
 #
 function releases
 {
 
     if [[ -d config/desktop ]]; then
+
         local releases=($(grep -rw config/distributions/* -e 'supported' | cut -d"/" -f3))        
         [[ -n $FORCE_RELEASE ]] && local releases+=($FORCE_RELEASE)
+
     else
+
         local releases=(bionic focal bullseye groovy buster stretch xenial)
+
     fi
 
     for i in ${releases[@]}
     do
+
         variants "$i"
+
     done
 
 }
@@ -133,25 +153,31 @@ function releases
 
 
 #
-#   Cycle build variants, cli, cli, minimal
+# Cycle build variants, cli, cli, minimal
 #
 function variants
 {
 
     local variants=(cli_1 cli_2)
     if [[ -d config/desktop ]]; then
+
         local variants+=($(find -L config/desktop/$1/environments/ -name support -exec grep -l 'supported' {} \; | cut -d"/" -f5))
         [[ -n $FORCE_DESKTOP ]] && local variants+=($FORCE_DESKTOP)
+
     else
+
         local variants+=(xfce)
+
     fi
     for j in ${variants[@]}
     do
+
         build_desktop="yes"
         build_minimal="no"
         [[ $j == cli_1 ]] && build_desktop="no" && build_minimal="no"
         [[ $j == cli_2 ]] && build_desktop="no" && build_minimal="yes"
         configs "$1" "$j" "$build_desktop" "$build_minimal"
+
     done
 
 }
@@ -166,14 +192,20 @@ function configs
 {
 
     if [[ -d config/desktop && $build_desktop != no ]]; then
+
         local configs=($(find -L config/desktop/$1/environments/$2/config* -name packages 2>/dev/null | cut -d"/" -f6 | uniq))
+
     else
+
         local configs="$4"
+
     fi
 
     for k in ${configs[@]}
     do
+
         appgroup "$1" "$2" "$3" "$k"
+
     done
 
 }
@@ -191,77 +223,118 @@ function appgroup
     local limit=16
 
     if [[ -d config/desktop && $3 == "yes" && $MAKEFORALLAPPS == "yes" ]]; then
+
         string=$(find -L config/desktop/$1/appgroups/ -mindepth 1 -maxdepth 1 -type d 2> /dev/null | sort | cut -d"/" -f5 | head -${limit} | tr '\n' ' ' )
         string=$(printf '%s\n' "$string" | tr -s '[:blank:]' ' ')
         wordCount=$(printf '%s\n' "$string" | wc -w)
         start=1
         boards "$1" "$2" "$3" "$4" ""
         while [ $start -le $wordCount ]; do
+
             end=$start
-                while [ $end -le $wordCount ]; do
+            while [ $end -le $wordCount ]; do
+
                 boards "$1" "$2" "$3" "$4" "$(printf '%s\n' "$string" | cut -d ' ' -f "$start-$end")"
-            end=$(( end + 1 ))
+                end=$(( end + 1 ))
+
             done
-        start=$(( start + 1 ))
+            start=$(( start + 1 ))
+
         done
+
     elif [[ -d config/desktop && $3 == "yes" ]]; then
+
         boards "$1" "$2" "$3" "$4" ""
         boards "$1" "$2" "$3" "$4" "browsers"
         boards "$1" "$2" "$3" "$4" "browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
         boards "$1" "$2" "$3" "$4" "3dsupport browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
+
     else
+
         boards "$1" "$2" "$3" "$4" ""
+
     fi
 
 }
 
-#
-# main
-#
-DAYSBEFORE=4
-TEMP_DIR=$(mktemp -d || exit 1)
-r=0
-cd ${BLTPATH}
-START_TIME=$(date +%s)
-display_alert "Starting rootfs cache rebuilt" "$(date)" "info"
-display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 2> /dev/null | wc -l)" "info"
-git pull -q 2> /dev/null
-if [[ $? -ne 0 ]]; then
-	display_alert "Updating build script" "git pull" "err"
-	exit 1
-else
-	display_alert "Updating build script" "git pull" "info"
-fi
-MEM_INFO=$(($(LC_ALL=C free -w 2>/dev/null | grep "^Mem" | awk '{print $2}' || LC_ALL=C free | grep "^Mem"| awk '{print $2}')/1024))
-display_alert "System memory" "$(($MEM_INFO/1024))Gb" "info"
-PARALLEL=$(awk '{printf("%d",$1/2500)}' <<<${MEM_INFO})
-display_alert "Calculated parallel builds" "$PARALLEL" "info"
-if [[ "${FORCE}" == "force" ]]; then
-	display_alert "Cache will be removed and rebuild" "${FORCE}" "info"
-	else
-	display_alert "Cache will be updated" "${FORCE}" "info"
-fi
 
+
+
+#
+# Main function
+#
+
+# load config file to override default values
+[[ -f cacherebuild.conf ]] && source cacherebuild.conf
+
+# hardcoded variables and calculations
+DAYSBEFORE=4
+START_TIME=$(date +%s)
 MONTH=$(date -d "$M" '+%m' | sed 's/\<0//g')
 DAYINMONTH=$(date -d "$D" '+%d' | sed 's/\<0//g')
 REBUILDDAY=$(date -d "${MONTH}/1 + 1 month - ${DAYSBEFORE} day" "+%d")
+MEM_INFO=$(($(LC_ALL=C free -w 2>/dev/null | grep "^Mem" | awk '{print $2}' || LC_ALL=C free | grep "^Mem"| awk '{print $2}')/1024))
+PARALLEL=$(awk '{printf("%d",$1/2500)}' <<<${MEM_INFO})
+r=0
 
+# jump to build script folder
+cd ${BLTPATH}
+
+display_alert "Starting rootfs cache rebuilt" "$(date)" "info"
+display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 2> /dev/null | wc -l)" "info"
+
+git pull -q 2> /dev/null
+
+if [[ $? -ne 0 ]]; then
+
+    display_alert "Updating build script" "git pull" "err"
+    exit 1
+
+else
+
+    display_alert "Updating build script" "git pull" "info"
+
+fi
+
+
+display_alert "System memory" "$(($MEM_INFO/1024))Gb" "info"
+
+display_alert "Calculated parallel builds" "$PARALLEL" "info"
+
+if [[ "${FORCE}" == "force" ]]; then
+
+    display_alert "Cache will be removed and rebuild" "${FORCE}" "info"
+
+else
+
+    display_alert "Cache will be updated" "${FORCE}" "info"
+
+fi
+
+# when we should start building for next month
 if [[ $DAYINMONTH -gt $REBUILDDAY ]]; then
-	display_alert "${DAYSBEFORE} days before next month" "building for next month FORCED_MONTH_OFFSET=1" "info"
-	FORCED_MONTH_OFFSET=1
+
+    display_alert "${DAYSBEFORE} days before next month" "building for next month FORCED_MONTH_OFFSET=1" "info"
+    FORCED_MONTH_OFFSET=1
+
 fi
 
 if [[ $DAYINMONTH -lt 7 ]]; then
-	display_alert "First seven (7) days we clean files of previous month" "cleaning old files" "info"
-	find ${BLTPATH}cache/rootfs/ -type f -mtime +7 -exec rm -f {} \;
+
+    display_alert "First seven (7) days we clean files of previous month" "cleaning old files" "info"
+    find ${BLTPATH}cache/rootfs/ -type f -mtime +7 -exec rm -f {} \;
+
 fi
 
 if [[ $UPLOAD != "yes" ]]; then
-	display_alert "Uploading to servers" "no" "wrn"
-else
-	display_alert "Uploading to servers" "yes" "info"
-fi
 
+    display_alert "Uploading to servers" "no" "wrn"
+
+else
+
+    display_alert "Uploading to servers" "yes" "info"
+
+fi
 
 # removing previous cache if forced
 [[ "${FORCE}" == "force" ]] && sudo rm -f ${BLTPATH}cache/rootfs/*
@@ -278,12 +351,17 @@ releases
 sleep 3
 while :
 do
-	sleep 3
-	CURRENT_TIME=$(date +%s)
-	echo -ne "Rebuilding cache: \x1B[92m$(( CURRENT_TIME - START_TIME ))s\x1B[0m\r"
-	if [[ $(df | grep /.tmp | wc -l) -lt 1 ]]; then
-		break
-	fi
+
+    sleep 3
+    CURRENT_TIME=$(date +%s)
+    echo -ne "Rebuilding cache: \x1B[92m$(( CURRENT_TIME - START_TIME ))s\x1B[0m\r"
+
+    if [[ $(df | grep /.tmp | wc -l) -lt 1 ]]; then
+
+        break
+
+    fi
+
 done
 
 display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 | wc -l)" "info"
