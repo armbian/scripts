@@ -5,4 +5,8 @@
  - ubootrebuild.sh builds all u-boots. 
 	 - Can be ran manually - before starting testing new release.
 	 - can run on public server
-
+ - betarepository.sh builds all kernels if changed
+	 - only builds changed kernels
+	 - always build BSP
+	 - bump nighly version
+	 - update repository
