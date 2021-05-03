@@ -4,7 +4,7 @@ BLTPATH="$(pwd)/"                     # path of the build script
 FORCE=yes                             # yes | force = remove cache and create new one
 FORCED_MONTH_OFFSET=0                 # cache is valid one month. This allows creation in advance
 MAKEFORALLAPPS="no"                   # yes = make all app combinations. It might be too much. If not set, hardcoded values are choosen
-PARALLEL_BUILDS=12                    # choose how many you can run in parallel - depends on your hardware
+PARALLEL_BUILDS=""                    # choose how many you want to run in parallel. Leave empty for auto
 USE_SCREEN="no"                       # run commands in screen
 FORCE_RELEASE="hirsute bullseye"      # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
 FORCE_DESKTOP=""                      # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
@@ -274,7 +274,6 @@ MONTH=$(date -d "$M" '+%m' | sed 's/\<0//g')
 DAYINMONTH=$(date -d "$D" '+%d' | sed 's/\<0//g')
 REBUILDDAY=$(date -d "${MONTH}/1 + 1 month - ${DAYSBEFORE} day" "+%d")
 MEM_INFO=$(($(LC_ALL=C free -w 2>/dev/null | grep "^Mem" | awk '{print $2}' || LC_ALL=C free | grep "^Mem"| awk '{print $2}')/1024))
-PARALLEL=$(awk '{printf("%d",$1/2500)}' <<<${MEM_INFO})
 r=0
 
 # jump to build script folder
@@ -299,7 +298,18 @@ fi
 
 display_alert "System memory" "$(($MEM_INFO/1024))Gb" "info"
 
-display_alert "Calculated parallel builds" "$PARALLEL" "info"
+
+if [[ -z ${PARALLEL_BUILDS} ]]; then
+
+    PARALLEL_BUILDS=$(awk '{printf("%d",$1/2500)}' <<<${MEM_INFO})
+    display_alert "Calculated parallel builds" "$PARALLEL_BUILDS" "info"
+
+else
+
+    display_alert "Selected parallel builds" "$PARALLEL_BUILDS" "info"
+
+fi
+
 
 if [[ "${FORCE}" == "force" ]]; then
 
@@ -321,14 +331,14 @@ fi
 
 if [[ $DAYINMONTH -lt 7 ]]; then
 
-    display_alert "First seven (7) days we clean files of previous month" "cleaning old files" "info"
-    find ${BLTPATH}cache/rootfs/ -type f -mtime +7 -exec rm -f {} \;
+    display_alert "First seven (7) days we clean files of previous month" "cleaning files older then 14 days" "info"
+    find ${BLTPATH}cache/rootfs/ -type f -mtime +14 -exec rm -f {} \;
 
 fi
 
 if [[ $UPLOAD != "yes" ]]; then
 
-    display_alert "Uploading to servers" "no" "wrn"
+    display_alert "Uploading to servers" "no" "info"
 
 else
 
