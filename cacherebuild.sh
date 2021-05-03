@@ -14,11 +14,40 @@ FORCE_DESKTOP=""                      # we only build supported desktop caches. 
 [[ -f cacherebuild.conf ]] && source cacherebuild.conf
 
 
-# go to build script root and run update
-cd ${BLTPATH}
-git pull
-TEMP_DIR=$(mktemp -d || exit 1)
-r=0
+
+
+display_alert()
+{
+	# log function parameters to install.log
+	[[ -n "${DEST}" ]] && echo "Displaying message: $@" >> "${DEST}"/debug/output.log
+
+	local tmp=""
+	[[ -n $2 ]] && tmp="[\e[0;33m $2 \x1B[0m]"
+
+	case $3 in
+		err)
+		echo -e "[\e[0;31m error \x1B[0m] $1 $tmp"
+		;;
+
+		wrn)
+		echo -e "[\e[0;35m warn \x1B[0m] $1 $tmp"
+		;;
+
+		ext)
+		echo -e "[\e[0;32m o.k. \x1B[0m] \e[1;32m$1\x1B[0m $tmp"
+		;;
+
+		info)
+		echo -e "[\e[0;32m o.k. \x1B[0m] $1 $tmp"
+		;;
+
+		*)
+		echo -e "[\e[0;32m .... \x1B[0m] $1 $tmp"
+		;;
+	esac
+}
+
+
 
 
 #
@@ -186,80 +215,86 @@ function appgroup
 
 }
 
-
+#
+# main
+#
+DAYSBEFORE=4
+TEMP_DIR=$(mktemp -d || exit 1)
+r=0
+cd ${BLTPATH}
 START_TIME=$(date +%s)
-MEM_INFO=$(LC_ALL=C free -w 2>/dev/null | grep "^Mem" || LC_ALL=C free | grep "^Mem")
-PARALLEL=$(awk '{printf("%d",$2/1024/1800)}' <<<${MEM_INFO})
-
-# check if we need to do this at all
-rootfsver=$(cat ${BLTPATH}lib/configuration.sh | grep ROOTFSCACHE_VERSION)
-eval $roofsver
-# making cache for next month +1
-gethash=$(echo "$(date -d "$D +${FORCED_MONTH_OFFSET} month" +"%Y-%m-module$ROOTFSCACHE_VERSION" | sed 's/^0*//')" | git hash-object --stdin )
-cachefile=${BLTPATH}cache/hash/rootfs.githash
-
-[[ -f $cachefile ]] && readhash=$(cat ${BLTPATH}cache/hash/rootfs.githash)
-if [[ "$readhash" == "$gethash" ]]; then
-
-    echo "No need to rebuild"
-
+display_alert "Starting rootfs cache rebuilt" "$(date)" "info"
+display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 2> /dev/null | wc -l)" "info"
+git pull -q 2> /dev/null
+if [[ $? -ne 0 ]]; then
+	display_alert "Updating build script" "git pull" "err"
+	exit 1
 else
-
-    #echo "Rebuilding cache"
-    # clean old cache just to make sure
-    [[ "${FORCE}" == "force" ]] && sudo rm -f ${BLTPATH}cache/rootfs/*
-    sudo rm -rf ${BLTPATH}.tmp
-
-    # run rebuild
-    releases
-
-    # wait until
-    sleep 3
-    while :
-        do
-        sleep 3
-        CURRENT_TIME=$(date +%s)
-        echo -ne "Rebuilding cache: \x1B[92m$(( CURRENT_TIME - START_TIME ))s\x1B[0m\r"
-        if [[ $(df | grep /.tmp | wc -l) -lt 1 ]]; then
-            break
-        fi
-    done
-
-    #diff=$(comm -3 <(ls -1 ${BLTPATH}cache/rootfs/*.lz4 | sed -r "s/.+\/(.+)\..+/\1/" | sed "s/-arm.*//" | sort) <(sort $TEMP_DIR/in.txt) | xargs)
-    #[[ -n $diff ]] && echo -e "Subject: Problem with cache rebuild\n\n$diff was not finished"
-    #| ssmtp igor@armbian.com
-
-    # sign in parallel
-    #cd ${BLTPATH}cache/rootfs/
-    #find *.lz4 -type f | parallel 'echo $GPG_PASS | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes {}'
-
-    [[ $UPLOAD != "yes" ]] && exit
-
-    rsync -arP --info=progress2 --info=name0 ${BLTPATH}cache/rootfs/. igorp@10.0.10.2:/tank/armbian/dl.armbian.com/_rootfs
-
-    # fix permissions
-    ssh igorp@10.0.10.2 "sudo chown -R igorp.sudo /tank/armbian/dl.armbian.com"
-
-    while :
-    do
-        ssh igorp@10.0.10.52 "run-one sudo /root/sync-images-to-minio"
-        [[ $? -eq 0 ]] && break
-        sleep 5
-    done
-
-    # create torrents
-    ssh igorp@10.0.10.10 "run-one /ext/scripts/recreate.sh"
-
-    # wait a day that mirrors are synched
-    echo "Sleeping"
-    sleep 24h
-
-    echo "Synching"
-    rsync -arP --delete --info=progress2 --info=name0 ${BLTPATH}cache/rootfs/. igorp@10.0.10.2:/tank/armbian/dl.armbian.com/_rootfs
-    # create torrents to remove deprecated
-    ssh igorp@10.0.10.10 "run-one /ext/scripts/recreate.sh"
-
-    # store hash
-    echo ${gethash} > ${cachefile}
-
+	display_alert "Updating build script" "git pull" "info"
 fi
+MEM_INFO=$(($(LC_ALL=C free -w 2>/dev/null | grep "^Mem" | awk '{print $2}' || LC_ALL=C free | grep "^Mem"| awk '{print $2}')/1024))
+display_alert "System memory" "$(($MEM_INFO/1024))Gb" "info"
+PARALLEL=$(awk '{printf("%d",$1/2500)}' <<<${MEM_INFO})
+display_alert "Calculated parallel builds" "$PARALLEL" "info"
+if [[ "${FORCE}" == "force" ]]; then
+	display_alert "Cache will be removed and rebuild" "${FORCE}" "info"
+	else
+	display_alert "Cache will be updated" "${FORCE}" "info"
+fi
+
+MONTH=$(date -d "$M" '+%m' | sed 's/\<0//g')
+DAYINMONTH=$(date -d "$D" '+%d' | sed 's/\<0//g')
+REBUILDDAY=$(date -d "${MONTH}/1 + 1 month - ${DAYSBEFORE} day" "+%d")
+
+if [[ $DAYINMONTH -gt $REBUILDDAY ]]; then
+	display_alert "${DAYSBEFORE} days before next month" "building for next month FORCED_MONTH_OFFSET=1" "info"
+	FORCED_MONTH_OFFSET=1
+fi
+
+if [[ $DAYINMONTH -lt 7 ]]; then
+	display_alert "First seven (7) days we clean files of previous month" "cleaning old files" "info"
+	find ${BLTPATH}cache/rootfs/ -type f -mtime +7 -exec rm -f {} \;
+fi
+
+if [[ $UPLOAD != "yes" ]]; then
+	display_alert "Uploading to servers" "no" "wrn"
+else
+	display_alert "Uploading to servers" "yes" "info"
+fi
+
+
+# removing previous cache if forced
+[[ "${FORCE}" == "force" ]] && sudo rm -f ${BLTPATH}cache/rootfs/*
+
+# removing previous tmp build directories
+sudo rm -rf ${BLTPATH}.tmp
+
+sleep 3
+
+# run main rebuild function
+releases
+
+# wait until all are finished
+sleep 3
+while :
+do
+	sleep 3
+	CURRENT_TIME=$(date +%s)
+	echo -ne "Rebuilding cache: \x1B[92m$(( CURRENT_TIME - START_TIME ))s\x1B[0m\r"
+	if [[ $(df | grep /.tmp | wc -l) -lt 1 ]]; then
+		break
+	fi
+done
+
+display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 | wc -l)" "info"
+
+[[ $UPLOAD != "yes" ]] && exit
+
+# rsync with NAS server
+rsync -arP --delete --info=progress2 --info=name0 ${BLTPATH}cache/rootfs/. igorp@nas:/tank/armbian/dl.armbian.com/_rootfs
+
+# fix permissions
+ssh igorp@nas "sudo chown -R igorp.sudo /tank/armbian/dl.armbian.com"
+
+# create torrents
+ssh igorp@utils "run-one /ext/scripts/recreate.sh"
