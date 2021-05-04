@@ -376,13 +376,5 @@ done
 
 display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 | wc -l)" "info"
 
-[[ $UPLOAD != "yes" ]] && exit
-
-# rsync with NAS server
-rsync -arP --delete --info=progress2 --info=name0 ${BLTPATH}cache/rootfs/. igorp@nas:/tank/armbian/dl.armbian.com/_rootfs
-
-# fix permissions
-ssh igorp@nas "sudo chown -R igorp.sudo /tank/armbian/dl.armbian.com"
-
-# create torrents
-ssh igorp@utils "run-one /ext/scripts/recreate.sh"
+# files are collected if this file exists
+touch ${BLTPATH}cache/rootfs/.waiting
