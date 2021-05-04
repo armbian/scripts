@@ -105,7 +105,7 @@ function boards
 
         while :
         do
-            sleep $((1 + $RANDOM % 5))
+            sleep $((1 + $RANDOM % 15))
             CURRENT_TIME=$(date +%s)
             CONCURENT=$(df | grep /.tmp | wc -l)
             FREE_MEM=$(free | grep Mem | awk '{print $4/$2 * 100}' | awk '{print int($1+0.5)}')
