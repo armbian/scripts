@@ -353,6 +353,11 @@ fi
 # removing previous tmp build directories
 sudo rm -rf ${BLTPATH}.tmp
 
+if [[ -f ${BLTPATH}cache/rootfs/.waiting ]]; then
+	display_alert "Syncing in progress. Exiting." "cache/rootfs/.waiting exits" "info"
+	exit 0
+fi
+
 sleep 3
 
 # run main rebuild function
