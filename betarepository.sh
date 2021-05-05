@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BLTPATH="/build/"
+#BLTPATH="/build/"
 PULL_FROM="master"
 
 # load config file to override default values
@@ -18,7 +18,7 @@ trap '{ sudo rm -f -- "/var/run/nightly-repo"; }' EXIT
 sudo sh -c 'echo $$ > /var/run/nightly-repo'
 
 # remove user configs
-sudo rm ${BLTPATH}userpatches/targets.conf
+sudo rm ${BLTPATH}userpatches/targets.conf 2>/dev/null
 
 cd ${BLTPATH}
 
@@ -42,6 +42,7 @@ sudo git merge $PULL_FROM ${CURRENT} --no-ff --no-edit
 
 # exit if push to nightly is not possible
 [[ $(sudo git branch | grep "*" | awk '{print $2}') != nightly ]] && exit 1
+echo "1"
 [[ $? -eq 0 ]] && sudo git push || exit 1
 
 # Build kernels if there is any change to patches, config or upstream
