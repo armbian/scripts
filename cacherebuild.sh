@@ -78,7 +78,7 @@ function boards
         fi
 
         PARAMETER+=" DESKTOP_ENVIRONMENT_CONFIG_NAME=\"$4\" DESKTOP_APPGROUPS_SELECTED=\"$5\" ROOT_FS_CREATE_ONLY=\"${FORCE}\" KERNEL_ONLY=\"no\" "
-        PARAMETER+=" KERNEL_CONFIGURE=\"no\" OFFLINE_WORK=\"yes\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\" "
+        PARAMETER+=" KERNEL_CONFIGURE=\"no\" OFFLINE_WORK=\"yes\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\" ARMBIAN_MIRROR=\"https://imola.armbian.com/dl/\" "
         PARAMETER+=" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\" APT_PROXY_ADDR=\"10.0.10.10:3142\""
 
         [[ $USE_SCREEN != yes ]] && PARAMETER+=" &"
@@ -103,9 +103,11 @@ function boards
 
         eval "$PARAMETER"
 
+	# store pids
+	PIDS=$PIDS" "$(echo $!)
+
         while :
         do
-            sleep $((1 + $RANDOM % 15))
             CURRENT_TIME=$(date +%s)
             CONCURENT=$(df | grep /.tmp | wc -l)
             FREE_MEM=$(free | grep Mem | awk '{print $4/$2 * 100}' | awk '{print int($1+0.5)}')
@@ -346,11 +348,28 @@ else
 
 fi
 
+# don't start if previous run is still running
+while :
+do
+
+    sleep 3
+    CURRENT_TIME=$(date +%s)
+	display_alert "Waiting for cleanup" "yes" "info"
+
+    if [[ $(df | grep /.tmp | wc -l) -lt 1 ]]; then
+
+        break
+
+    fi
+
+done
+
 # removing previous cache if forced
 [[ "${FORCE}" == "force" ]] && sudo rm -f ${BLTPATH}cache/rootfs/*
 
 # removing previous tmp build directories
 sudo rm -rf ${BLTPATH}.tmp
+sudo rm ${BLTPATH}cache/rootfs/*.current 2>/dev/null
 
 if [[ -f ${BLTPATH}cache/rootfs/.waiting ]]; then
 	display_alert "Syncing in progress. Exiting." "cache/rootfs/.waiting exits" "info"
@@ -362,24 +381,50 @@ sleep 3
 # run main rebuild function
 releases
 
-# wait until all are finished
-sleep 3
-while :
+#
+# wait until all build PIDS are done
+#
+while true
 do
+i=0
+        for pids in $PIDS
+        do
+                if ps -p $pids > /dev/null; then
+                        i=$((i+1))
+                fi
+        done
 
-    sleep 3
-    CURRENT_TIME=$(date +%s)
-    echo -ne "Rebuilding cache: \x1B[92m$(( CURRENT_TIME - START_TIME ))s\x1B[0m\r"
-
-    if [[ $(df | grep /.tmp | wc -l) -lt 1 ]]; then
-
-        break
-
-    fi
+        [[ $i -eq 0 ]] && break
 
 done
 
+
+#
+# clean all build that are not labelled as .current and are older then 4 days
+#
+if [[ ${FORCED_MONTH_OFFSET} -eq 0 ]]; then
+
+	display_alert "Clean all build that are not labelled as current." "cleanup" "info"
+
+	# create a diff between marked as current and others
+	BRISI=($(diff <(find ${BLTPATH}cache/rootfs -name "*.lz4.current" | sed "s/.current//" | sort) <(find ${BLTPATH}cache/rootfs -name "*.lz4" | sort) | grep ">" | sed "s/> //"))
+	for brisi in "${BRISI[@]}"; do
+		if [[ $(find "$brisi" -mtime +4 -print) ]]; then
+				display_alert "File is older then 4 days. Deleting." "$(basename $brisi)" "info"
+				sudo rm $brisi
+			else
+				display_alert "File is not older then 4 days" "$(basename $brisi)" "info"
+		fi
+	done
+
+	# remove .current mark
+	sudo rm ${BLTPATH}cache/rootfs/*.current
+fi
+
+# calculate execution time
+CURRENT_TIME=$(date +%s)
+display_alert "Rebuilding cache time" "$(( CURRENT_TIME - START_TIME )) seconds" "info"
 display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 | wc -l)" "info"
 
-# files are collected if this file exists
+# files are collected by 3rd party script if this file exists
 touch ${BLTPATH}cache/rootfs/.waiting
