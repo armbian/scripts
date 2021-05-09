@@ -10,3 +10,4 @@
 	 - always build BSP
 	 - bump nighly version
 	 - update repository
+ - selected-images.sh builds image for or more boards
