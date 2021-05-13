@@ -8,7 +8,7 @@ PARALLEL_BUILDS=""                    # choose how many you want to run in paral
 USE_SCREEN="no"                       # run commands in screen
 FORCE_RELEASE="hirsute bullseye"      # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
 FORCE_DESKTOP="cinnamon i3-wm xmonad"                      # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
-
+PURGEDAYS="3"
 
 
 
@@ -108,6 +108,7 @@ function boards
 
         while :
         do
+            sleep 0.5
             CURRENT_TIME=$(date +%s)
             CONCURENT=$(df | grep /.tmp | wc -l)
             FREE_MEM=$(free | grep Mem | awk '{print $4/$2 * 100}' | awk '{print int($1+0.5)}')
@@ -409,11 +410,11 @@ if [[ ${FORCED_MONTH_OFFSET} -eq 0 ]]; then
 	# create a diff between marked as current and others
 	BRISI=($(diff <(find ${BLTPATH}cache/rootfs -name "*.lz4.current" | sed "s/.current//" | sort) <(find ${BLTPATH}cache/rootfs -name "*.lz4" | sort) | grep ">" | sed "s/> //"))
 	for brisi in "${BRISI[@]}"; do
-		if [[ $(find "$brisi" -mtime +4 -print) ]]; then
-				display_alert "File is older then 4 days. Deleting." "$(basename $brisi)" "info"
+		if [[ $(find "$brisi" -mtime +${PURGEDAYS} -print) ]]; then
+				display_alert "File is older then ${PURGEDAYS} days. Deleting." "$(basename $brisi)" "info"
 				sudo rm $brisi
 			else
-				display_alert "File is not older then 4 days" "$(basename $brisi)" "info"
+				display_alert "File is not older then ${PURGEDAYS} days" "$(basename $brisi)" "info"
 		fi
 	done
 
