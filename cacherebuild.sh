@@ -429,3 +429,6 @@ display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.
 
 # files are collected by 3rd party script if this file exists
 sudo touch ${BLTPATH}cache/rootfs/.waiting
+
+# removing previous tmp build directories
+sudo rm -rf ${BLTPATH}.tmp
