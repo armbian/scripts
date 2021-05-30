@@ -428,4 +428,4 @@ display_alert "Rebuilding cache time" "$(( CURRENT_TIME - START_TIME )) seconds"
 display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 | wc -l)" "info"
 
 # files are collected by 3rd party script if this file exists
-touch ${BLTPATH}cache/rootfs/.waiting
+sudo touch ${BLTPATH}cache/rootfs/.waiting
