@@ -64,7 +64,7 @@ function boards
 
         PARAMETER=""
 
-        [[ $PARALLEL -gt 1 && $USE_SCREEN == yes ]] && PARAMETER="screen -dmSL ${h}$1 "
+        [[ $PARALLEL_BUILDS -gt 1 && $USE_SCREEN == yes ]] && PARAMETER="screen -dmSL ${h}$1 "
 
         PARAMETER+="${BLTPATH}compile.sh BOARD=\"$h\" BRANCH=\"current\" RELEASE=\"$1\""
         if [[ $2 == cli* ]]; then
