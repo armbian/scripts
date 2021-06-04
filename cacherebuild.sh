@@ -372,11 +372,6 @@ done
 sudo rm -rf ${BLTPATH}.tmp
 sudo rm ${BLTPATH}cache/rootfs/*.current 2>/dev/null
 
-if [[ -f ${BLTPATH}cache/rootfs/.waiting ]]; then
-	display_alert "Syncing in progress. Exiting." "cache/rootfs/.waiting exits" "info"
-	exit 0
-fi
-
 sleep 3
 
 # run main rebuild function
