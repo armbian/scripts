@@ -11,3 +11,11 @@
 	 - bump nighly version
 	 - update repository
  - selected-images.sh builds image for or more boards
+
+
+# VERSION
+
+- bug fix releases for selected images
+- new stable images added after major release
+- BSP will be recreated for all and pushed to stable repository
+- build artefacts for selected builds will also be pushed to stable repository
