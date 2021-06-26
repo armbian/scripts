@@ -132,23 +132,13 @@ function boards
 function releases
 {
 
-    if [[ -d config/desktop ]]; then
+	local releases=($(grep -rw config/distributions/*/ -e 'supported' | cut -d"/" -f3))
+	[[ -n $FORCE_RELEASE ]] && local releases+=($FORCE_RELEASE)
 
-        local releases=($(grep -rw config/distributions/* -e 'supported' | cut -d"/" -f3))        
-        [[ -n $FORCE_RELEASE ]] && local releases+=($FORCE_RELEASE)
-
-    else
-
-        local releases=(bionic focal bullseye groovy buster stretch xenial)
-
-    fi
-
-    for i in ${releases[@]}
-    do
-
-        variants "$i"
-
-    done
+	for i in ${releases[@]}
+	do
+		variants "$i"
+	done
 
 }
 
@@ -162,16 +152,9 @@ function variants
 {
 
     local variants=(cli_1 cli_2)
-    if [[ -d config/desktop ]]; then
+    local variants+=($(find -L config/desktop/$1/environments/ -name support -exec grep -l 'supported' {} \; | cut -d"/" -f5))
+    [[ -n $FORCE_DESKTOP ]] && local variants+=($FORCE_DESKTOP)
 
-        local variants+=($(find -L config/desktop/$1/environments/ -name support -exec grep -l 'supported' {} \; | cut -d"/" -f5))
-        [[ -n $FORCE_DESKTOP ]] && local variants+=($FORCE_DESKTOP)
-
-    else
-
-        local variants+=(xfce)
-
-    fi
     for j in ${variants[@]}
     do
 
@@ -179,6 +162,7 @@ function variants
         build_minimal="no"
         [[ $j == cli_1 ]] && build_desktop="no" && build_minimal="no"
         [[ $j == cli_2 ]] && build_desktop="no" && build_minimal="yes"
+
         configs "$1" "$j" "$build_desktop" "$build_minimal"
 
     done
