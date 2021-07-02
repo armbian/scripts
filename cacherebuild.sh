@@ -7,7 +7,7 @@ MAKEFORALLAPPS="no"                             # yes = make all app combination
 PARALLEL_BUILDS=""                              # choose how many you want to run in parallel. Leave empty for auto
 USE_SCREEN="no"                                 # run commands in screen
 FORCE_RELEASE="hirsute bullseye"                # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
-FORCE_DESKTOP="cinnamon"                        # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
+FORCE_DESKTOP="cinnamon,gnome"                  # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
 PURGEDAYS="3"                                   # delete files that are older then n days and are not used anymore
 
 
