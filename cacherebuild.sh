@@ -79,7 +79,7 @@ function boards
 
         PARAMETER+=" DESKTOP_ENVIRONMENT_CONFIG_NAME=\"$4\" DESKTOP_APPGROUPS_SELECTED=\"$5\" ROOT_FS_CREATE_ONLY=\"${FORCE}\" KERNEL_ONLY=\"no\" "
         PARAMETER+=" KERNEL_CONFIGURE=\"no\" OFFLINE_WORK=\"yes\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\"  "
-        PARAMETER+=" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\" "
+        PARAMETER+=" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\" APT_PROXY_ADDR=\"10.0.10.10:3142\""
 
         [[ $USE_SCREEN != yes ]] && PARAMETER+=" &"
 
