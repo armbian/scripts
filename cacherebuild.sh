@@ -234,6 +234,7 @@ function appgroup
         boards "$1" "$2" "$3" "$4" ""
         boards "$1" "$2" "$3" "$4" "browsers"
         boards "$1" "$2" "$3" "$4" "browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
+        boards "$1" "$2" "$3" "$4" "3dsupport browsers"
         boards "$1" "$2" "$3" "$4" "3dsupport browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
 
     else
