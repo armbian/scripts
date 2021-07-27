@@ -2,7 +2,7 @@
 
 BLTPATH="$(pwd)/"                               # path of the build script
 FORCE=yes                                       # yes | force = remove cache and create new one
-FORCED_MONTH_OFFSET=1                           # cache is valid one month. This allows creation in advance
+FORCED_MONTH_OFFSET=0                           # cache is valid one month. This allows creation in advance
 MAKEFORALLAPPS="no"                             # yes = make all app combinations. It might be too much. If not set, hardcoded values are choosen
 PARALLEL_BUILDS=""                              # choose how many you want to run in parallel. Leave empty for auto
 USE_SCREEN="no"                                 # run commands in screen
