@@ -1,0 +1,21 @@
+@cnxsoft
+@
+@itsfoss2
+@9to5linux
+@linuxtoday
+@nixcraft
+@DestLinuxPod
+@schestowitz
+@pcfixmardel
+@releaseteam
+@LinuxActionNews
+@itsfoss_net
+@jupitersignal
+@distrowatch
+@linuxformat
+@LibreNationUK
+@linuxjournal
+@FOSS_Linux
+@tecmint
+@OpenSourceForU
+@opensourceway https://opensource.com/contact
