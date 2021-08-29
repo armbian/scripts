@@ -1,5 +1,4 @@
 @cnxsoft
-@
 @itsfoss2
 @9to5linux
 @linuxtoday
