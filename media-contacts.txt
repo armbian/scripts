@@ -1,4 +1,5 @@
 @cnxsoft
+@aarch64org
 @itsfoss2
 @9to5linux
 @linuxtoday
