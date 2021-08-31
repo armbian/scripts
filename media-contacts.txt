@@ -19,3 +19,12 @@
 @tecmint
 @OpenSourceForU
 @opensourceway https://opensource.com/contact
+
+
+Forum topics:
+https://forum.odroid.com/viewtopic.php?f=138&t=26991 (Odroid C2)
+https://forum.odroid.com/viewtopic.php?f=179&t=34959 (Odroid N2)
+https://forum.odroid.com/viewtopic.php?f=203&t=38627 (Odroid C4/HC4)
+http://www.friendlyarm.com/Forum/viewtopic.php?f=62&t=2492 (FriendlyARM)
+http://www.friendlyarm.com/Forum/viewtopic.php?f=59&t=1030 (Nanopi Duo)
+http://www.friendlyarm.com/Forum/viewtopic.php?f=55&t=2007 (Nanopi K2)
