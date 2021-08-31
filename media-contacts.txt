@@ -28,3 +28,16 @@ https://forum.odroid.com/viewtopic.php?f=203&t=38627 (Odroid C4/HC4)
 http://www.friendlyarm.com/Forum/viewtopic.php?f=62&t=2492 (FriendlyARM)
 http://www.friendlyarm.com/Forum/viewtopic.php?f=59&t=1030 (Nanopi Duo)
 http://www.friendlyarm.com/Forum/viewtopic.php?f=55&t=2007 (Nanopi K2)
+
+Forums where Armbian add for our forum support could be added:
+
+https://forum.pine64.org/forumdisplay.php?fid=151 (pinecube)
+https://forum.pine64.org/showthread.php?tid=6928 (reusing Pine64 post for RockPRO64)
+https://forum.pine64.org/forumdisplay.php?fid=95 (Pine H64, has to be created)
+https://forum.pine64.org/showthread.php?tid=6187 (reusing Pine64 admin post)
+https://forum.pine64.org/forumdisplay.php?fid=84 (Pine A64+, creating a topic)
+https://forum.pine64.org/showthread.php?tid=4809 (reusing Pine64 admin post)
+https://forum.pine64.org/forumdisplay.php?fid=69 (SOpine new thread has to be made)
+https://forum.pine64.org/forumdisplay.php?fid=114 (Pinebook pro - new thread has to be made)
+
+https://tinker-board.asus.com/forum/index.php?/forum/8-software/ (Tinkerboard 1)
