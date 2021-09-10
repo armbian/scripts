@@ -276,7 +276,7 @@ lz4 -tqq $file
                 display_alert "Integrity check failed" "Removing $file" "err"
 		rm ${file}*
                 else
-                display_alert "Checking" "$file" "info"
+                display_alert "Integrity checking" "$file" "info"
         fi
 done
 
