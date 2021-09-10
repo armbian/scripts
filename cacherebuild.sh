@@ -267,6 +267,19 @@ REBUILDDAY=$(date -d "${MONTH}/1 + 1 month - ${DAYSBEFORE} day" "+%d")
 MEM_INFO=$(($(LC_ALL=C free -w 2>/dev/null | grep "^Mem" | awk '{print $2}' || LC_ALL=C free | grep "^Mem"| awk '{print $2}')/1024))
 r=0
 
+# check and remove failed caches
+cd ${BLTPATH}cache/rootfs
+for file in *.lz4
+do
+lz4 -tqq $file
+        if [[ $? -ne 0 ]]; then
+                display_alert "Integrity check failed" "Removing $file" "err"
+		rm ${file}*
+                else
+                display_alert "Checking" "$file" "info"
+        fi
+done
+
 # jump to build script folder
 cd ${BLTPATH}
 
