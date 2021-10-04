@@ -101,7 +101,7 @@ function boards
             echo ""
         fi
 
-        eval "$PARAMETER"
+        echo "$PARAMETER" >> /tmp/list.txt
 
 	# store pids
 	PIDS=$PIDS" "$(echo $!)
@@ -395,6 +395,7 @@ i=0
 
 done
 
+exit
 
 #
 # clean all build that are not labelled as .current and are older then 4 days
