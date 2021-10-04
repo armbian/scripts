@@ -101,7 +101,7 @@ function boards
             echo ""
         fi
 
-        echo "$PARAMETER" >> $1
+        echo "$PARAMETER" >> ../filelist.txt
 
 	# store pids
 	PIDS=$PIDS" "$(echo $!)
