@@ -101,7 +101,7 @@ function boards
             echo ""
         fi
 
-        echo "$PARAMETER" >> ../filelist.txt
+        echo "$PARAMETER" >> ../build-rootfs/filelist.txt
 
 	# store pids
 	PIDS=$PIDS" "$(echo $!)
