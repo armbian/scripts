@@ -81,7 +81,7 @@ function boards
         PARAMETER+=" KERNEL_CONFIGURE=\"no\" OFFLINE_WORK=\"yes\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\"  "
         PARAMETER+=" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\" APT_PROXY_ADDR=\"10.0.10.10:3142\""
 
-        [[ $USE_SCREEN != yes ]] && PARAMETER+=" &"
+##        [[ $USE_SCREEN != yes ]] && PARAMETER+=" &"
 
         r=$(( r + 1 ))
         vari=$2
