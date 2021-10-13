@@ -9,9 +9,8 @@ USE_SCREEN="no"                                 # run commands in screen
 FORCE_RELEASE="hirsute bullseye"                # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
 FORCE_DESKTOP="cinnamon"                        # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
 PURGEDAYS="4"                                   # delete files that are older then n days and are not used anymore
-
-
-
+CLEANING="${1:-no}"
+FILE_OUT="${2:-filelist.txt}"
 
 #
 # Fancy status display
@@ -48,6 +47,9 @@ display_alert()
 
 }
 
+
+
+if [[ "$CLEANING" != "yes" ]]; then
 
 
 
@@ -101,7 +103,7 @@ function boards
             echo ""
         fi
 
-        echo "$PARAMETER" >> ../build-rootfs/filelist.txt
+        echo "$PARAMETER" >> "$FILE_OUT"
 
 	# store pids
 	PIDS=$PIDS" "$(echo $!)
@@ -384,37 +386,36 @@ i=0
 
 done
 
-exit
 
-#
-# clean all build that are not labelled as .current and are older then 4 days
-#
-if [[ ${FORCED_MONTH_OFFSET} -eq 0 ]]; then
+else
 
-	display_alert "Clean all build that are not labelled as current." "cleanup" "info"
+    #
+    # clean all build that are not labelled as .current and are older then 4 days
+    #
+    if [[ ${FORCED_MONTH_OFFSET} -eq 0 ]]; then
 
-	# create a diff between marked as current and others
-	BRISI=($(diff <(find ${BLTPATH}cache/rootfs -name "*.lz4.current" | sed "s/.current//" | sort) <(find ${BLTPATH}cache/rootfs -name "*.lz4" | sort) | grep ">" | sed "s/> //"))
-	for brisi in "${BRISI[@]}"; do
-		if [[ $(find "$brisi" -mtime +${PURGEDAYS} -print) ]]; then
-				display_alert "File is older then ${PURGEDAYS} days. Deleting." "$(basename $brisi)" "info"
-				sudo rm $brisi
-			else
-				display_alert "File is not older then ${PURGEDAYS} days" "$(basename $brisi)" "info"
-		fi
-	done
+        display_alert "Clean all build that are not labelled as current." "cleanup" "info"
 
-	# remove .current mark
-	sudo rm ${BLTPATH}cache/rootfs/*.current
+        # create a diff between marked as current and others
+        BRISI=($(diff <(find ${BLTPATH}cache/rootfs -name "*.lz4.current" | sed "s/.current//" | sort) <(find ${BLTPATH}cache/rootfs -name "*.lz4" | sort) | grep ">" | sed "s/> //"))
+        for brisi in "${BRISI[@]}"; do
+            if [[ $(find "$brisi" -mtime +${PURGEDAYS} -print) ]]; then
+                    display_alert "File is older then ${PURGEDAYS} days. Deleting." "$(basename $brisi)" "info"
+                    sudo rm $brisi
+                else
+                    display_alert "File is not older then ${PURGEDAYS} days" "$(basename $brisi)" "info"
+            fi
+        done
+
+        # remove .current mark
+        sudo rm -f ${BLTPATH}cache/rootfs/*.current
+    fi
+
 fi
 
-# calculate execution time
-CURRENT_TIME=$(date +%s)
-display_alert "Rebuilding cache time" "$(( CURRENT_TIME - START_TIME )) seconds" "info"
-display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 | wc -l)" "info"
 
-# files are collected by 3rd party script if this file exists
-sudo touch ${BLTPATH}cache/rootfs/.waiting
+# calculate execution time
+display_alert "Currently present cache files" "$(ls -l ${BLTPATH}cache/rootfs/*.lz4 2> /dev/null| wc -l)" "info"
 
 # removing previous tmp build directories
 sudo rm -rf ${BLTPATH}.tmp
