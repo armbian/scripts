@@ -49,9 +49,6 @@ display_alert()
 
 
 
-if [[ "$CLEANING" != "yes" ]]; then
-
-
 
 #
 # Cycle main build commands
@@ -103,7 +100,13 @@ function boards
             echo ""
         fi
 
-        echo "$PARAMETER" >> "$FILE_OUT"
+	if [[ "$CLEANING" != "yes" ]]; then
+
+		eval "$PARAMETER"
+	else
+
+	        echo "$PARAMETER" >> "$FILE_OUT"
+	fi
 
 	# store pids
 	PIDS=$PIDS" "$(echo $!)
@@ -362,7 +365,7 @@ done
 
 # removing previous tmp build directories
 sudo rm -rf ${BLTPATH}.tmp
-sudo rm ${BLTPATH}cache/rootfs/*.current 2>/dev/null
+[[ "$CLEANING" != "yes" ]] && sudo rm ${BLTPATH}cache/rootfs/*.current 2>/dev/null
 
 sleep 3
 
@@ -387,14 +390,13 @@ i=0
 done
 
 
-else
 
-    #
-    # clean all build that are not labelled as .current and are older then 4 days
-    #
-    if [[ ${FORCED_MONTH_OFFSET} -eq 0 ]]; then
+#
+# clean all build that are not labelled as .current and are older then 4 days
+#
+if [[ ${FORCED_MONTH_OFFSET} -eq 0 ]]; then
 
-        display_alert "Clean all build that are not labelled as current." "cleanup" "info"
+	display_alert "Clean all build that are not labelled as current." "cleanup" "info"
 
         # create a diff between marked as current and others
         BRISI=($(diff <(find ${BLTPATH}cache/rootfs -name "*.lz4.current" | sed "s/.current//" | sort) <(find ${BLTPATH}cache/rootfs -name "*.lz4" | sort) | grep ">" | sed "s/> //"))
@@ -409,9 +411,8 @@ else
 
         # remove .current mark
         sudo rm -f ${BLTPATH}cache/rootfs/*.current
-    fi
-
 fi
+
 
 
 # calculate execution time
