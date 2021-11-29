@@ -40,7 +40,8 @@ function boards
 {
 
     # we only need to select one 32 and one 64bit board    
-    local TARGETS=("$BUILD_VARIANTS")
+    #local TARGETS=("$BUILD_VARIANTS")
+    local TARGETS=(lepotato bananapi)
     for h in "${TARGETS[@]}"
     do
 
