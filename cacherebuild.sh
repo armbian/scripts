@@ -11,7 +11,7 @@ FORCE_DESKTOP="cinnamon"                        # we only build supported deskto
 PURGEDAYS="4"                                   # delete files that are older then n days and are not used anymore
 CLEANING="${1:-no}"
 FILE_OUT="${2:-filelist.txt}"
-BUILD_VARIANTS="${1:-lepotato bananapi}"
+BUILD_VARIANTS="${3:-lepotato bananapi}"
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 
