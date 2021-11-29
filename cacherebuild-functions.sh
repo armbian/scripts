@@ -39,8 +39,11 @@ display_alert()
 function boards
 {
 
-    # we only need to select one 32 and one 64bit board
+    # we only need to select one 32 and one 64bit board    
     local TARGETS=(lepotato bananapi)
+    
+    [[ -n $3 ]] && TARGETS=($3)
+    
     for h in "${TARGETS[@]}"
     do
 
