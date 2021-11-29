@@ -32,6 +32,7 @@ DAYINMONTH=$(date -d "$D" '+%d' | sed 's/\<0//g')
 REBUILDDAY=$(date -d "${MONTH}/1 + 1 month - ${DAYSBEFORE} day" "+%d")
 MEM_INFO=$(($(LC_ALL=C free -w 2>/dev/null | grep "^Mem" | awk '{print $2}' || LC_ALL=C free | grep "^Mem"| awk '{print $2}')/1024))
 r=0
+truncate --size=0 ${FILE_OUT}
 
 # jump to build script folder
 cd ${BLTPATH}
