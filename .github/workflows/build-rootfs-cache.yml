@@ -25,7 +25,7 @@ jobs:
 
   Prepare:
 
-    name: find targets
+    name: targets
     runs-on: [self-hosted, Linux, cache]
     if: ${{ github.repository_owner == 'armbian' }}
     outputs:
@@ -106,7 +106,7 @@ jobs:
             echo $PARTS
             echo ::set-output name=matrix::$(for x in $(seq -w 1 $PARTS); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
-  Cache:
+  cache:
 
     needs: [ Prepare ]
     runs-on: [self-hosted, Linux, cache]

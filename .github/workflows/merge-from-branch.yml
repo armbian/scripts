@@ -17,7 +17,7 @@ jobs:
 
   Merge:
 
-    name: "Merge ${{ inputs.branch }} into nightly"
+    name: "master into ${{ inputs.branch }}"
     runs-on: [self-hosted, Linux]
     if: ${{ github.repository_owner == 'Armbian' }}
 
