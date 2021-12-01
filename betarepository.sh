@@ -4,6 +4,7 @@
 PULL_FROM="master"
 
 # load config file to override default values
+# shellcheck source=betarepository.conf
 [[ -f betarepository.conf ]] && source betarepository.conf
 
 # delete lock file after 6  hours
