@@ -6,7 +6,7 @@ PULL_FROM="master"
 # load config file to override default values
 [[ -f betarepository.conf ]] && source betarepository.conf
 
-# delete lock file after 6 hours
+# delete lock file after 6  hours
 sudo find /run -name nightly-repo -type f -mmin +1440 -delete
 
 # exit if kernel update is running
