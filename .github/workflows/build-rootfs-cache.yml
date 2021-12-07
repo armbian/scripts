@@ -5,9 +5,12 @@ on:
   workflow_call:
     inputs:
       rootfsarch:
-        required: true
-        type: string
+       required: true
+       type: string
       branch:
+       required: true
+       type: string
+      runner:
         required: true
         type: string
     secrets:
@@ -26,7 +29,7 @@ jobs:
   Prepare:
 
     name: targets
-    runs-on: [self-hosted, Linux, cache]
+    runs-on: [self-hosted, Linux, cache, "${{ inputs.runner }}"]
     if: ${{ github.repository_owner == 'armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
@@ -109,7 +112,7 @@ jobs:
   cache:
 
     needs: [ Prepare ]
-    runs-on: [self-hosted, Linux, cache]
+    runs-on: [self-hosted, Linux, cache, "${{ inputs.runner }}" ]
     if: ${{ github.repository_owner == 'armbian' }}
     timeout-minutes: 480
     strategy:
