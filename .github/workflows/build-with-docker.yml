@@ -73,17 +73,3 @@ jobs:
           repository: armbian/build
           path: build
           clean: true
-
-    name: Sub
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          repository: armbian/build
-          path: build
-          clean: true
-
-
