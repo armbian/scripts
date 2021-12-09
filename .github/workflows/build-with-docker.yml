@@ -46,7 +46,7 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run:
-          MATRIX=$(cat config/targets.conf | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq)
+          MATRIX=$(cat build/config/targets.conf | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq)
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   gradle:
@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: ${{fromJson(needs.Prepare.outputs.matrix)}}
+        board: ${{fromJson(needs.Prepare.outputs.matrix)}}
         release: [focal,buster,bullseye,hirsute,jammy]
         desktop: [xfce]
     #if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
