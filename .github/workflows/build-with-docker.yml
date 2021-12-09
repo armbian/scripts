@@ -47,9 +47,8 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run:
-          MATRIX=$(cat build/config/targets.conf | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq)
-          echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)          
-
+          echo ::set-output name=matrix::$(for x in $(cat build/config/targets.conf | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+       
   gradle:
     needs: Prepare
     strategy:
