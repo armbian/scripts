@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        board: [uefi-arm64,uefi-x86,virtual-qemu]
+        board: [uefi-x86]
         release: [focal,buster,bullseye,hirsute,jammy]
         desktop: [xfce]
     #if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
@@ -44,3 +44,33 @@ jobs:
           repository: armbian/build
           path: build
           clean: true
+
+final:
+  gradle:
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [uefi-arm64]
+        release: [focal,buster,bullseye,hirsute,jammy]
+        desktop: [xfce]
+    #if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
+    name: Variant
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/build
+          path: build
+          clean: true
+
+
+
+
+
+
+
+
+
