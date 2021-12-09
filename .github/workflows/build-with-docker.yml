@@ -88,8 +88,6 @@ jobs:
       - name: Build
         run: |
 
-          mkdir -p build/userpatches
-          cp scripts/configs/* build/userpatches/
           cd build
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
