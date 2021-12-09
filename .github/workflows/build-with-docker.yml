@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        board: ${{fromJson(needs.Prepare.outputs.matrix)}}
+        node: ${{fromJson(needs.Prepare.outputs.matrix)}}
         release: [focal,buster,bullseye,hirsute,jammy]
         desktop: [xfce]
     #if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
