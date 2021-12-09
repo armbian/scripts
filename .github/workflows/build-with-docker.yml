@@ -44,7 +44,7 @@ jobs:
         id: list_dirs
         run: |
 
-          echo ::set-output name=matrix::$(for x in $(cat build/config/${{ inputs.variant }} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' ); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo ::set-output name=matrix::$(for x in $(cat build/config/${{ inputs.variant }} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   image:
     needs: Prepare
@@ -62,4 +62,5 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
+          ref: nightly
           clean: true
