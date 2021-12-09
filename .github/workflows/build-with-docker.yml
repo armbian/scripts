@@ -85,15 +85,15 @@ jobs:
 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')
 
-      - name: Import GPG key
+#      - name: Import GPG key
 
-        uses: crazy-max/ghaction-import-gpg@v3
-        with:
-          gpg-private-key: ${{ inputs.GPG_KEY1 }}
-          passphrase: ${{ inputs.GPG_PASSPHRASE1 }}
-          workdir: scripts
-          git-user-signingkey: true
-          git-commit-gpgsign: true
+#        uses: crazy-max/ghaction-import-gpg@v3
+#        with:
+#          gpg-private-key: ${{ inputs.GPG_KEY1 }}
+#          passphrase: ${{ inputs.GPG_PASSPHRASE1 }}
+#          workdir: scripts
+#          git-user-signingkey: true
+#          git-commit-gpgsign: true
 
       - name: Build
         run: |
@@ -129,3 +129,12 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
+      - name: Upload artefacts
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/output/images/Armbian*
+          tag: "${BOARD}/archive"
+          overwrite: true
+          file_glob: true
+          body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
