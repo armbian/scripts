@@ -88,6 +88,7 @@ jobs:
       - name: Build
         run: |
 
+          export TERM=dumb
           cd build
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
@@ -111,8 +112,6 @@ jobs:
           KERNEL_CONFIGURE="no" \
           BOARD="$BOARD" \
           BRANCH="$BRANCH" \
-          SKIP_EXTERNAL_TOOLCHAINS="yes" \
-          OFFLINE_WORK="yes" \
           REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
