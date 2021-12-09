@@ -12,6 +12,9 @@ on:
       runner:
         required: true
         type: string
+      jobs:
+        required: true
+        type: string
     secrets:
       GPG_KEY1:
         required: false
@@ -48,7 +51,7 @@ jobs:
         id: list_dirs
         run: |
 
-echo "${{ github.event.inputs.jobs }}"
+          echo "${{ github.event.inputs.jobs }}"
 
           PREFIX="-desktop"
           if [[ "${{ github.event.inputs.branch }}" == "nightly" ]]; then
