@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      variant:
+       required: true
+       type: string
       rootfsarch:
        required: true
        type: string
@@ -10,9 +13,6 @@ on:
        required: true
        type: string
       runner:
-        required: true
-        type: string
-      jobs:
         required: true
         type: string
     secrets:
@@ -51,13 +51,7 @@ jobs:
         id: list_dirs
         run: |
 
-          echo "${{ github.event.inputs.jobs }}"
-
-          PREFIX="-desktop"
-          if [[ "${{ github.event.inputs.branch }}" == "nightly" ]]; then
-             PREFIX="-cli-beta"
-          fi
-          echo ::set-output name=matrix::$(for x in $(cat build/config/targets${PREFIX}.conf | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo ::set-output name=matrix::$(for x in $(cat build/config/${{ github.event.inputs.branch }} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   gradle:
     needs: Prepare
