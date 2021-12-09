@@ -51,7 +51,7 @@ jobs:
         id: list_dirs
         run: |
 
-          echo ::set-output name=matrix::$(for x in $(cat build/config/${{ github.event.inputs.rootfsarch }} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo ::set-output name=matrix::$(for x in $(cat build/config/${{ github.event.inputs.branch }} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   gradle:
     needs: Prepare
