@@ -105,6 +105,7 @@ jobs:
           ./compile.sh docker \
           BETA="yes" \
           RELEASE="${RELEASE}" \
+          KERNEL_ONLY="no" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="$DESKTOP_ENVIRONMENT_CONFIG_NAME" \
           BUILD_DESKTOP="$BUILD_DESKTOP" \
           BUILD_MINIMAL="$BUILD_MINIMAL" \
