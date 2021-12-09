@@ -6,12 +6,6 @@ on:
       variant:
        required: true
        type: string
-      rootfsarch:
-       required: true
-       type: string
-      branch:
-       required: true
-       type: string
       runner:
         required: true
         type: string
@@ -61,8 +55,8 @@ jobs:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
     #if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
-    name: Variant
-    runs-on: ubuntu-latest    
+    #name: Variant
+    runs-on: ${{ inputs.runner }}    
     steps:
 
       - name: Checkout repository
