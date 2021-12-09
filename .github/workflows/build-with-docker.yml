@@ -45,8 +45,7 @@ jobs:
           path: build
           clean: true
 
-final:
-  gradle:
+  final:
     strategy:
       fail-fast: false
       matrix:
