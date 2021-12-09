@@ -48,7 +48,9 @@ jobs:
         id: list_dirs
         run: |
 
-          PREFIX="-cli-desktop"
+echo "${{ github.event.inputs.jobs }}"
+
+          PREFIX="-desktop"
           if [[ "${{ github.event.inputs.branch }}" == "nightly" ]]; then
              PREFIX="-cli-beta"
           fi
