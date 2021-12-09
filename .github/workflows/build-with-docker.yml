@@ -11,15 +11,15 @@ on:
         type: string
     secrets:
       GPG_KEY1:
-        required: false
+        required: true
       GPG_PASSPHRASE1:
-        required: false
+        required: true
       GPG_KEY2:
-        required: false
+        required: true
       GPG_PASSPHRASE2:
-        required: false
+        required: true
       SCRIPTS_ACCESS_TOKEN:
-        required: false
+        required: true
 
 jobs:
 
