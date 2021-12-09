@@ -50,6 +50,7 @@ jobs:
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   gradle:
+    needs: Prepare
     strategy:
       fail-fast: false
       matrix:
