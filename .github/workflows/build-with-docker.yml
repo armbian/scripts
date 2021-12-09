@@ -9,21 +9,17 @@ on:
       runner:
         required: true
         type: string
+    secrets:
       GPG_KEY1:
         required: true
-        type: string
       GPG_PASSPHRASE1:
         required: true
-        type: string
       GPG_KEY2:
         required: true
-        type: string
       GPG_PASSPHRASE2:
         required: true
-        type: string
       SCRIPTS_ACCESS_TOKEN:
         required: true
-        type: string
 
 jobs:
 
