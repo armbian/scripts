@@ -9,7 +9,6 @@ on:
       runner:
         required: true
         type: string
-    secrets:
       GPG_KEY1:
         required: true
       GPG_PASSPHRASE1:
@@ -89,8 +88,8 @@ jobs:
 
         uses: crazy-max/ghaction-import-gpg@v3
         with:
-          gpg-private-key: ${{ secrets.GPG_KEY1 }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
+          gpg-private-key: ${{ input.GPG_KEY1 }}
+          passphrase: ${{ input.GPG_PASSPHRASE1 }}
           workdir: scripts
           git-user-signingkey: true
           git-commit-gpgsign: true
