@@ -27,7 +27,6 @@ jobs:
 
     name: targets
     runs-on: ubuntu-latest
-    #if: ${{ github.repository_owner == 'armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
@@ -39,7 +38,7 @@ jobs:
           repository: armbian/build
           path: build
           ref: nightly
-          clean: false
+          clean: true
 
       - name: Prepare matrix
         id: list_dirs
@@ -47,15 +46,13 @@ jobs:
 
           echo ::set-output name=matrix::$(for x in $(cat build/config/${{ inputs.variant }} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
-  gradle:
+  image:
     needs: Prepare
     strategy:
       fail-fast: false
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    #if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
-    #name: Variant
     runs-on: ${{ inputs.runner }}    
     steps:
 
