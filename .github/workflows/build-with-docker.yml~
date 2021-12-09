@@ -47,8 +47,7 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run:
-          PREFIX="-cli-desktop"
-          [[ "${{ github.event.inputs.branch }}" == "nightly" ]] && PREFIX="-cli-beta"
+          [[ "${{ github.event.inputs.branch }}" == nightly ]] && PREFIX="-cli-beta"
           echo ::set-output name=matrix::$(for x in $(cat build/config/targets${PREFIX}.conf | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   gradle:
