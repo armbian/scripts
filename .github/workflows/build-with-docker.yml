@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     #if: ${{ github.repository_owner == 'armbian' }}
     outputs:
-      matrix: ${{steps.list_dirs.outputs.matrix}}
+      matrix: ${{steps.list_dirs.outputs.matric}}
     steps:
 
       - name: Checkout repository
