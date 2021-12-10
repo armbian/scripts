@@ -54,7 +54,7 @@ jobs:
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: [self-hosted, Linux, "${{ inputs.runner }}"]
+    runs-on: ["${{ inputs.runner }}"]
     steps:
 
       - name: Checkout repository
