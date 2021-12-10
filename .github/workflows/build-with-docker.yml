@@ -38,7 +38,7 @@ jobs:
           repository: armbian/build
           path: build
           ref: nightly
-          clean: true
+          clean: false
 
       - name: Prepare matrix
         id: list_dirs
@@ -64,7 +64,7 @@ jobs:
           repository: armbian/build
           path: build
           ref: nightly
-          clean: true
+          clean: false
 
       - name: Checkout support scripts
         uses: actions/checkout@v2
@@ -72,7 +72,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/scripts
           path: scripts
-          clean: true
+          clean: false
 
       - name: Purge
         uses: dev-drprasad/delete-older-releases@v0.2.0
