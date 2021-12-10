@@ -103,6 +103,7 @@ jobs:
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
+          echo "BOARD=$BOARD" >> $GITHUB_ENV
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
           <<< $(cat config/${{ inputs.variant }} | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED//,/ }"
@@ -133,7 +134,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/output/images/Armbian*
-          tag: "${BOARD}/archive"
+          tag: "${{ env.BOARD }}/archive"
           overwrite: true
           file_glob: true
           body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
