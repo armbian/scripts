@@ -83,6 +83,7 @@ jobs:
       - name: Pull Docker image
         run: |
 
+          sudo apt-get -yy install docker containerd docker.io
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')
 
 #      - name: Import GPG key
