@@ -74,6 +74,14 @@ jobs:
           path: scripts
           clean: true
 
+      - name: Purge
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          repo: armbian/distribution
+          keep_latest: 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Sync
         run: |
 
