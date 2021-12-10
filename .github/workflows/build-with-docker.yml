@@ -124,7 +124,6 @@ jobs:
           KERNEL_CONFIGURE="no" \
           BOARD="$BOARD" \
           BRANCH="$BRANCH" \
-          GPG_PASS="${{ secrets.GPG_PASSPHRASE1 }}" \
           REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
