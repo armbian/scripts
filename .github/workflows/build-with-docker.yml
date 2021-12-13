@@ -46,8 +46,13 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run: |
-          printenv
-          echo ::set-output name=matrix::$(for x in $(split --number=l/${{ inputs.part }}/3 <<< $(cat build/config/${{ inputs.variant }} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d":" -f2,3)); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          var="${{ inputs.part }}"
+          if [[ "$var" != *beta ]]; then
+            FILENAME="targets.conf | grep ${var%:*}"
+          else
+            FILENAME="targets-${var%:*}-${var#*:}.conf"          
+          fi
+          echo ::set-output name=matrix::$(for x in $(split --number=l/${{ inputs.part }}/3 <<< $(cat build/config/${FILENAME} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d":" -f2,3)); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   image:
     needs: Prepare
@@ -135,16 +140,20 @@ jobs:
               sudo mkdir -p cache/toolchain build/cache/rootfs || true
               ! sudo mountpoint -q cache/toolchain && sudo mount nas:/tank/armbian/toolchain.armbian.com cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
               ! sudo mountpoint -q cache/rootfs && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
-          #else
-          #    sudo rsync --size-only --delete -avr rsync://rsync.armbian.com/dl/_rootfs/. cache/rootfs/ || true
           fi
           
+          var="${{ inputs.part }}"
+          if [[ "$var" != *beta ]]; then
+            FILENAME="targets.conf | grep ${var%:*}"
+          else
+            FILENAME="targets-${var%:*}-${var#*:}.conf"          
+          fi
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
           echo "BOARD=$BOARD" >> $GITHUB_ENV
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
-          <<< $(cat config/${{ inputs.variant }} | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')
+          <<< $(cat config/${FILENAME} | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED//,/ }"
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
