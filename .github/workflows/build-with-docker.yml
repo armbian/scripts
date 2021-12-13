@@ -12,6 +12,9 @@ on:
       part:
         required: true
         type: number
+      upload:
+        required: true
+        type: boolean
     secrets:
       GPG_KEY1:
         required: true
@@ -182,6 +185,7 @@ jobs:
           EXPERT="yes"
 
       - name: Upload artefacts
+        if: inputs.upload == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
