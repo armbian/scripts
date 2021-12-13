@@ -131,6 +131,18 @@ jobs:
 #          git-user-signingkey: true
 #          git-commit-gpgsign: true
 
+      - name: Check if file exist
+        run: |
+        
+          cd build
+          CHUNK="${{ matrix.node }}"
+          LINE=$(echo $CHUNK | cut -d":" -f1)
+          BOARD=$(echo $CHUNK | cut -d":" -f2)
+          echo "BOARD=$BOARD" >> $GITHUB_ENV
+          read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
+          <<< $(cat config/${FILENAME} | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')                    
+          echo "${BOARD}/${RELEASE_PATH}/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}${DESKTOP_ENVIRONMENT:+_${DESKTOP_ENVIRONMENT}_desktop}.img.gz"
+        
       - name: Build
         run: |
 
