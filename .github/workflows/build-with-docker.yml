@@ -208,10 +208,15 @@ jobs:
           EXPERT="yes"
 
           # future download URL
-          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${BOARD}/${FOLDER}/$(ls -1 output/images/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}*.img.xz)"
+          FILE="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${BOARD}/${FOLDER}/$(ls -1 output/images/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}*.img.xz | xargs -n 1 basename)"
+
+          # save upload API calls
+          if ! wget -q --spider --timeout=15 --tries=3 --retry-connrefused ${FILE} ; then
+              echo "UPLOAD=true" >> $GITHUB_ENV
+          fi
 
       - name: Upload artefacts
-        if: inputs.uploading == 'true'
+        if: inputs.uploading == 'true' && env.UPLOAD == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
