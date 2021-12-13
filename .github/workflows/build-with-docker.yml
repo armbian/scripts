@@ -46,13 +46,14 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run: |
-          var="${{ inputs.part }}"
+          var="${{ inputs.variant }}"
           if [[ "$var" != *beta ]]; then
             FILENAME="targets.conf | grep ${var%:*}"
           else
-            FILENAME="targets-${var%:*}-${var#*:}.conf"          
+            FILENAME="targets-${var%:*}-${var#*:}.conf"
           fi
-          echo ::set-output name=matrix::$(for x in $(split --number=l/${{ inputs.part }}/3 <<< $(cat build/config/${FILENAME} | grep -v "^$" | grep -v "^#" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d":" -f2,3)); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          COMMAND="split --number=l/${{ inputs.part }}/3 <<< $(cat build/config/${FILENAME} | grep -v \"^$\" | grep -v \"^#\" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
+          echo ::set-output name=matrix::$(for x in $(eval $COMMAND)); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   image:
     needs: Prepare
