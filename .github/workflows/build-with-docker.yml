@@ -205,6 +205,9 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
+          # future download URL
+          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${BOARD}/${FOLDER}/$(ls -1 output/images/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}*.img.xz)"
+
       - name: Upload artefacts
         if: inputs.uploading == 'true'
         uses: svenstaro/upload-release-action@v2
