@@ -47,10 +47,10 @@ jobs:
         id: list_dirs
         run: |
           var="${{ inputs.variant }}"
-          if [[ "$var" != *beta ]]; then
-            FILENAME="targets.conf | grep ${var%:*}"
+          if [[ "$var" != *stable ]]; then
+            FILENAME="targets-${var%:*}-beta.conf"
           else
-            FILENAME="targets-${var%:*}-${var#*:}.conf"
+            FILENAME="targets.conf | grep ${var%:*}"
           fi
           COMMAND="split --number=l/${{ inputs.part }}/3 <<< \$(cat build/config/${FILENAME} | grep -v \"^\$\" | grep -v \"^#\" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3)"          
           echo ::set-output name=matrix::$(for x in $(eval $COMMAND); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
@@ -143,12 +143,13 @@ jobs:
               ! sudo mountpoint -q cache/rootfs && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
           fi
           
-          var="${{ inputs.part }}"
-          if [[ "$var" != *beta ]]; then
-            FILENAME="targets.conf | grep ${var%:*}"
+          var="${{ inputs.variant }}"
+          if [[ "$var" != *stable ]]; then
+            FILENAME="targets-${var%:*}-beta.conf"
           else
-            FILENAME="targets-${var%:*}-${var#*:}.conf"          
+            FILENAME="targets.conf | grep ${var%:*}"
           fi
+          
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
