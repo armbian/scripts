@@ -9,6 +9,11 @@ on:
       runner:
         required: true
         type: string
+      part:
+        required: true
+        type: number
+      uploading:
+        type: string
     secrets:
       GPG_KEY1:
         required: true
@@ -43,9 +48,14 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run: |
-
-          echo ::set-output name=matrix::$(for x in $(cat build/config/${{ inputs.variant }} | grep -v "^$" | \
-          grep -v "^#" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d":" -f2,3); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          var="${{ inputs.variant }}"
+          if [[ "$var" != *stable ]]; then
+            FILENAME="targets-${var%:*}-beta.conf"
+          else
+            FILENAME="targets.conf | grep ${var%:*}"
+          fi
+          COMMAND="split --number=l/${{ inputs.part }}/3 <<< \$(cat build/config/${FILENAME} | grep -v \"^\$\" | grep -v \"^#\" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3)"          
+          echo ::set-output name=matrix::$(for x in $(eval $COMMAND); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   image:
     needs: Prepare
@@ -120,7 +130,7 @@ jobs:
 #          workdir: scripts
 #          git-user-signingkey: true
 #          git-commit-gpgsign: true
-
+        
       - name: Build
         run: |
 
@@ -133,16 +143,23 @@ jobs:
               sudo mkdir -p cache/toolchain build/cache/rootfs || true
               ! sudo mountpoint -q cache/toolchain && sudo mount nas:/tank/armbian/toolchain.armbian.com cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
               ! sudo mountpoint -q cache/rootfs && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
-          #else
-          #    sudo rsync --size-only --delete -avr rsync://rsync.armbian.com/dl/_rootfs/. cache/rootfs/ || true
           fi
           
+          var="${{ inputs.variant }}"
+          if [[ "$var" != *stable ]]; then
+            FILENAME="targets-${var%:*}-beta.conf"
+            FOLDER=nightly
+          else
+            FILENAME="targets.conf | grep ${var%:*}"
+            FOLDER=archive
+          fi
+          echo "FOLDER=$FOLDER" >> $GITHUB_ENV
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
           echo "BOARD=$BOARD" >> $GITHUB_ENV
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
-          <<< $(cat config/${{ inputs.variant }} | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')
+          <<< $(cat config/${FILENAME} | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED//,/ }"
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
@@ -168,12 +185,21 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
+          # future download URL
+          FILE="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${BOARD}/${FOLDER}/$(ls -1 output/images/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}*.img.xz | xargs -n 1 basename)"
+
+          # save upload API calls
+          if ! wget -q --spider --timeout=15 --tries=3 --retry-connrefused ${FILE} ; then
+              echo "UPLOAD=true" >> $GITHUB_ENV
+          fi
+
       - name: Upload artefacts
+        if: inputs.uploading == 'true' && env.UPLOAD == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/output/images/Armbian*
-          tag: "${{ env.BOARD }}/nightly"
+          tag: "${{ env.BOARD }}/${{ env.FOLDER }}"
           overwrite: true
           file_glob: true
           body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
