@@ -151,7 +151,7 @@ jobs:
           BOARD=$(echo $CHUNK | cut -d":" -f2)
           echo "BOARD=$BOARD" >> $GITHUB_ENV
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED <<< $(cat config/${FILENAME} | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')                    
-          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${BOARD}/${FOLDER}/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}${DESKTOP_ENVIRONMENT:+_${DESKTOP_ENVIRONMENT}_desktop}.img.gz"
+          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${BOARD}/${FOLDER}/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}${DESKTOP_ENVIRONMENT:+_${DESKTOP_ENVIRONMENT}_desktop}.img.gz"
         
       - name: Build
         run: |
