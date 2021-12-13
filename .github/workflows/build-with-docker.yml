@@ -54,7 +54,7 @@ jobs:
           else
             FILENAME="targets.conf | grep ${var%:*}"
           fi
-          COMMAND="split --number=l/${{ inputs.part }}/3 <<< \$(cat build/config/${FILENAME} | grep -v \"^\$\" | grep -v \"^#\" |  cut -f1 -d ' ' | pr -t -n3 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3)"          
+          COMMAND="split --number=l/${{ inputs.part }}/3 <<< \$(cat build/config/${FILENAME} | grep -v \"^\$\" | grep -v \"^#\" |  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3)"          
           echo ::set-output name=matrix::$(for x in $(eval $COMMAND); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   image:
