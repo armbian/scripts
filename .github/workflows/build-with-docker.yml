@@ -9,6 +9,9 @@ on:
       runner:
         required: true
         type: string
+      part:
+        required: true
+        type: number
     secrets:
       GPG_KEY1:
         required: true
