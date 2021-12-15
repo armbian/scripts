@@ -34,6 +34,10 @@ on:
         required: true
       SCRIPTS_ACCESS_TOKEN:
         required: true
+      SSH_KEY_TORRENTS: 
+        required: true
+      KNOWN_HOSTS_UPLOAD:
+        required: true
 
 jobs:
 
@@ -198,7 +202,7 @@ jobs:
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.KEY_TORRENTS }}
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
