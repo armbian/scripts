@@ -208,23 +208,8 @@ jobs:
 
       - name: Deploy to server
         run: |
-          sudo apt-get -y -qq install lftp
-          sudo chown -R $USER:$USER $(pwd)/build/output/images/
+          sudo apt-get -y -qq install lftp          
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
-
-
-
-
-          # future download URL
-          FILE="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${BOARD}/${FOLDER}/$(ls -1 output/images/Armbian_$(cat VERSION)_${BOARD^}_${RELEASE}_${BRANCH}*.img.xz | xargs -n 1 basename)"
-
-          # save upload API calls
-          if ! wget -q --spider --timeout=15 --tries=3 --retry-connrefused ${FILE} ; then
-              echo "UPLOAD=true" >> $GITHUB_ENV
-          fi
-
-
-
 
       - name: Upload artefacts
         if: inputs.uploading == 'true' && env.UPLOAD == 'true'
