@@ -53,7 +53,7 @@ jobs:
         id: list_dirs
         run: |
 
-          COMMAND="cat build/config/target*.conf | grep -v \"^$\" | grep -v \"^#\" | \${{ inputs.include }} \${{ inputs.exclude }} sed 's/\s\s*/ /g' | cut -d' ' -f1,2 | sed 's/ /:/g' | sort | uniq"
+          COMMAND="cat build/config/target*.conf | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed 's/\s\s*/ /g' | cut -d' ' -f1,2 | sed 's/ /:/g' | sort | uniq"
           echo ::set-output name=matrix::$(for x in $(eval $COMMAND); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   U-boot:
