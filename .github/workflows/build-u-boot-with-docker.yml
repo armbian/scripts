@@ -135,16 +135,7 @@ jobs:
               ! sudo mountpoint -q cache/toolchain && sudo mount nas:/tank/armbian/toolchain.armbian.com cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
               ! sudo mountpoint -q cache/rootfs && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
           fi
-          
-          var="${{ inputs.variant }}"
-          if [[ "$var" != *stable ]]; then
-            FILENAME="targets-${var%:*}-beta.conf"
-            FOLDER=nightly
-          else
-            FILENAME="targets.conf | grep ${var%:*}"
-            FOLDER=archive
-          fi
-          echo "FOLDER=$FOLDER" >> $GITHUB_ENV
+         
           CHUNK="${{ matrix.node }}"
           BOARD=$(echo $CHUNK | cut -d":" -f1)
           BRANCH=$(echo $CHUNK | cut -d":" -f2)
