@@ -3,18 +3,9 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
-      variant:
-       required: true
-       type: string
       runner:
         required: true
         type: string
-      part:
-        required: true
-        type: number
-      of:
-        required: true
-        type: number
       include:
         required: false
         type: string
