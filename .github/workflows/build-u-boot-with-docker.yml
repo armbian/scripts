@@ -153,7 +153,7 @@ jobs:
           BRANCH="$BRANCH" \
           KERNEL_CONFIGURE="no" \
           OFFLINE="no" \
-          REPOSITORY_INSTALL="armbian-firmware,kernel,armbian-firmware" \          
+          REPOSITORY_INSTALL="armbian-firmware,kernel,armbian-firmware" \
           EXPERT="yes"
 
       - name: Install SSH key for storage
