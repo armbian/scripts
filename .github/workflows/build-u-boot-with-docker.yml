@@ -82,20 +82,20 @@ jobs:
           repository: armbian/scripts
           path: scripts
           clean: false
+        
+      - name: Pull Docker image
+        run: |
+
+          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
+          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
 
       - name: Sync
         run: |
 
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
-          
-      - name: Pull Docker image
-        run: |
 
-          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')
-          
       - name: Fix permissions
         run: |
 
