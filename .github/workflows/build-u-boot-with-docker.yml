@@ -149,6 +149,7 @@ jobs:
           BOARD="$BOARD" \
           PRIVATE_CCACHE="yes" \
           BETA="yes" \
+          USE_TORRENT="yes" \
           KERNEL_ONLY="yes" \
           BRANCH="$BRANCH" \
           KERNEL_CONFIGURE="no" \
