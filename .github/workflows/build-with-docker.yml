@@ -196,7 +196,7 @@ jobs:
           MAKE_FOLDERS="yes" \
           ARMBIAN_CACHE_TOOLCHAIN_PATH="${ARMBIAN_CACHE_TOOLCHAIN_PATH}" \
           ARMBIAN_CACHE_ROOTFS_PATH="${ARMBIAN_CACHE_ROOTFS_PATH}" \
-          REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware" \
+          REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
