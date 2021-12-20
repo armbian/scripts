@@ -86,12 +86,12 @@ jobs:
           done | sort -u -t: -k3,3 )
           
           mkdir -p build-kernel
-          echo "no" > build-kernel/skip          
-          unset MATRIX
+          echo "no" > build-kernel/skip
           if [[ -z "$MATRIX" ]]; then
               MATRIX="none:none:none"
               echo "yes" > build-kernel/skip
-          fi          
+          fi
+          MATRIX="none:none:none"
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   Linux:
