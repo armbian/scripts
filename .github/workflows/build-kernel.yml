@@ -29,14 +29,14 @@ jobs:
       - name: Determine changed kernels
         run: |
 
-            # fake function
-            enable_extension ()
-            {
-            return 0
-            }
+          # fake function
+          enable_extension ()
+          {
+          return 0
+          }
 
-            BOOTCONFIG=true
-            BETA=yes
+          BOOTCONFIG=true
+          BETA=yes
 
             OUT=$(for BRANCH in legacy current edge; do
 
