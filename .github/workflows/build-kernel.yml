@@ -1,0 +1,24 @@
+name: Build kernels
+on:
+  workflow_dispatch:
+
+  Prepare:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/build
+          path: build
+          ref: nightly
+          clean: false
+
+      - name: Checkout support scripts
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/scripts
+          path: scripts
+          clean: false
