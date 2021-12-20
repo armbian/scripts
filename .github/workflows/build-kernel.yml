@@ -6,6 +6,9 @@ jobs:
 
   Prepare:
     runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'Armbian' }}
+    outputs:
+      matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
       - name: Checkout repository
@@ -82,6 +85,44 @@ jobs:
                   done <<< "$FILES"
           done | sort -u -t: -k3,3 )
           while IFS= read -r line; do
-          MATRIX+="$line"
+          MATRIX+="$line\n"
           done <<< "$OUT"
-          for x in $(echo -e "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq
+          mkdir -p build-kernel
+          echo "no" > build-kernel/skip          
+          if [[ -z "$MATRIX" ]]; then
+              MATRIX="none:none:none"
+              echo "yes" > build-kernel/skip
+          fi          
+          echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+
+  Linux:
+
+    name: "Build Linux"
+    needs: [ Prepare ]
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'armbian' }}
+    timeout-minutes: 480
+    strategy:
+      fail-fast: false
+      matrix: 
+        node: ${{fromJson(needs.Prepare.outputs.matrix)}}
+
+    steps:
+
+      - name: Checkout Armbian support scripts
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/scripts
+          path: scripts
+          clean: true
+          
+      - name: Checkout Armbian build script
+
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/build
+          path: build
+          ref: ${{ github.event.pull_request.head.sha }}
+          clean: false
