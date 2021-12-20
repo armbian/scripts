@@ -93,7 +93,7 @@ jobs:
               MATRIX="none:none:none"
               echo "yes" > build-kernel/skip
           fi          
-          echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo ::set-output name=matrix::$(for x in $(echo -n "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   Linux:
 
