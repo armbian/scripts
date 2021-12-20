@@ -67,7 +67,6 @@ jobs:
                                     else
                                             ref_name=${KERNELBRANCH##*:}
                                     fi
-
                                     [[ -z $LINUXFAMILY ]] && LINUXFAMILY=$BOARDFAMILY
                                     [[ -z ${KERNELPATCHDIR} ]] && KERNELPATCHDIR=$LINUXFAMILY-$BRANCH
                                     [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
@@ -94,7 +93,7 @@ jobs:
                     done <<< "$FILES"
             done | sort -u -t: -k3,3 )
             while IFS= read -r line; do
-            MATRIX+="$line\n"
+            MATRIX+="$line"
             done <<< "$OUT"
 
             for x in $(echo -e "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq>
