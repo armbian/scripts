@@ -87,6 +87,7 @@ jobs:
           
           mkdir -p build-kernel
           echo "no" > build-kernel/skip          
+          unset MATRIX
           if [[ -z "$MATRIX" ]]; then
               MATRIX="none:none:none"
               echo "yes" > build-kernel/skip
