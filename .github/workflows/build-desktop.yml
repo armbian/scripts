@@ -39,6 +39,21 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           ref: nightly
+          
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        env:
+          cache-name: build-kernel
+        with:
+          path: build-kernel
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux            
+
+      - name: Read value
+        run: |
+          echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
+          echo ${{ env.SKIP }} 
 
       - name: Build desktops
         id: list_dirs
@@ -55,6 +70,7 @@ jobs:
               echo  "$i:$j"
             done
           done)
+          [[ "${{ env.SKIP }}" == "yes" ]] && unset MATRIX
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           
   Desktop:
