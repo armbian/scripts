@@ -127,6 +127,7 @@ jobs:
     steps:
 
       - name: Checkout Armbian support scripts
+        if: ${{ success() && github.repository_owner == 'Armbian' }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -135,7 +136,7 @@ jobs:
           clean: true
           
       - name: Checkout Armbian build script
-
+        if: ${{ success() && github.repository_owner == 'Armbian' }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -152,6 +153,7 @@ jobs:
           if_key_exists: replace
 
       - name: Fix permissions
+        if: ${{ success() && github.repository_owner == 'Armbian' }}
         run: |
 
           # make sure no temporally dirs are mounted from previous runs
@@ -173,6 +175,7 @@ jobs:
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Mount upload folders
+        if: ${{ success() && github.repository_owner == 'Armbian' }}
         run: |
          
           # mount deploy target
@@ -185,11 +188,13 @@ jobs:
           sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty
 
       - name: Sync
-        run: |
+        if: ${{ success() && github.repository_owner == 'Armbian' }}
+        run: |          
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
 
       - name: Pull Docker image
+        if: ${{ success() && github.repository_owner == 'Armbian' }}
         run: |
         
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
@@ -197,6 +202,7 @@ jobs:
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
 
       - name: Build
+        if: ${{ success() && github.repository_owner == 'Armbian' }}
         run: |
 
           CHUNK="${{ matrix.node }}"
@@ -215,6 +221,7 @@ jobs:
           KERNEL_ONLY="yes" \
           BRANCH="$BRANCH" \
           KERNEL_CONFIGURE="no" \
+          CLEAN_LEVEL="" \
           EXPERT="yes"
 
       - name: Unmount upload folders
