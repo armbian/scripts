@@ -1,7 +1,25 @@
 name: Build kernels
 on:
   workflow_dispatch:
-
+  workflow_call:
+    inputs:
+      uploading:
+        type: string
+    secrets:
+      GPG_KEY1:
+        required: true
+      GPG_PASSPHRASE1:
+        required: true
+      GPG_KEY2:
+        required: true
+      GPG_PASSPHRASE2:
+        required: true
+      SCRIPTS_ACCESS_TOKEN:
+        required: true
+      SSH_KEY_TORRENTS: 
+        required: true
+      KNOWN_HOSTS_UPLOAD:
+        required: true
 jobs:
 
   Prepare:
