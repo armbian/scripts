@@ -201,9 +201,9 @@ jobs:
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Mount upload folders
-        if: ${{ inputs.runner != "ubuntu-latest" }}
         run: |
-          
+        
+          echo ${{ inputs.runner }}
           # mount deploy target
           sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
