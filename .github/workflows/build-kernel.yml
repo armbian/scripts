@@ -244,8 +244,7 @@ jobs:
           EXPERT="yes"
 
           if [[ $? -eq 0 ]]; then
-              sudo mkdir -p ../build-kernel
-              cp cache/hash/*.git* ../build-kernel/ 2> /dev/null || true
+              sudo mkdir -p ../build-kernel              
               cp cache/hash-beta/*.git* ../build-kernel/ 2> /dev/null || true
           fi
 
