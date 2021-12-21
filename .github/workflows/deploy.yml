@@ -26,7 +26,7 @@ jobs:
   Deploy:
 
     name: Update kernel status
-    runs-on: ubuntu-latest
+    runs-on: fast
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
 
