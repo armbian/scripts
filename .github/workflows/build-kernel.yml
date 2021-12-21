@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      runner:
+        required: true
+        type: string
       uploading:
         type: string
       reference:
@@ -25,7 +28,7 @@ on:
 jobs:
 
   Prepare:
-    runs-on: small
+    runs-on: ${{ inputs.runner }}
     name: "Looking for changes"
     if: ${{ github.repository_owner == 'Armbian' }}
     outputs:
@@ -125,7 +128,7 @@ jobs:
   GCC:
 
     needs: [ Prepare ]
-    runs-on: fast    
+    runs-on: ${{ inputs.runner }}
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 480
     strategy:
