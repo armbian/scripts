@@ -117,17 +117,16 @@ jobs:
           
           mkdir -p build-kernel
           echo "no" > build-kernel/skip
-          if [[ -z "$MATRIX" ]]; then
-              MATRIX="none:none:none"
+          if [[ -z "$MATRIX" ]]; then              
               echo "yes" > build-kernel/skip
-          fi          
+          fi 
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   GCC:
 
     needs: [ Prepare ]
-    runs-on: fast
-    if: ${{ success() && github.repository_owner == 'Armbian' }}
+    runs-on: fast    
+    if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 480
     strategy:
       fail-fast: false
@@ -137,7 +136,7 @@ jobs:
     steps:
    
       - name: Checkout Armbian support scripts
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -146,7 +145,7 @@ jobs:
           clean: false
           
       - name: Checkout Armbian build script
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -167,7 +166,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
 
       - name: Install SSH key for storage
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_TORRENTS }}
@@ -175,7 +174,7 @@ jobs:
           if_key_exists: replace
 
       - name: Fix permissions
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         run: |
 
           # make sure no temporally dirs are mounted from previous runs
@@ -199,7 +198,7 @@ jobs:
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Mount upload folders
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         run: |
          
           # mount deploy target
@@ -212,7 +211,7 @@ jobs:
           sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty
 
       - name: Sync
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         run: |          
 
           mkdir -p build/userpatches build/cache/hash build/cache/hash-beta
@@ -222,7 +221,7 @@ jobs:
           sudo rsync -ar --delete scripts/hash-beta/. build/cache/hash-beta/ 2> /dev/null
 
       - name: Pull Docker image
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         run: |
         
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
@@ -230,7 +229,7 @@ jobs:
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
 
       - name: Build
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         run: |
 
           cd build
@@ -266,7 +265,7 @@ jobs:
           fi
 
       - name: Unmount folders
-        if: ${{ matrix.node != 'none:none:none' }}
+        
         run: |
          
             sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
