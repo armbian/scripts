@@ -81,7 +81,7 @@ jobs:
       name: "Build package"
       needs: [ Prepare ]
       runs-on: ubuntu-latest
-      if: ${{ env.SKIP }} != yes
+      if: env.SKIP != 'yes'
       timeout-minutes: 480
       strategy:
         fail-fast: false
