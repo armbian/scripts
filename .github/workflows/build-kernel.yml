@@ -135,11 +135,15 @@ jobs:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
     steps:
+   
+      - run: |
+          echo "${{ env.build }}"
 
       - name: Stop if nothing found
         run: |
         
-          [[ "${{ matrix.node }}" == "none:none:none" ]] && exit 1
+          [[ "${{ matrix.node }}" == "none:none:none" ]] && echo "build=false" >> $GITHUB_ENV
+          echo "${{ env.build }}"
 
       - name: Checkout Armbian support scripts
         
