@@ -206,7 +206,8 @@ jobs:
           BETA="yes" \
           KERNEL_ONLY="yes" \
           BRANCH="$BRANCH" \
-          KERNEL_CONFIGURE="no" \          
+          KERNEL_CONFIGURE="no" \
+          EXPERT="yes"
 
       - name: Unmount upload folders
         run: |
