@@ -1,0 +1,199 @@
+272aedd4a Linux 5.10.87
+8dd559d53 arm: ioremap: don't abuse pfn_valid() to check if pfn is in RAM
+65c578935 arm: extend pfn_valid to take into account freed memory map alignment
+6e634c0e7 memblock: ensure there is no overflow in memblock_overlaps_region()
+74551f13c memblock: align freed memory map on pageblock boundaries with SPARSEMEM
+b4b54c7ba memblock: free_unused_memmap: use pageblock units instead of MAX_ORDER
+b6a1cbd18 perf intel-pt: Fix error timestamp setting on the decoder error path
+0612aa02c perf intel-pt: Fix missing 'instruction' events with 'q' option
+71c795028 perf intel-pt: Fix next 'err' value, walking trace
+02681dd17 perf intel-pt: Fix state setting when receiving overflow (OVF) packet
+cbed09b44 perf intel-pt: Fix intel_pt_fup_event() assumptions about setting state type
+3bb7fd4be perf intel-pt: Fix sync state when a PSB (synchronization) packet is found
+731ff7884 perf intel-pt: Fix some PGE (packet generation enable/control flow packets) usage
+b23f9252a perf inject: Fix itrace space allowed for new attributes
+7c26da3be ethtool: do not perform operations on net devices being unregistered
+6992d8c21 hwmon: (dell-smm) Fix warning on /proc/i8k creation error
+c31470a30 fuse: make sure reclaim doesn't write the inode
+613725436 bpf: Fix integer overflow in argument calculation for bpf_map_area_alloc
+9099f3512 staging: most: dim2: use device release method
+ac76adc87 KVM: x86: Ignore sparse banks size for an "all CPUs", non-sparse IPI req
+6f0d9d3e7 tracing: Fix a kmemleak false positive in tracing_map
+f35f7f04a drm/amd/display: add connector type check for CRC source set
+dd3cea342 drm/amd/display: Fix for the no Audio bug with Tiled Displays
+dadce6124 net: netlink: af_netlink: Prevent empty skb by adding a check on len.
+bca6af432 i2c: rk3x: Handle a spurious start completion interrupt flag
+d6edec8a7 parisc/agp: Annotate parisc agp init functions with __init
+cf520ccff ALSA: hda/hdmi: fix HDA codec entry table order for ADL-P
+701a07fd0 ALSA: hda: Add Intel DG2 PCI ID and HDMI codec vid
+6d22a96d1 net/mlx4_en: Update reported link modes for 1/10G
+999069d8b Revert "tty: serial: fsl_lpuart: drop earlycon entry for i.MX8QXP"
+27f4ce02b s390/test_unwind: use raw opcode instead of invalid instruction
+9eab949e2 KVM: arm64: Save PSTATE early on exit
+990fd815e drm/msm/dsi: set default num_data_lanes
+c602863ad nfc: fix segfault in nfc_genl_dump_devices_done
+37050f17f Linux 5.10.86
+324144918 netfilter: selftest: conntrack_vrf.sh: fix file permission
+e4f2aee66 Linux 5.10.85
+47301c06f Documentation/Kbuild: Remove references to gcc-plugin.sh
+af5ba49cf MAINTAINERS: adjust GCC PLUGINS after gcc-plugin.sh removal
+ad13421fd doc: gcc-plugins: update gcc-plugins.rst
+9fc17c3af kbuild: simplify GCC_PLUGINS enablement in dummy-tools/gcc
+d428e5477 bpf: Add selftests to cover packet access corner cases
+0ec0eda3f misc: fastrpc: fix improper packet size calculation
+261d45a4c irqchip: nvic: Fix offset for Interrupt Priority Offsets
+cd946f0eb irqchip/irq-gic-v3-its.c: Force synchronisation when issuing INVALL
+e1c6611f8 irqchip/armada-370-xp: Fix support for Multi-MSI interrupts
+8f3ed9dea irqchip/armada-370-xp: Fix return value of armada_370_xp_msi_alloc()
+d530e9943 irqchip/aspeed-scu: Replace update_bits with write_bits.
+014c2fa5d csky: fix typo of fpu config macro
+ee86d0bad iio: accel: kxcjk-1013: Fix possible memory leak in probe and remove
+c10c53419 iio: ad7768-1: Call iio_trigger_notify_done() on error
+0f86c9e81 iio: adc: axp20x_adc: fix charging current reporting on AXP22x
+af7fbb8c0 iio: adc: stm32: fix a current leak by resetting pcsel before disabling vdda
+fff92f371 iio: at91-sama5d2: Fix incorrect sign extension
+a2545b147 iio: dln2: Check return value of devm_iio_trigger_register()
+69ae78c1a iio: dln2-adc: Fix lockdep complaint
+416383999 iio: itg3200: Call iio_trigger_notify_done() on error
+bc4d8367e iio: kxsd9: Don't return error code in trigger handler
+28ea539a3 iio: ltr501: Don't return error code in trigger handler
+db12d9508 iio: mma8452: Fix trigger reference couting
+4e7852911 iio: stk3310: Don't return error code in interrupt handler
+5c4a0f307 iio: trigger: stm32-timer: fix MODULE_ALIAS
+5de9c5b13 iio: trigger: Fix reference counting
+cbc04c0c9 iio: gyro: adxrs290: fix data signedness
+fee8be5bd xhci: avoid race between disable slot command and host runtime suspend
+1b43c9b65 usb: core: config: using bit mask instead of individual bits
+74b6a6a23 xhci: Remove CONFIG_USB_DEFAULT_PERSIST to prevent xHCI from runtime suspending
+ef284f086 usb: core: config: fix validation of wMaxPacketValue entries
+e4de8ca01 USB: gadget: zero allocate endpoint 0 buffers
+7193ad3e5 USB: gadget: detect too-big endpoint 0 requests
+63fc70bff selftests/fib_tests: Rework fib_rp_filter_test()
+126d1897c net/qla3xxx: fix an error code in ql_adapter_up()
+5e663bcd9 net, neigh: clear whole pneigh_entry at alloc time
+ae6738320 net: fec: only clear interrupt of handling queue in fec_enet_rx_queue()
+83b16b9c4 net: altera: set a couple error code in probe()
+385ffd31e net: cdc_ncm: Allow for dwNtbOutMaxSize to be unset or zero
+47322fddb tools build: Remove needless libpython-version feature check that breaks test-all fast path
+42bea3a1b dt-bindings: net: Reintroduce PHY no lane swap binding
+3f57215f7 Documentation/locking/locktypes: Update migrate_disable() bits.
+77d255d28 perf tools: Fix SMT detection fast read path
+391ca20ea Revert "PCI: aardvark: Fix support for PCI_ROM_ADDRESS1 on emulated bridge"
+e5b7fb219 i40e: Fix NULL pointer dereference in i40e_dbg_dump_desc
+347cc9b4d mtd: rawnand: fsmc: Fix timing computation
+0b2e1fccd mtd: rawnand: fsmc: Take instruction delay into account
+57f290572 i40e: Fix pre-set max number of queues for VF
+eb87117c2 i40e: Fix failed opcode appearing if handling messages from VF
+82ed3829c clk: imx: use module_platform_driver
+4d12546cf RDMA/hns: Do not destroy QP resources in the hw resetting phase
+33f320c35 RDMA/hns: Do not halt commands during reset until later
+4458938b2 ASoC: codecs: wcd934x: return correct value from mixer put
+1089dac26 ASoC: codecs: wcd934x: handle channel mappping list correctly
+83dae68fc ASoC: codecs: wsa881x: fix return values from kcontrol put
+62e4dc5e1 ASoC: qdsp6: q6routing: Fix return value from msm_routing_put_audio_mixer
+2f4764fe3 ASoC: rt5682: Fix crash due to out of scope stack vars
+bdd8129c6 PM: runtime: Fix pm_runtime_active() kerneldoc comment
+661c4412c qede: validate non LSO skb length
+c4d2d7c93 scsi: scsi_debug: Fix buffer size of REPORT ZONES command
+1e434d268 scsi: pm80xx: Do not call scsi_remove_host() in pm8001_alloc()
+5dfe61147 block: fix ioprio_get(IOPRIO_WHO_PGRP) vs setuid(2)
+5f1f94c26 tracefs: Set all files to the same group ownership as the mount option
+2ba0738f7 net: mvpp2: fix XDP rx queues registering
+47ffefd88 aio: fix use-after-free due to missing POLLFREE handling
+e4d19740b aio: keep poll requests on waitqueue until completed
+fc2f636ff signalfd: use wake_up_pollfree()
+9f3acee7e binder: use wake_up_pollfree()
+8e04c8397 wait: add wake_up_pollfree()
+2f8eb4c4c libata: add horkage for ASMedia 1092
+f76580d82 can: m_can: Disable and ignore ELO interrupt
+703dde112 can: pch_can: pch_can_rx_normal: fix use after free
+2737d0bc2 drm/syncobj: Deal with signalled fences in drm_syncobj_find_fence.
+17edb38e7 clk: qcom: regmap-mux: fix parent clock lookup
+172a98224 mmc: renesas_sdhi: initialize variable properly when tuning
+33204825c tracefs: Have new files inherit the ownership of their parent
+c520943a0 nfsd: Fix nsfd startup race (again)
+eeb071180 nfsd: fix use-after-free due to delegation race
+8b4264c27 md: fix update super 1.0 on rdev size change
+caf9b352d btrfs: replace the BUG_ON in btrfs_del_root_ref with proper error handling
+41b3cc57d btrfs: clear extent buffer uptodate when we fail to write it
+75490bcbd scsi: qla2xxx: Format log strings only if needed
+07977a3f3 ALSA: pcm: oss: Handle missing errors in snd_pcm_oss_change_params*()
+ad45babf7 ALSA: pcm: oss: Limit the period size to 16MB
+02b2b691b ALSA: pcm: oss: Fix negative period/buffer sizes
+6760e6dde ALSA: hda/realtek: Fix quirk for TongFang PHxTxX1
+7fe903d35 ALSA: hda/realtek - Add headset Mic support for Lenovo ALC897 platform
+3063ee516 ALSA: ctl: Fix copy of updated id with element read/write
+c58109022 mm: bdi: initialize bdi_min_ratio when bdi is unregistered
+06368922f KVM: x86: Wait for IPIs to be delivered when handling Hyper-V TLB flush hypercall
+2a51edaf5 net/sched: fq_pie: prevent dismantle issue
+4b7e90672 devlink: fix netns refcount leak in devlink_nl_cmd_reload()
+9d683d14f IB/hfi1: Correct guard on eager buffer deallocation
+2e2edebb5 iavf: Fix reporting when setting descriptor count
+aada0b3f3 iavf: restore MSI state on reset
+32a329b73 netfilter: conntrack: annotate data-races around ct->timeout
+5e39de85b udp: using datalen to cap max gso segments
+666521b38 seg6: fix the iif in the IPv6 socket control block
+484069b5d nfp: Fix memory leak in nfp_cpp_area_cache_add()
+b1830ede1 bonding: make tx_rebalance_counter an atomic
+a59df4ea7 ice: ignore dropped packets during init
+349e83c0c bpf: Fix the off-by-two error in range markings
+f26951db8 bpf, x86: Fix "no previous prototype" warning
+74685aaec vrf: don't run conntrack on vrf with !dflt qdisc
+d5cf399a6 selftests: netfilter: add a vrf+conntrack testcase
+83ea620a1 nfc: fix potential NULL pointer deref in nfc_genl_dump_ses_done
+f3d9114ac drm/amdkfd: fix boot failure when iommu is disabled in Picasso.
+7508a9aa6 drm/amdgpu: init iommu after amdkfd device init
+ac9db04ee drm/amdgpu: move iommu_resume before ip init/resume
+fe9dca7dd drm/amdgpu: add amdgpu_amdkfd_resume_iommu
+5d191b097 drm/amdkfd: separate kfd_iommu_resume from kfd_resume
+46dcf66d6 drm/amd/amdkfd: adjust dummy functions' placement
+dded8d76a x86/sme: Explicitly map new EFI memmap table as encrypted
+923f4dc5d can: sja1000: fix use after free in ems_pcmcia_add_card()
+819251da7 can: kvaser_pciefd: kvaser_pciefd_rx_error_frame(): increase correct stats->{rx,tx}_errors counter
+854a2bede can: kvaser_usb: get CAN clock frequency from device
+2c08271f4 IB/hfi1: Fix leak of rcvhdrtail_dummy_kvaddr
+d87c10607 IB/hfi1: Fix early init panic
+d60dd3685 IB/hfi1: Insure use of smp_processor_id() is preempt disabled
+05eb0e4a1 nft_set_pipapo: Fix bucket load in AVX2 lookup routine for six 8-bit groups
+89f3edc98 HID: check for valid USB device for many HID drivers
+889c39113 HID: wacom: fix problems when device is not a valid USB device
+6272b1700 HID: bigbenff: prevent null pointer dereference
+d877651af HID: add USB_HID dependancy on some USB HID drivers
+a7e9c5ddf HID: add USB_HID dependancy to hid-chicony
+28989ed4d HID: add USB_HID dependancy to hid-prodikeys
+611443296 HID: add hid_is_usb() function to make it simpler for USB detection
+2298d5edd HID: google: add eel USB id
+12362cd3a HID: quirks: Add quirk for the Microsoft Surface 3 type-cover
+cc97d7321 gcc-plugins: fix gcc 11 indigestion with plugins...
+1eee36a55 gcc-plugins: simplify GCC plugin-dev capability test
+518c3f98e usb: gadget: uvc: fix multiple opens
+a0582e24d Linux 5.10.84
+e6edaf267 ipmi: msghandler: Make symbol 'remove_work_wq' static
+a8d18fb4d net/tls: Fix authentication failure in CCM mode
+dbe73dace parisc: Mark cr16 CPU clocksource unstable on all SMP machines
+01300d215 iwlwifi: mvm: retry init flow if failed
+a5d0a72b8 serial: 8250: Fix RTS modem control while in rs485 mode
+f9802d704 serial: 8250_pci: rewrite pericom_do_set_divisor()
+50b06889c serial: 8250_pci: Fix ACCES entries in pci_serial_quirks array
+e1722acf4 serial: core: fix transmit-buffer reset and memleak
+bda142bbe serial: tegra: Change lower tolerance baud rate limit for tegra20 and tegra30
+901f7e0aa serial: pl011: Add ACPI SBSA UART match id
+946ded228 tty: serial: msm_serial: Deactivate RX DMA for polling support
+67d08450a x86/64/mm: Map all kernel memory into trampoline_pgd
+b3a519b5a x86/tsc: Disable clocksource watchdog for TSC on qualified platorms
+1ed4a8fd3 x86/tsc: Add a timer to make sure TSC_adjust is always checked
+a92f044a9 usb: typec: tcpm: Wait in SNK_DEBOUNCED until disconnect
+6d8c191bf USB: NO_LPM quirk Lenovo Powered USB-C Travel Hub
+90c915051 xhci: Fix commad ring abort, write all 64 bits to CRCR register.
+1235485c6 vgacon: Propagate console boot parameters before calling `vc_resize'
+92b9113c6 parisc: Fix "make install" on newer debian releases
+c27a548d3 parisc: Fix KBUILD_IMAGE for self-extracting kernel
+92f309c83 x86/entry: Add a fence for kernel entry SWAPGS in paranoid_entry()
+4bbbc9c4f x86/pv: Switch SWAPGS to ALTERNATIVE
+4d42b7bcf sched/uclamp: Fix rq->uclamp_max not set on first enqueue
+2015ffa3a x86/xen: Add xenpv_restore_regs_and_return_to_usermode()
+8b9279cad x86/entry: Use the correct fence macro after swapgs in kernel CR3
+c8e341191 x86/sev: Fix SEV-ES INS/OUTS instructions for word, dword, and qword
+64ca109bf KVM: VMX: Set failure code in prepare_vmcs02()
+60ce9a754 KVM: x86/pmu: Fix reserved bits for AMD PerfEvtSeln register
+cfebd5a27 atlantic: Remove warn trace message.
