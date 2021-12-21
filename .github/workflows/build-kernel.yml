@@ -274,7 +274,7 @@ jobs:
           echo ${{ inputs.uploading }}
 
       - name: Upload build artifacts
-        if: ${{ env.UPLOAD == true }}
+
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.FILE_NAME }}
