@@ -142,7 +142,7 @@ jobs:
       - name: Stop if nothing found
         run: |
         
-          [[ "${{ matrix.node }}" == "none:none:none" ]] && echo "build=false" >> $GITHUB_ENV
+          [[ "${{ matrix.node }}" == "none:none:none" ]] && echo "build=0" >> $GITHUB_ENV
           echo "${{ env.build }}"
 
       - name: Checkout Armbian support scripts
