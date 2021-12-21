@@ -272,13 +272,14 @@ jobs:
           echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
           echo "UPLOAD=true" >> $GITHUB_ENV
           echo ${{ inputs.uploading }}
+          sudo chown -R $USER:$USER output/debs-beta/linux-${BRANCH}-${FAMILY}*
 
       - name: Upload build artifacts
 
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.FILE_NAME }}
-          path: build/output/debs-beta/linux-${{ env.FILE_NAME }}*
+          path: build/output/debs-beta/linux-*${{ env.FILE_NAME }}*
           if-no-files-found: ignore
           retention-days: 30
 
