@@ -38,8 +38,10 @@ jobs:
         with:
           fetch-depth: 0
           repository: armbian/build
+          path: build
           ref: nightly
-          
+          clean: false
+
       - name: Cache Gradle packages
         uses: actions/cache@v2
         env:
@@ -60,16 +62,17 @@ jobs:
         run: |
 
           MATRIX=$(
-          set +e
-          releases=($(find config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
+          set +e          
+          releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
           for i in ${releases[@]}
           do	
-            environments=($([[ -d config/desktop/$i/environments ]] && ls -1 config/desktop/$i/environments))
+            environments=($([[ -d build/config/desktop/$i/environments ]] && ls -1 build/config/desktop/$i/environments))
             for j in ${environments[@]}
             do
               echo  "$i:$j"
             done
           done)
+
           [[ "${{ env.SKIP }}" == "yes" ]] && unset MATRIX
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           
