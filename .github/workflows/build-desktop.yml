@@ -27,7 +27,7 @@ jobs:
   Prepare:
 
     name: Find desktop variants
-    runs-on: ubuntu-latest
+    runs-on: small
     if: ${{ github.repository_owner == 'Armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
