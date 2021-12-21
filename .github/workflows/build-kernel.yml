@@ -184,6 +184,7 @@ jobs:
           BRANCH=$(echo $CHUNK | cut -d":" -f2)          
 
           export TERM=dumb
+          cd build
           ./compile.sh docker \
           ARMBIAN_MIRROR="https://github.com/armbian/mirror/releases/download/" \
           BOARD="$BOARD" \
