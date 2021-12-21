@@ -46,6 +46,14 @@ jobs:
           repository: armbian/scripts
           path: scripts
           clean: false
+          
+      - name: Cache build parameters
+        uses: actions/cache@v2
+        env:
+          cache-name: build-kernel
+        with:
+          path: build-kernel
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
 
 
       - name: Determine changed kernels
