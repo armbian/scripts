@@ -155,8 +155,7 @@ jobs:
           ref:  ${{ inputs.reference }}
           clean: false
 
-      - name: Cache Gradle packages
-        if: ${{ matrix.node != 'none:none:none' }}
+      - name: Cache Gradle packages        
         uses: actions/cache@v2
         env:
           cache-name: build-kernel
