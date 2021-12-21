@@ -61,9 +61,7 @@ jobs:
       - name: Update scripts
         run: |
 
-          ls -l build-kernel
-          if [[ "$(cat build-kernel/skip 2> /dev/null || true)" == "no" ]]; then
-          sudo rsync -ar --remove-source-files *.git* scripts/hash${{ env.FILE_EXT }}/ || true
+          sudo rsync -ar --remove-source-files build-kernel/*.git* scripts/hash-beta/ || true
           cd scripts
           sudo chown -R $USER:$USER .git
           if git status --porcelain | grep .; then
@@ -75,5 +73,4 @@ jobs:
              git add .
              git commit -m "Update hashes for ${{ env.FILE_DEST }} repository"
              git push
-          fi
           fi
