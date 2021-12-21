@@ -272,7 +272,7 @@ jobs:
           echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
           echo "UPLOAD=true" >> $GITHUB_ENV
           echo ${{ inputs.uploading }}
-          sudo chown -R $USER:$USER output/debs-beta/linux-${BRANCH}-${FAMILY}*
+          sudo chown -R $USER:$USER output/debs-beta/linux-*${BRANCH}-${FAMILY}*
 
       - name: Upload build artifacts
 
