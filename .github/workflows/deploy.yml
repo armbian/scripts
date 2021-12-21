@@ -40,7 +40,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux            
 
+      - name: Read value
+        run: |
+          echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
+          echo ${{ env.SKIP }} 
+
       - name: Checkout Armbian support scripts
+        if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -50,6 +56,7 @@ jobs:
           clean: true
 
       - name: Import GPG key
+        if: ${{ env.SKIP != 'yes' }}
         uses: crazy-max/ghaction-import-gpg@v3
         with:
           gpg-private-key: ${{ secrets.GPG_KEY2 }}
@@ -59,6 +66,7 @@ jobs:
           git-commit-gpgsign: true
 
       - name: Update scripts
+        if: ${{ env.SKIP != 'yes' }}
         run: |
 
           sudo rsync -ar --remove-source-files build-kernel/*.git* scripts/hash-beta/ || true
