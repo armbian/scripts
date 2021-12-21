@@ -23,9 +23,9 @@ on:
         required: true
 jobs:
 
-  Deploy:
+  Hash:
 
-    name: Update kernel status
+    name: Update
     runs-on: fast
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
