@@ -30,6 +30,7 @@ jobs:
 
 
       - name: Determine changed kernels
+        id: list_dirs
         run: |
 
           # fake function
