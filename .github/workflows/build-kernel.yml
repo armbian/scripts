@@ -136,6 +136,10 @@ jobs:
 
     steps:
 
+      - name: Stop if nothing found
+        if: ${{ matrix.node == "none:none:none" }}
+        run: exit 1
+
       - name: Checkout Armbian support scripts
         
         uses: actions/checkout@v2
