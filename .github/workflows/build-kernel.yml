@@ -162,8 +162,8 @@ jobs:
          
           # mount deploy target
           sudo apt-get -y -qq install sshfs
-          sudo mkdir -p /root/.ssh/
-          sudo cp ~/.ssh/known_hosts /root/.ssh/
+          #sudo mkdir -p $HOME/.ssh/
+          #sudo cp ~/.ssh/known_hosts $HOME/.ssh/
           sudo mkdir -p build/output/debs || true
           sudo mkdir -p build/output/debs-beta || true
           sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa
