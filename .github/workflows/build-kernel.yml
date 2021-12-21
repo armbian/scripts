@@ -171,9 +171,27 @@ jobs:
           
       - name: Pull Docker image
         run: |
+        
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
           sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
+
+      - name: Build
+        run: |
+
+          CHUNK="${{ matrix.node }}"
+          BOARD=$(echo $CHUNK | cut -d":" -f1)
+          BRANCH=$(echo $CHUNK | cut -d":" -f2)          
+
+          export TERM=dumb
+          ./compile.sh docker \
+          ARMBIAN_MIRROR="https://github.com/armbian/mirror/releases/download/" \
+          BOARD="$BOARD" \
+          PRIVATE_CCACHE="yes" \
+          BETA="yes" \
+          KERNEL_ONLY="yes" \
+          BRANCH="$BRANCH" \
+          KERNEL_CONFIGURE="no" \          
 
   Closing:
 
