@@ -1,0 +1,78 @@
+name: Update hash
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      uploading:
+        type: string
+    secrets:
+      GPG_KEY1:
+        required: true
+      GPG_PASSPHRASE1:
+        required: true
+      GPG_KEY2:
+        required: true
+      GPG_PASSPHRASE2:
+        required: true
+      SCRIPTS_ACCESS_TOKEN:
+        required: true
+      KEY_TORRENTS:
+        required: true
+      KNOWN_HOSTS_UPLOAD:
+        required: true
+
+Deploy:
+
+    name: Update kernel status
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        env:
+          cache-name: build-kernel
+        with:
+          path: build-kernel
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux            
+
+      - name: Checkout Armbian support scripts
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/scripts
+          token: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
+          path: scripts
+          clean: true
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ secrets.GPG_KEY2 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE2 }}
+          workdir: scripts
+          git-user-signingkey: true
+          git-commit-gpgsign: true
+
+      - name: Update scripts
+        run: |
+
+          ls -l build-kernel
+          if [[ "$(cat build-kernel/skip 2> /dev/null || true)" == "no" ]]; then
+          sudo rsync -ar --remove-source-files *.git* scripts/hash${{ env.FILE_EXT }}/ || true
+          cd scripts
+          sudo chown -R $USER:$USER .git
+          if git status --porcelain | grep .; then
+             git config --global user.email "info@armbian.com"
+             git config --global user.name "Armbianworker"
+             git config pull.rebase false
+             git pull
+             echo "update"
+             git add .
+             git commit -m "Update hashes for ${{ env.FILE_DEST }} repository"
+             git push
+          fi
+          fi
