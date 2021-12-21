@@ -4,20 +4,20 @@ on:
 
 jobs:
 
-  Merge:
-    uses: armbian/scripts/.github/workflows/merge-from-branch.yml@master
-
-    with:
-      branch: 'nightly'
-
-    secrets:
-      GPG_KEY2: ${{ secrets.GPG_KEY2 }}
-      GPG_PASSPHRASE2: ${{ secrets.GPG_PASSPHRASE2 }}
+#  Merge:
+#    uses: armbian/scripts/.github/workflows/merge-from-branch.yml@master
+#
+#    with:
+#      branch: 'nightly'
+#
+#    secrets:
+#      GPG_KEY2: ${{ secrets.GPG_KEY2 }}
+#      GPG_PASSPHRASE2: ${{ secrets.GPG_PASSPHRASE2 }}
 
   Prepare:
     runs-on: ubuntu-latest
     name: "Looking for changes"
-    needs: [ Merge ]
+#    needs: [ Merge ]
     if: ${{ github.repository_owner == 'Armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
