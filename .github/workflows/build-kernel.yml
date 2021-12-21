@@ -131,7 +131,7 @@ jobs:
     name: Build board support packages
     needs: [Linux]
     runs-on: [self-hosted, Linux, fast]
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.repository_owner == 'Armbian' }}
+    if: ${{ success() && github.repository_owner == 'Armbian' }}
     steps:
       
       - name: Checkout Armbian support scripts
