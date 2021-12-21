@@ -137,13 +137,13 @@ jobs:
     steps:
    
       - run: |
-          echo "${{ env.build }}"
+          echo "${{ env.BUILDING }}"
 
       - name: Stop if nothing found
         run: |
         
-          [[ "${{ matrix.node }}" == "none:none:none" ]] && echo "build=0" >> $GITHUB_ENV
-          echo "${{ env.build }}"
+          [[ "${{ matrix.node }}" == "none:none:none" ]] && echo "BUILDING=0" >> $GITHUB_ENV
+          echo "${{ env.BUILDING }}"
 
       - name: Checkout Armbian support scripts
         
