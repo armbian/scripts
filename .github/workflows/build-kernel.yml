@@ -211,8 +211,12 @@ jobs:
       - name: Sync
         if: ${{ success() && github.repository_owner == 'Armbian' }}
         run: |          
-          mkdir -p build/userpatches
+
+          mkdir -p build/userpatches build/cache/hash build/cache/hash-beta
+          sudo rm -f build/userpatches/targets.conf
           sudo cp scripts/configs/* build/userpatches/
+          sudo rsync -ar --delete scripts/hash/. build/cache/hash/ 2> /dev/null
+          sudo rsync -ar --delete scripts/hash-beta/. build/cache/hash-beta/ 2> /dev/null
 
       - name: Pull Docker image
         if: ${{ success() && github.repository_owner == 'Armbian' }}
