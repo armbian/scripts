@@ -270,9 +270,11 @@ jobs:
           fi
           
           echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
+          echo "UPLOAD=true" >> $GITHUB_ENV
+          echo ${{ inputs.uploading }}
 
       - name: Upload build artifacts
-        if: ${{ inputs.uploading == true }}
+        if: ${{ env.UPLOAD == true }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.FILE_NAME }}
