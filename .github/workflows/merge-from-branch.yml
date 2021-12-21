@@ -5,6 +5,9 @@ on:
 
   workflow_call:
     inputs:
+      runner:
+        required: true
+        type: string
       branch:
         required: true
         type: string
@@ -18,7 +21,7 @@ jobs:
   Merge:
 
     name: "Master into ${{ inputs.branch }}"
-    runs-on: [self-hosted, Linux]
+    runs-on: ${{ inputs.runner }}
     if: ${{ github.repository_owner == 'Armbian' }}
 
     steps:
