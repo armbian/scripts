@@ -21,8 +21,9 @@ on:
         required: true
       KNOWN_HOSTS_UPLOAD:
         required: true
+jobs:
 
-Deploy:
+  Deploy:
 
     name: Update kernel status
     runs-on: ubuntu-latest
