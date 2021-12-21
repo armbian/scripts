@@ -23,10 +23,26 @@ jobs:
     repository:
       name: "... updating"
       runs-on: [self-hosted, Linux, local]
-      if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
+      if: ${{ github.repository_owner == 'Armbian' }}
       steps:
 
+        - name: Cache Gradle packages
+          uses: actions/cache@v2
+          env:
+            cache-name: build-kernel
+          with:
+            path: build-kernel
+            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
+            restore-keys: |
+              ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
+
+        - name: Read value
+          run: |
+            echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
+            echo ${{ env.SKIP }} 
+
         - name: Install SSH key for repository
+          if: ${{ env.SKIP != 'yes' }}
           uses: shimataro/ssh-key-action@v2
           with:
             key: ${{ secrets.KEY_REPOSITORY }}
@@ -35,4 +51,5 @@ jobs:
             if_key_exists: replace
 
         - name: Update beta repository
+          if: ${{ env.SKIP != 'yes' }}
           run: ssh -T -i ~/.ssh/${{ inputs.KEY_ID }} ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
