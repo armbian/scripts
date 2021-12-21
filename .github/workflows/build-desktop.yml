@@ -80,6 +80,7 @@ jobs:
   
       name: "Build package"
       needs: [ Prepare ]
+      if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
       runs-on: ubuntu-latest
       timeout-minutes: 480
       strategy:
