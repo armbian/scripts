@@ -4,8 +4,20 @@ on:
 
 jobs:
 
+  Merge:
+    uses: armbian/scripts/.github/workflows/merge-from-branch.yml@master
+
+    with:
+      branch: 'nightly'
+
+    secrets:
+      GPG_KEY2: ${{ secrets.GPG_KEY2 }}
+      GPG_PASSPHRASE2: ${{ secrets.GPG_PASSPHRASE2 }}
+
   Prepare:
     runs-on: ubuntu-latest
+    name: "Looking for changes"
+    needs: [ Merge ]
     if: ${{ github.repository_owner == 'Armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
@@ -133,14 +145,21 @@ jobs:
     runs-on: [self-hosted, Linux, fast]
     if: ${{ success() && github.repository_owner == 'Armbian' }}
     steps:
-      
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
       - name: Checkout Armbian support scripts
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           repository: armbian/scripts
           path: scripts
-          clean: true
+          clean: false
           
       - name: Checkout Armbian build script
 
@@ -151,3 +170,40 @@ jobs:
           path: build
           ref: ${{ github.event.pull_request.head.sha }}
           clean: false
+
+      - name: Fix permissions
+        run: |
+
+          # make sure no temporally dirs are mounted from previous runs
+          while :
+          do
+              sudo pkill compile.sh || true
+              sudo pkill arm-binfmt-P || true
+              sudo pkill aarch64-binfmt-P || true
+              sudo pkill pixz || true
+              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
+              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
+              echo "Mounted temp directories. Trying to unmount."
+              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
+              sleep 10
+          done
+          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
+          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
+
+      - name: Mount upload folders
+        run: |
+         
+          # mount deploy target
+          sudo apt-get -y -qq install sshfs
+          sudo mkdir -p /root/.ssh/
+          sudo cp ~/.ssh/known_hosts /root/.ssh/
+          sudo mkdir -p build/output/debs || true
+          sudo mkdir -p build/output/debs-beta || true
+          sudo sshfs upload@users.armbian.com:/debs buildo/utput/debs -o IdentityFile=~/.ssh/id_rsa
+          sudo sshfs upload@users.armbian.com:/debs-beta buildo/utput/debs-beta -o IdentityFile=~/.ssh/id_rsa
+          
+      - name: Pull Docker image
+        run: |
+          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
+          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
