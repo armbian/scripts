@@ -17,7 +17,7 @@ jobs:
 
   Merge:
 
-    name: "master into ${{ inputs.branch }}"
+    name: "Master into ${{ inputs.branch }}"
     runs-on: [self-hosted, Linux]
     if: ${{ github.repository_owner == 'Armbian' }}
 
