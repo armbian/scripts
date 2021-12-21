@@ -245,7 +245,7 @@ jobs:
           CHUNK="${{ matrix.node }}"
           BOARD=$(echo $CHUNK | cut -d":" -f1)
           BRANCH=$(echo $CHUNK | cut -d":" -f2)          
-
+          FAMILY=$(echo $CHUNK | cut -d":" -f3)
           export TERM=dumb
           
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf
@@ -266,6 +266,17 @@ jobs:
               sudo mkdir -p ../build-kernel              
               cp cache/hash-beta/*.git* ../build-kernel/ 2> /dev/null || true
           fi
+          
+          echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
+
+      - name: Upload build artifacts
+        if: ${{ inputs.uploading == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.FILE_NAME }}
+          path: build/output/debs-beta/linux-${{ env.FILE_NAME }}*
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Unmount folders
         
