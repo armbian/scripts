@@ -115,7 +115,6 @@ jobs:
 
   Linux:
 
-    name: "Build Linux"
     needs: [ Prepare ]
     runs-on: fast
     if: ${{ github.repository_owner == 'armbian' }}
