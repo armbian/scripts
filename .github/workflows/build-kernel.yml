@@ -144,6 +144,13 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           clean: false
 
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
       - name: Fix permissions
         run: |
 
@@ -227,7 +234,7 @@ jobs:
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.KEY_TORRENTS }}
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
