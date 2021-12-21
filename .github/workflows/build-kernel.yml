@@ -201,7 +201,7 @@ jobs:
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Mount upload folders
-        if: ${{ inputs.runner != ubuntu-latest }}
+        if: ${{ inputs.runner != "ubuntu-latest" }}
         run: |
           
           # mount deploy target
