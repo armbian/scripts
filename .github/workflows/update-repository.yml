@@ -21,7 +21,7 @@ on:
 jobs:
 
     repository:
-      name: "... updating"
+      name: "Publishing"
       runs-on: [self-hosted, Linux, local]
       if: ${{ github.repository_owner == 'Armbian' }}
       steps:
