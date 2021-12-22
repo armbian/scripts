@@ -3,9 +3,6 @@ name: Maintain Runners
 on:
   workflow_dispatch:
   workflow_call:
-    inputs:
-      uploading:
-        type: string
 
 jobs:
 
