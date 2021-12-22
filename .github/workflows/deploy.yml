@@ -109,9 +109,6 @@ jobs:
             # use prepared configs
             sudo cp ../scripts/configs/* userpatches/
             [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes          
-            #./compile.sh KERNEL_ONLY="yes" BOARD="bananapi" BRANCH="current" KERNEL_CONFIGURE="no" REPOSITORY_INSTALL="u-boot,kernel" 'prepare_host_basic'          
-            rm -rf output/debs*
-      
             ./compile.sh all-new-beta-bsp
             # wait until it finishes
             while :
