@@ -13,7 +13,7 @@ jobs:
       matrix:
         runner: [ubuntu-latest,aarch64]
 
-    name: Build on ${{ matrix.runner }}
+    name: ${{ matrix.runner }}
     runs-on: ${{ matrix.runner }}
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
