@@ -1,199 +1,56 @@
-5fd3cce37 Linux 4.19.221
-3abc67ecf net: sched: make function qdisc_free_cb() static
-f9ff09e26 net_sched: fix a crash in tc_new_tfilter()
-d7b6d5f0e irqchip: nvic: Fix offset for Interrupt Priority Offsets
-0642f669d irqchip/irq-gic-v3-its.c: Force synchronisation when issuing INVALL
-ea4361bed irqchip/armada-370-xp: Fix support for Multi-MSI interrupts
-9b3ed0c3b irqchip/armada-370-xp: Fix return value of armada_370_xp_msi_alloc()
-a3730f741 iio: accel: kxcjk-1013: Fix possible memory leak in probe and remove
-e40ddc4bd iio: adc: axp20x_adc: fix charging current reporting on AXP22x
-243ace2cc iio: at91-sama5d2: Fix incorrect sign extension
-c6ad58220 iio: dln2: Check return value of devm_iio_trigger_register()
-9c1f3bdec iio: dln2-adc: Fix lockdep complaint
-36322c395 iio: itg3200: Call iio_trigger_notify_done() on error
-b3f2482dd iio: kxsd9: Don't return error code in trigger handler
-f7db20fdd iio: ltr501: Don't return error code in trigger handler
-f5deab10c iio: mma8452: Fix trigger reference couting
-ed04c87d8 iio: stk3310: Don't return error code in interrupt handler
-37e85bdff iio: trigger: stm32-timer: fix MODULE_ALIAS
-a2cce4fed iio: trigger: Fix reference counting
-cc7c2818c xhci: avoid race between disable slot command and host runtime suspend
-d843b2b5d usb: core: config: using bit mask instead of individual bits
-5054e9aec xhci: Remove CONFIG_USB_DEFAULT_PERSIST to prevent xHCI from runtime suspending
-3db1cbe2d usb: core: config: fix validation of wMaxPacketValue entries
-32de5efd4 USB: gadget: zero allocate endpoint 0 buffers
-13e45e7a2 USB: gadget: detect too-big endpoint 0 requests
-eddd1f2f1 net/qla3xxx: fix an error code in ql_adapter_up()
-5177509b0 net, neigh: clear whole pneigh_entry at alloc time
-9549dab5b net: fec: only clear interrupt of handling queue in fec_enet_rx_queue()
-797f299e5 net: altera: set a couple error code in probe()
-0301ca145 net: cdc_ncm: Allow for dwNtbOutMaxSize to be unset or zero
-a96af5b76 tools build: Remove needless libpython-version feature check that breaks test-all fast path
-fc0bb5f52 mtd: rawnand: fsmc: Take instruction delay into account
-4b689c361 i40e: Fix pre-set max number of queues for VF
-bf959d8e4 ASoC: qdsp6: q6routing: Fix return value from msm_routing_put_audio_mixer
-358544866 qede: validate non LSO skb length
-23047a238 block: fix ioprio_get(IOPRIO_WHO_PGRP) vs setuid(2)
-1e06540f8 tracefs: Set all files to the same group ownership as the mount option
-321fba81e aio: fix use-after-free due to missing POLLFREE handling
-580c7e023 aio: keep poll requests on waitqueue until completed
-f226fdd85 signalfd: use wake_up_pollfree()
-32288f504 binder: use wake_up_pollfree()
-8dd7c46a5 wait: add wake_up_pollfree()
-00fceb6e1 libata: add horkage for ASMedia 1092
-ad66b8922 can: m_can: Disable and ignore ELO interrupt
-3e193ef4e can: pch_can: pch_can_rx_normal: fix use after free
-62b461e9a clk: qcom: regmap-mux: fix parent clock lookup
-7d795454c tracefs: Have new files inherit the ownership of their parent
-7cf51a98d ALSA: pcm: oss: Handle missing errors in snd_pcm_oss_change_params*()
-2e54cf679 ALSA: pcm: oss: Limit the period size to 16MB
-f96c0959c ALSA: pcm: oss: Fix negative period/buffer sizes
-fd753901c ALSA: ctl: Fix copy of updated id with element read/write
-505039dd0 mm: bdi: initialize bdi_min_ratio when bdi is unregistered
-28e98eafd IB/hfi1: Correct guard on eager buffer deallocation
-c90d24082 udp: using datalen to cap max gso segments
-6431e7109 seg6: fix the iif in the IPv6 socket control block
-eb51f639e nfp: Fix memory leak in nfp_cpp_area_cache_add()
-f1a3e1750 bonding: make tx_rebalance_counter an atomic
-4696fa37c ice: ignore dropped packets during init
-c315bd962 bpf: Fix the off-by-two error in range markings
-3b861a403 nfc: fix potential NULL pointer deref in nfc_genl_dump_ses_done
-ae214e04b net: sched: use Qdisc rcu API instead of relying on rtnl lock
-da1d32408 net: sched: add helper function to take reference to Qdisc
-f602ed9f8 net: sched: extend Qdisc with rcu
-92833e8b5 net: sched: rename qdisc_destroy() to qdisc_put()
-cd25f1099 net: core: netlink: add helper refcount dec and lock function
-ccf070183 can: sja1000: fix use after free in ems_pcmcia_add_card()
-7a09ebf00 can: kvaser_usb: get CAN clock frequency from device
-128074f16 HID: check for valid USB device for many HID drivers
-945e3464b HID: wacom: fix problems when device is not a valid USB device
-b0f286d9b HID: add USB_HID dependancy on some USB HID drivers
-de8ac0cf0 HID: add USB_HID dependancy to hid-chicony
-cb54ea86f HID: add USB_HID dependancy to hid-prodikeys
-b1efa723b HID: add hid_is_usb() function to make it simpler for USB detection
-df6178298 HID: google: add eel USB id
-bcd694e3e Linux 4.19.220
-dc4731f44 ipmi: msghandler: Make symbol 'remove_work_wq' static
-ffab6973e parisc: Mark cr16 CPU clocksource unstable on all SMP machines
-1179b168f serial: core: fix transmit-buffer reset and memleak
-d3dbf51a9 serial: pl011: Add ACPI SBSA UART match id
-5b75e312d tty: serial: msm_serial: Deactivate RX DMA for polling support
-b076922bb x86/64/mm: Map all kernel memory into trampoline_pgd
-bb7905681 usb: typec: tcpm: Wait in SNK_DEBOUNCED until disconnect
-74d754bf4 USB: NO_LPM quirk Lenovo Powered USB-C Travel Hub
-abba418a9 xhci: Fix commad ring abort, write all 64 bits to CRCR register.
-d2993192c vgacon: Propagate console boot parameters before calling `vc_resize'
-1acc01fbb parisc: Fix "make install" on newer debian releases
-dba156a37 parisc: Fix KBUILD_IMAGE for self-extracting kernel
-eed6dba98 drm/msm: Do hw_init() before capturing GPU state
-40fdfacb2 net/smc: Keep smc_close_final rc during active close
-11560e977 net/rds: correct socket tunable error in rds_tcp_tune()
-2fd949365 net: annotate data-races on txq->xmit_lock_owner
-54d996cd6 net: usb: lan78xx: lan78xx_phy_init(): use PHY_POLL instead of "0" if no IRQ is available
-913c24af2 rxrpc: Fix rxrpc_local leak in rxrpc_lookup_peer()
-676dc7d9b net/mlx4_en: Fix an use-after-free bug in mlx4_en_try_alloc_resources()
-7d3d2d2b5 siphash: use _unaligned version by default
-68ae92971 net: mpls: Fix notifications when deleting a device
-57af54a56 net: qlogic: qlcnic: Fix a NULL pointer dereference in qlcnic_83xx_add_rings()
-9d3687daf natsemi: xtensa: fix section mismatch warnings
-0cea7788b i2c: stm32f7: stop dma transfer in case of NACK
-347029082 i2c: stm32f7: recover the bus on access timeout
-8bf31f9d9 fget: check that the fd still exists after getting a ref to it
-895538f9d fs: add fget_many() and fput_many()
-4f9a4d570 sata_fsl: fix warning in remove_proc_entry when rmmod sata_fsl
-0769449b0 sata_fsl: fix UAF in sata_fsl_port_stop when rmmod sata_fsl
-36fbc46a7 ipmi: Move remove_work to dedicated workqueue
-89d3674af kprobes: Limit max data_size of the kretprobe instances
-3d50e0b57 vrf: Reset IPCB/IP6CB when processing outbound pkts in vrf dev xmit
-24a139c10 perf hist: Fix memory leak of a perf_hpp_fmt
-d95940717 net: ethernet: dec: tulip: de4x5: fix possible array overflows in type3_infoblock()
-2c1a6a9a0 net: tulip: de4x5: fix the problem that the array 'lp->phy[8]' may be out of bound
-dd07f8971 ethernet: hisilicon: hns: hns_dsaf_misc: fix a possible array overflow in hns_dsaf_ge_srst_by_port()
-2d95244eb ata: ahci: Add Green Sardine vendor ID as board_ahci_mobile
-8368b993f scsi: iscsi: Unblock session then wake up error handler
-48735db23 thermal: core: Reset previous low and high trip during thermal zone init
-71bdb6e41 btrfs: check-integrity: fix a warning on write caching disabled disk
-c873fa156 s390/setup: avoid using memblock_enforce_memory_limit
-ad790bfe9 platform/x86: thinkpad_acpi: Fix WWAN device disabled issue after S3 deep
-4d9994fb4 net: return correct error code
-0275fcd9b atlantic: Fix OOB read and write in hw_atl_utils_fw_rpc_wait
-eb246efb6 gfs2: Fix length of holes reported at end-of-file
-6dd5f1cc2 of: clk: Make <linux/of_clk.h> self-contained
-905686264 NFSv42: Fix pagecache invalidation after COPY/CLONE
-4e91adc73 shm: extend forced shm destroy to support objects from several IPC nses
-24e6b4723 Linux 4.19.219
-bdef6fc5e tty: hvc: replace BUG_ON() with negative return value
-e4e01b0e4 xen/netfront: don't trust the backend response data blindly
-e52c0efbd xen/netfront: disentangle tx_skb_freelist
-26509bb5d xen/netfront: don't read data from request on the ring page
-e7d1024f5 xen/netfront: read response from backend only once
-f89a05402 xen/blkfront: don't trust the backend response data blindly
-80baa7751 xen/blkfront: don't take local copy of a request from the ring page
-b647c449f xen/blkfront: read response from backend only once
-dcbfd3f13 xen: sync include/xen/interface/io/ring.h with Xen's newest version
-22b814fdc fuse: release pipe buf after last use
-2350cffd7 NFC: add NCI_UNREG flag to eliminate the race
-b0313bc7f hugetlbfs: flush TLBs correctly after huge_pmd_unshare
-b2a7e63ed s390/mm: validate VMA in PGSTE manipulation functions
-2692931d9 tracing: Check pid filtering when creating events
-3f8ad8472 vhost/vsock: fix incorrect used length reported to the guest
-a539070b7 net: hns3: fix VF RSS failed problem after PF enable multi-TCs
-7d0354c9a net/smc: Don't call clcsock shutdown twice when smc shutdown
-fd25bc47e MIPS: use 3-level pgtable for 64KB page size on MIPS_VA_BITS_48
-1bc55e92b tcp_cubic: fix spurious Hystart ACK train detections for not-cwnd-limited flows
-68945e943 PM: hibernate: use correct mode for swsusp_close()
-8ba43fd0c net/smc: Ensure the active closing peer first closes clcsock
-3b7c37106 ipv6: fix typos in __ip6_finish_output()
-482522c19 drm/vc4: fix error code in vc4_create_object()
-0d4b29eaa scsi: mpt3sas: Fix kernel panic during drive powercycle test
-33712bc64 ARM: socfpga: Fix crash with CONFIG_FORTIRY_SOURCE
-301cdc22d NFSv42: Don't fail clone() unless the OP_CLONE operation failed
-b03c7892c firmware: arm_scmi: pm: Propagate return value to caller
-d67bad99b net: ieee802154: handle iftypes as u32
-caa6246ac ASoC: topology: Add missing rwsem around snd_ctl_remove() calls
-33bb18e65 ASoC: qdsp6: q6routing: Conditionally reset FrontEnd Mixer
-e6295d39e ARM: dts: BCM5301X: Add interrupt properties to GPIO node
-14f6a7a2e ARM: dts: BCM5301X: Fix I2C controller interrupt
-0dc62d3d6 netfilter: ipvs: Fix reuse connection if RS weight is 0
-c472f170c arm64: dts: marvell: armada-37xx: Set pcie_reset_pin to gpio function
-33a174313 arm64: dts: marvell: armada-37xx: declare PCIe reset pin
-72168c3cc pinctrl: armada-37xx: Correct PWM pins definitions
-44d9715fd pinctrl: armada-37xx: add missing pin: PCIe1 Wakeup
-601f8bf68 pinctrl: armada-37xx: Correct mpp definitions
-5973eb634 PCI: aardvark: Fix checking for link up via LTSSM state
-3f1578504 PCI: aardvark: Fix link training
-6a50aee37 PCI: aardvark: Fix PCIe Max Payload Size setting
-e7d212111 PCI: aardvark: Configure PCIe resources from 'ranges' DT property
-85ec59a6d PCI: aardvark: Update comment about disabling link training
-955528a9f PCI: aardvark: Move PCIe reset card code to advk_pcie_train_link()
-b3cdc10e2 PCI: aardvark: Fix compilation on s390
-62d87e129 PCI: aardvark: Don't touch PCIe registers if no card connected
-26fa8b315 PCI: aardvark: Indicate error in 'val' when config read fails
-388ae5f87 PCI: aardvark: Replace custom macros by standard linux/pci_regs.h macros
-202a82b37 PCI: aardvark: Issue PERST via GPIO
-83e880682 PCI: aardvark: Improve link training
-0ca4db367 PCI: aardvark: Train link immediately after enabling training
-78c6ab8e1 PCI: aardvark: Wait for endpoint to be ready before training link
-53c71a915 PCI: aardvark: Fix a leaked reference by adding missing of_node_put()
-9ef384ed3 proc/vmcore: fix clearing user buffer by properly using clear_user()
-6e6cc157f xtensa: use CONFIG_USE_OF instead of CONFIG_OF
-bbaf4fe5e tracing: Fix pid filtering when triggers are attached
-8963bf33b xen: detect uninitialized xenbus in xenbus_init
-3ce18bdaf xen: don't continue xenstore initialization in case of errors
-65f1f3eb0 fuse: fix page stealing
-bca19bb2d staging: rtl8192e: Fix use after free in _rtl92e_pci_disconnect()
-5bb560192 HID: wacom: Use "Confidence" flag to prevent reporting invalid contacts
-e4ca6cbd5 media: cec: copy sequence field for the reply
-de8f8b39c ALSA: ctxfi: Fix out-of-range access
-c3b9f29fc binder: fix test regression due to sender_euid change
-84a43ffae usb: hub: Fix locking issues with address0_mutex
-b8416a099 usb: hub: Fix usb enumeration issue due to address0 race
-c964b1bbf usb: dwc2: hcd_queue: Fix use of floating point literal
-d9de0adfc USB: serial: option: add Fibocom FM101-GL variants
-022d16c9c USB: serial: option: add Telit LE910S1 0x9200 composition
-1f244a54b Linux 4.19.218
-f3c2df75d soc/tegra: pmc: Fix imbalanced clock disabling in error code path
-62b4c59eb usb: max-3421: Use driver data instead of maintaining a list of bound devices
-21b693bf3 ASoC: DAPM: Cover regression by kctl change notification fix
-773d50f4a RDMA/netlink: Add __maybe_unused to static inline in C file
-d6d73a8c0 batman-adv: Don't always reallocate the fragmentation skb head
+508a321e0 Linux 4.19.222
+c9f17e929 xen/netback: don't queue unlimited number of packages
+1de7644ea xen/netback: fix rx queue stall detection
+57e46acb3 xen/console: harden hvc_xen against event channel storms
+3559ca594 xen/netfront: harden netfront against event channel storms
+269d7124b xen/blkfront: harden blkfront against event channel storms
+04181973c scsi: scsi_debug: Sanity check block descriptor length in resp_mode_select()
+445d2dc63 ovl: fix warning in ovl_create_real()
+55e0c283f fuse: annotate lock in fuse_reverse_inval_entry()
+4b2d9600b media: mxl111sf: change mutex_init() location
+cc2d4087b ARM: dts: imx6ull-pinfunc: Fix CSI_DATA07__ESAI_TX0 pad name
+7e8645ca2 firmware: arm_scpi: Fix string overflow in SCPI genpd driver
+9723ebad4 Input: touchscreen - avoid bitwise vs logical OR warning
+b182bc713 ARM: 8800/1: use choice for kernel unwinders
+3bdac6e17 mwifiex: Remove unnecessary braces from HostCmd_SET_SEQ_NO_BSS_INFO
+b753ea6a1 ARM: 8805/2: remove unneeded naked function usage
+77c91834f net: lan78xx: Avoid unnecessary self assignment
+03029bb04 mac80211: validate extended element ID is present
+595a684fa net: systemport: Add global locking for descriptor lifecycle
+6ca6342eb drm/amdgpu: correct register access for RLC_JUMP_TABLE_RESTORE
+61295b8ca libata: if T_LENGTH is zero, dma direction should be DMA_NONE
+8938a4473 timekeeping: Really make sure wall_to_monotonic isn't positive
+d902474ae USB: serial: option: add Telit FN990 compositions
+c9c61034b USB: serial: cp210x: fix CP2105 GPIO registration
+12ae8cd1c PCI/MSI: Mask MSI-X vectors only on success
+107883a5b PCI/MSI: Clear PCI_MSIX_FLAGS_MASKALL on error
+bb43b3c3b USB: NO_LPM quirk Lenovo USB-C to Ethernet Adapher(RTL8153-04)
+05da4194e USB: gadget: bRequestType is a bitfield, not a enum
+e56b65c1e sit: do not call ipip6_dev_free() from sit_init_net()
+18c73170d net/packet: rx_owner_map depends on pg_vec
+d861443c4 netdevsim: Zero-initialize memory for new map's value in function nsim_bpf_map_alloc
+3ac691481 ixgbe: set X550 MDIO speed before talking to PHY
+cc9b655bb igbvf: fix double free in `igbvf_probe`
+c615597e3 igb: Fix removal of unicast MAC filters of VFs
+214082bd1 soc/tegra: fuse: Fix bitwise vs. logical OR warning
+1ed173726 rds: memory leak in __rds_conn_create()
+109627a6d dmaengine: st_fdma: fix MODULE_ALIAS
+4e388232e sch_cake: do not call cake_destroy() from cake_init()
+c7d81fe5f ARM: socfpga: dts: fix qspi node compatible
+69f054d66 mac80211: track only QoS data frames for admission control
+4355c9f34 x86/sme: Explicitly map new EFI memmap table as encrypted
+dc573e568 x86: Make ARCH_USE_MEMREMAP_PROT a generic Kconfig symbol
+2becaa990 nfsd: fix use-after-free due to delegation race
+8389f50ce audit: improve robustness of the audit queue handling
+293f957be dm btree remove: fix use after free in rebalance_children()
+f6e48de06 recordmcount.pl: look for jgnop instruction as well as bcrl on s390
+55f8c6f0b mac80211: send ADDBA requests using the tid/queue of the aggregation session
+4abf352f3 hwmon: (dell-smm) Fix warning on /proc/i8k creation error
+a501f2500 tracing: Fix a kmemleak false positive in tracing_map
+ff3f517bf net: netlink: af_netlink: Prevent empty skb by adding a check on len.
+315afcc22 i2c: rk3x: Handle a spurious start completion interrupt flag
+185608a39 parisc/agp: Annotate parisc agp init functions with __init
+80958640b net/mlx4_en: Update reported link modes for 1/10G
+9a5f956d0 drm/msm/dsi: set default num_data_lanes
+2a8845b96 nfc: fix segfault in nfc_genl_dump_devices_done
+a256aac5b stable: clamp SUBLEVEL in 4.19
