@@ -2,20 +2,19 @@ name: Build Docker image
 on:
   workflow_dispatch:
   workflow_call:
-    inputs:
-      runner:
-        required: true
-        type: string
     secrets:
       CR_PAT:
         required: true
         
 jobs:
+  gradle:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest,aarch64]
 
-  build:
-
-    name: Build on ${{ inputs.runner }}
-    runs-on: ${{ inputs.runner }}
+    name: Build on ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
 
