@@ -25,7 +25,7 @@ jobs:
 
   Update:
 
-    name: Update
+    name: Version
     runs-on: fast
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
