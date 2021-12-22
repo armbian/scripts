@@ -144,7 +144,7 @@ jobs:
 #          git-user-signingkey: true
 #          git-commit-gpgsign: true
         
-      - name: Build
+      - name: Assemble
         run: |
 
           export TERM=dumb
