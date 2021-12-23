@@ -170,7 +170,7 @@ jobs:
 
       - name: Clean cache
         run: |
-          sudo rm -r build-kernel/*
+          sudo rm -f build-kernel/* || true
 
       - name: Install SSH key for storage
         
