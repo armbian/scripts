@@ -223,10 +223,10 @@ jobs:
         
         run: |          
 
-          mkdir -p build/userpatches build/cache/hash build/cache/hash-beta
+          mkdir -p build/userpatches build/cache/hash build/cache/hash-beta 
           sudo rm -f build/userpatches/targets.conf
           sudo cp scripts/configs/* build/userpatches/
-          sudo rm -r build/cache/hash/* build/cache/hash-beta/* 2> /dev/null
+          sudo rm -r build/cache/hash/* build/cache/hash-beta/* 2> /dev/null || true
 
       - name: Pull Docker image
         
