@@ -7,7 +7,7 @@ on:
         required: true
         
 jobs:
-  gradle:
+  variants:
     strategy:
       fail-fast: false
       matrix:
