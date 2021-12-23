@@ -87,7 +87,7 @@ jobs:
                   [[ ${BOARDFAMILY} == sun8i-v3s ]] && BOARDFAMILY=sunxi
                   [[ ${BOARDFAMILY} == sun*iw* && ${BRANCH} != legacy ]] && BOARDFAMILY=sunxi64
                   [[ ${BOARDFAMILY} == meson8b ]] && BOARDFAMILY=meson
-                  [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]] && BOARDFAMILY=meson64
+                  [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]| sort | uniq | sort -u -t: -k1,2] && BOARDFAMILY=meson64
                   [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                   source "build/config/sources/${ARCH}.conf"
                   ref_type=${KERNELBRANCH%%:*}
@@ -113,10 +113,10 @@ jobs:
                   # ignore diff checking in case of network errrors
                   kernel_hash="scripts/hash"$([[ ${BETA} == yes ]] && echo "-beta")"/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
                   if [[ "$hash" != "$(head -1 "${kernel_hash}" 2>/dev/null)" || "$patch_hash" != "$(tail -1 "${kernel_hash}" 2>/dev/null)" ]]; then
-                      echo "$line:$BRANCH:${BOARDFAMILY}"
+                      echo "${BOARDFAMILY}:${BRANCH}:${line}"                      
                   fi
                   done <<< "$FILES"
-          done | sort -u -t: -k3,3 )
+          done | sort | uniq | sort -u -t: -k1,2 )
           
           mkdir -p build-kernel
           echo "no" > build-kernel/skip
@@ -249,9 +249,9 @@ jobs:
           fi 
 
           CHUNK="${{ matrix.node }}"
-          BOARD=$(echo $CHUNK | cut -d":" -f1)
+          BOARD=$(echo $CHUNK | cut -d":" -f3)
           BRANCH=$(echo $CHUNK | cut -d":" -f2)          
-          FAMILY=$(echo $CHUNK | cut -d":" -f3)
+          FAMILY=$(echo $CHUNK | cut -d":" -f1)
           export TERM=dumb
           
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf
@@ -302,3 +302,21 @@ jobs:
             sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
             sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
             sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+
+  bump:
+    needs: [gcc]
+    if: ${{ success() && github.repository_owner == 'Armbian' }}
+    uses: armbian/scripts/.github/workflows/update-version.yml@master
+
+    with:
+
+      uploading: true
+
+    secrets:
+      GPG_KEY1: ${{ secrets.GPG_KEY1 }}
+      GPG_PASSPHRASE1: ${{ secrets.GPG_PASSPHRASE1 }}
+      GPG_KEY2: ${{ secrets.GPG_KEY2 }}
+      GPG_PASSPHRASE2: ${{ secrets.GPG_PASSPHRASE2 }}
+      SCRIPTS_ACCESS_TOKEN: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
+      KEY_TORRENTS: ${{ secrets.KEY_TORRENTS }}
+      KNOWN_HOSTS_UPLOAD: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
