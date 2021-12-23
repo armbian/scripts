@@ -117,12 +117,7 @@ jobs:
                   fi
                   done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,2 )
-          
-          mkdir -p build-kernel
-          echo "no" > build-kernel/skip
-          if [[ -z "$MATRIX" ]]; then              
-              echo "yes" > build-kernel/skip
-          fi 
+         
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   gcc:
@@ -156,21 +151,6 @@ jobs:
           path: build
           ref:  ${{ inputs.reference }}
           clean: false
-
-      - name: Cache Gradle packages        
-        uses: actions/cache@v2
-        env:
-          cache-name: build-kernel
-        with:
-          path: build-kernel
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux 
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
-
-      - name: Clean cache
-        run: |
-          sudo rm -f build-kernel/* || true
 
       - name: Install SSH key for storage
         
@@ -303,20 +283,27 @@ jobs:
             sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
             sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
 
-  bump:
+  check:
+  
     needs: [gcc]
+    runs-on: ${{ inputs.runner }}
     if: ${{ success() && github.repository_owner == 'Armbian' }}
-    uses: armbian/scripts/.github/workflows/update-version.yml@master
+    steps:
+    
+      - name: Cache Gradle packages        
+        uses: actions/cache@v2
+        env:
+          cache-name: build-kernel
+        with:
+          path: build-kernel
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux 
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
 
-    with:
+      - name: Clean cache
+        run: |
 
-      uploading: true
-
-    secrets:
-      GPG_KEY1: ${{ secrets.GPG_KEY1 }}
-      GPG_PASSPHRASE1: ${{ secrets.GPG_PASSPHRASE1 }}
-      GPG_KEY2: ${{ secrets.GPG_KEY2 }}
-      GPG_PASSPHRASE2: ${{ secrets.GPG_PASSPHRASE2 }}
-      SCRIPTS_ACCESS_TOKEN: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
-      KEY_TORRENTS: ${{ secrets.KEY_TORRENTS }}
-      KNOWN_HOSTS_UPLOAD: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          sudo mkdir -p build-kernel
+          sudo rm -f build-kernel/* || true          
+          sudo echo "no" > build-kernel/skip
