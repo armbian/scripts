@@ -1,3 +1,102 @@
+856f88f27 Linux 5.10.88
+88f20cccb xen/netback: don't queue unlimited number of packages
+525875c41 xen/netback: fix rx queue stall detection
+8fa3a370c xen/console: harden hvc_xen against event channel storms
+d31b33791 xen/netfront: harden netfront against event channel storms
+8ac3b6ee7 xen/blkfront: harden blkfront against event channel storms
+76ec7fe2d Revert "xsk: Do not sleep in poll() when need_wakeup set"
+e24fc8983 bus: ti-sysc: Fix variable set but not used warning for reinit_modules
+70692b062 rcu: Mark accesses to rcu_state.n_force_qs
+a9078e791 scsi: scsi_debug: Sanity check block descriptor length in resp_mode_select()
+bdb854f13 scsi: scsi_debug: Fix type in min_t to avoid stack OOB
+aa1f91271 scsi: scsi_debug: Don't call kcalloc() if size arg is zero
+6859985a2 ovl: fix warning in ovl_create_real()
+5fd7d62da fuse: annotate lock in fuse_reverse_inval_entry()
+b99bdf127 media: mxl111sf: change mutex_init() location
+0413f7a1a xsk: Do not sleep in poll() when need_wakeup set
+6b8d8ecdd ARM: dts: imx6ull-pinfunc: Fix CSI_DATA07__ESAI_TX0 pad name
+8affa1b68 Input: touchscreen - avoid bitwise vs logical OR warning
+aec5897b2 drm/amdgpu: correct register access for RLC_JUMP_TABLE_RESTORE
+c1d519263 libata: if T_LENGTH is zero, dma direction should be DMA_NONE
+a9f2c6af5 timekeeping: Really make sure wall_to_monotonic isn't positive
+6471ebcd6 serial: 8250_fintek: Fix garbled text for console
+a7c806745 iocost: Fix divide-by-zero on donation from low hweight cgroup
+bcebb8eb1 zonefs: add MODULE_ALIAS_FS
+1c414ff63 btrfs: fix double free of anon_dev after failure to create subvolume
+005d9292b btrfs: fix memory leak in __add_inode_ref()
+cd98cb521 USB: serial: option: add Telit FN990 compositions
+5c93584d9 USB: serial: cp210x: fix CP2105 GPIO registration
+8f207f126 usb: xhci: Extend support for runtime power management for AMD's Yellow carp.
+e5949933f PCI/MSI: Mask MSI-X vectors only on success
+f8aa09186 PCI/MSI: Clear PCI_MSIX_FLAGS_MASKALL on error
+d17c5a389 usb: dwc2: fix STM ID/VBUS detection startup delay in dwc2_driver_probe
+2b2edc8fc USB: NO_LPM quirk Lenovo USB-C to Ethernet Adapher(RTL8153-04)
+fd623e16b tty: n_hdlc: make n_hdlc_tty_wakeup() asynchronous
+9439fabfc KVM: x86: Drop guest CPUID check for host initiated writes to MSR_IA32_PERF_CAPABILITIES
+5fe305c6d Revert "usb: early: convert to readl_poll_timeout_atomic()"
+2b54f485f USB: gadget: bRequestType is a bitfield, not a enum
+151ffac3a powerpc/85xx: Fix oops when CONFIG_FSL_PMC=n
+fcf9194d3 bpf, selftests: Fix racing issue in btf_skc_cls_ingress test
+6f46c59e6 sit: do not call ipip6_dev_free() from sit_init_net()
+6e1011cd1 net: systemport: Add global locking for descriptor lifecycle
+d1765f984 net/smc: Prevent smc_release() from long blocking
+337bb7bf7 net: Fix double 0x prefix print in SKB dump
+734a3f310 sfc_ef100: potential dereference of null pointer
+7da349f07 net/packet: rx_owner_map depends on pg_vec
+1a34fb9e2 netdevsim: Zero-initialize memory for new map's value in function nsim_bpf_map_alloc
+d3e1f5450 ixgbe: set X550 MDIO speed before talking to PHY
+48e01e388 ixgbe: Document how to enable NBASE-T support
+776ed8b36 igc: Fix typo in i225 LTR functions
+74a16e062 igbvf: fix double free in `igbvf_probe`
+ddac50d04 igb: Fix removal of unicast MAC filters of VFs
+12c193887 soc/tegra: fuse: Fix bitwise vs. logical OR warning
+451f1eded mptcp: clear 'kern' flag from fallback sockets
+222cebd99 drm/amd/pm: fix a potential gpu_metrics_table memory leak
+74dc97dfb rds: memory leak in __rds_conn_create()
+67f4362ae flow_offload: return EOPNOTSUPP for the unsupported mpls action type
+03fd6ca05 mac80211: fix lookup when adding AddBA extension element
+bef59d6a8 mac80211: agg-tx: don't schedule_and_wake_txq() under sta->lock
+96bc86cac drm/ast: potential dereference of null pointer
+cac0fd4b9 selftest/net/forwarding: declare NETIFS p9 p10
+81fbdd456 net/sched: sch_ets: don't remove idle classes from the round-robin list
+be32c8a78 dmaengine: st_fdma: fix MODULE_ALIAS
+dfff1d5e8 selftests: Fix IPv6 address bind tests
+08896ecff selftests: Fix raw socket bind tests with VRF
+5ba4dfb8b selftests: Add duplicate config only for MD5 VRF tests
+12512bc8f net: hns3: fix use-after-free bug in hclgevf_send_mbx_msg
+3a4f6dba1 inet_diag: fix kernel-infoleak for UDP sockets
+20ad1ef02 sch_cake: do not call cake_destroy() from cake_init()
+1208b445a s390/kexec_file: fix error handling when applying relocations
+c058c544e selftests: net: Correct ping6 expected rc from 2 to 1
+9983425c2 virtio/vsock: fix the transport to work with VMADDR_CID_ANY
+94a01e6fb soc: imx: Register SoC device only on i.MX boards
+cc426a91d clk: Don't parent clks until the parent is fully registered
+429bb01e4 ARM: socfpga: dts: fix qspi node compatible
+7b4cc168d ceph: initialize pathlen variable in reconnect_caps_cb
+e0f06c32a ceph: fix duplicate increment of opened_inodes metric
+640e28d61 tee: amdtee: fix an IS_ERR() vs NULL bug
+eed897a22 mac80211: track only QoS data frames for admission control
+24983f750 arm64: dts: rockchip: fix audio-supply for Rock Pi 4
+49bd59771 arm64: dts: rockchip: fix rk3399-leez-p710 vcc3v3-lan supply
+9fcdbbf39 arm64: dts: rockchip: fix rk3308-roc-cc vcc-sd supply
+ba866840b arm64: dts: rockchip: remove mmc-hs400-enhanced-strobe from rk3399-khadas-edge
+3516bc149 arm64: dts: imx8mp-evk: Improve the Ethernet PHY description
+06294e7e3 arm64: dts: imx8m: correct assigned clocks for FEC
+4cc6badff audit: improve robustness of the audit queue handling
+0e21e6cd5 dm btree remove: fix use after free in rebalance_children()
+f5187a9d5 recordmcount.pl: look for jgnop instruction as well as bcrl on s390
+51f6302f8 vdpa: check that offsets are within bounds
+e3a1ab5ae virtio_ring: Fix querying of maximum DMA mapping size for virtio device
+0612679e4 bpf, selftests: Add test case trying to taint map value pointer
+279e0bf80 bpf: Make 32->64 bounds propagation slightly more robust
+e2aad0b5f bpf: Fix signed bounds propagation after mov32
+f0f484714 firmware: arm_scpi: Fix string overflow in SCPI genpd driver
+7fd214fc7 mac80211: validate extended element ID is present
+0bb50470f mac80211: send ADDBA requests using the tid/queue of the aggregation session
+29bb131db mac80211: mark TX-during-stop for TX in in_reconfig
+15640e40e mac80211: fix regression in SSN handling of addba tx
+49b7e4969 KVM: downgrade two BUG_ONs to WARN_ON_ONCE
+8d0f56c2e KVM: selftests: Make sure kvm_create_max_vcpus test won't hit RLIMIT_NOFILE
 272aedd4a Linux 5.10.87
 8dd559d53 arm: ioremap: don't abuse pfn_valid() to check if pfn is in RAM
 65c578935 arm: extend pfn_valid to take into account freed memory map alignment
