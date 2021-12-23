@@ -70,9 +70,9 @@ jobs:
           done
 
           sudo docker stop $(docker ps -a -q) 2>/dev/null || true
-          sudo docker rm $(docker ps -a -q) 2>/dev/null || true
-          sudo docker images -a  | awk '{print $3}' | xargs docker rmi --force 2>/dev/null || true
-          sudo docker volume rm $(docker volume ls -q) 2>/dev/null || true
+          sudo docker rm $(docker ps -a -q) 2>/dev/null || true          
+          sudo docker image rm $(docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
+          sudo docker volume rm $(docker volume ls -q) 2>/dev/null || true          
 
           # check if swap exists
           swapon
