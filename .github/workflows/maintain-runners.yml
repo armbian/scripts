@@ -85,16 +85,16 @@ jobs:
           [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
           [[ -d cache ]] && sudo rm -rf cache || true
-          sudo rm -rf build-* || true
-          sudo rm -rf temp || true
-          sudo rm *.conf || true
-          sudo rm *.txt || true
+          sudo rm -rf build-* 2>/dev/null || true
+          sudo rm -rf temp 2>/dev/null || true
+          sudo rm *.conf 2>/dev/null || true
+          sudo rm *.txt 2>/dev/null || true
           
           cd build
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes
-          sudo rm -rf cache/sources
-          sudo rm -rf output/debs
-          sudo rm -rf output/debs-beta          
+          sudo rm -rf cache/sources/ || true
+          sudo rm -rf output/debs/ || true
+          sudo rm -rf output/debs-beta/ || true
           sudo shutdown -r 1
   Finish:
     name: Finish
