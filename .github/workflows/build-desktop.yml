@@ -27,7 +27,7 @@ jobs:
   Prepare:
 
     name: Find desktop variants
-    runs-on: small
+    runs-on: self-hosted
     if: ${{ github.repository_owner == 'Armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
