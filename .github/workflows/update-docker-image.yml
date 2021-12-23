@@ -51,8 +51,9 @@ jobs:
 
        run: |
 
-         docker stop $(docker ps -a -q) 2>/dev/null || true 
-         docker rm $(docker ps -a -q) 2>/dev/null || true         
+         docker stop $(docker ps -a -q) 2>/dev/null || true
+         docker rm $(docker ps -a -q) 2>/dev/null || true
+         sudo docker image rm $(docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
          docker images -a  | awk '{print $3}' | xargs docker rmi --force  2>/dev/null || true 
 
          cd build
