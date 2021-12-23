@@ -87,7 +87,7 @@ jobs:
                   [[ ${BOARDFAMILY} == sun8i-v3s ]] && BOARDFAMILY=sunxi
                   [[ ${BOARDFAMILY} == sun*iw* && ${BRANCH} != legacy ]] && BOARDFAMILY=sunxi64
                   [[ ${BOARDFAMILY} == meson8b ]] && BOARDFAMILY=meson
-                  [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]| sort | uniq | sort -u -t: -k1,2] && BOARDFAMILY=meson64
+                  [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]] && BOARDFAMILY=meson64
                   [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                   source "build/config/sources/${ARCH}.conf"
                   ref_type=${KERNELBRANCH%%:*}
