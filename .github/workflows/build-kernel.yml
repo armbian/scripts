@@ -255,7 +255,7 @@ jobs:
               echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
               echo "UPLOAD=true" >> $GITHUB_ENV
               # copy edge brach to stable repo
-              cp output/debs-beta/linux-{dtb,image,source,headers}* output/debs/ || true
+              cp output/debs-beta/linux-{dtb,image,source,headers}-edge-* output/debs/ || true
           fi
 
       - name: Upload hash
