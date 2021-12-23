@@ -168,6 +168,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux 
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
 
+      - name: Clean cache
+        run: |
+          sudo rm -r build-kernel/*
+
       - name: Install SSH key for storage
         
         uses: shimataro/ssh-key-action@v2
@@ -222,8 +226,7 @@ jobs:
           mkdir -p build/userpatches build/cache/hash build/cache/hash-beta
           sudo rm -f build/userpatches/targets.conf
           sudo cp scripts/configs/* build/userpatches/
-          sudo rsync -ar --delete scripts/hash/. build/cache/hash/ 2> /dev/null
-          sudo rsync -ar --delete scripts/hash-beta/. build/cache/hash-beta/ 2> /dev/null
+          sudo rm -r build/cache/hash/* build/cache/hash-beta/* 2> /dev/null
 
       - name: Pull Docker image
         
@@ -267,18 +270,10 @@ jobs:
           if [[ $? -eq 0 ]]; then
               sudo mkdir -p ../build-kernel              
               cp cache/hash-beta/*.git* ../build-kernel/ 2> /dev/null || true
-              echo "FILE_HASH=$(ls -1 cache/hash-beta/*.githash | head -1)"  >> $GITHUB_ENV
           fi
           
           echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
           echo "UPLOAD=true" >> $GITHUB_ENV
-          
-      - name: Upload hash
-        if: ${{ env.UPLOAD == 'true' }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: hash
-          path: build/${{ env.FILE_HASH }}
 
       - name: Upload build artifacts
 
