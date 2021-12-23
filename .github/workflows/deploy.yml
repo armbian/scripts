@@ -75,11 +75,17 @@ jobs:
           git-user-signingkey: true
           git-commit-gpgsign: true
 
+      - name: Download artefacts
+        if: ${{ env.SKIP != 'yes' }} 
+        uses: actions/download-artifact@v2
+        with:
+          name: hash
+
       - name: Update scripts
         if: ${{ env.SKIP != 'yes' }}
         run: |
 
-          sudo rsync -ar --remove-source-files build-kernel/*.git* scripts/hash-beta/ || true
+          sudo rsync -ar --remove-source-files *.git* scripts/hash-beta/ || true
           cd scripts
           sudo chown -R $USER:$USER .git
           if git status --porcelain | grep .; then
