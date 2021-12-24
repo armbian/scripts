@@ -43,7 +43,7 @@ jobs:
       - name: Read value
         run: |
         
-          [ ! -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
+          [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
         if: ${{ env.SKIP != 'yes' }}
