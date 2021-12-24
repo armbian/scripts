@@ -60,7 +60,6 @@ jobs:
       - name: Download changes
         uses: actions/download-artifact@v2
         with:
-          path: /
           name: changes
 
       - name: Determine changed kernels
