@@ -37,8 +37,9 @@ jobs:
           if-no-files-found: ignore
           path: changes.txt
       - name: Extract
-        run: |          
-          [ -s changes.txt ] || echo "BUILD=false >> $GITHUB_ENV
+        run: |
+          echo "BUILD=true" >> $GITHUB_ENV
+          [ -s changes.txt ] || echo "BUILD=false" >> $GITHUB_ENV
 
   Lists:
 
