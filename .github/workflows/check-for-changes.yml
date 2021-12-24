@@ -88,6 +88,6 @@ jobs:
 
         uses: actions/upload-artifact@v2
         with:
-          path: .
-          name: changes.txt
+          path: changes.txt
+          name: changes
           if-no-files-found: ignore
