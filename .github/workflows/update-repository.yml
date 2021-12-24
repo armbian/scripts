@@ -29,8 +29,7 @@ jobs:
       - name: Download changes
         uses: actions/download-artifact@v2
         with:
-          name: changes
-          path: changes.txt
+          name: changes.txt
 
       - name: Check
         run: |
