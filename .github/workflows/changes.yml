@@ -2,29 +2,7 @@ name: Changes
 on:
   workflow_dispatch:
   workflow_call:
-    inputs:
-      runner:
-        required: true
-        type: string
-      uploading:
-        type: string
-      reference:
-        type: string
-    secrets:
-      GPG_KEY1:
-        required: true
-      GPG_PASSPHRASE1:
-        required: true
-      GPG_KEY2:
-        required: true
-      GPG_PASSPHRASE2:
-        required: true
-      SCRIPTS_ACCESS_TOKEN:
-        required: true
-      KEY_TORRENTS:
-        required: true
-      KNOWN_HOSTS_UPLOAD:
-        required: true
+
 jobs:
 
   Prepare:
