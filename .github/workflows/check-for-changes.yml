@@ -90,4 +90,3 @@ jobs:
         with:
           name: changes
           if-no-files-found: ignore
-          path: changes.txt
