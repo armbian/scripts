@@ -58,6 +58,11 @@ jobs:
           ref: nightly
           clean: false
 
+      - name: Remove previous artefacts if any
+        run: |
+
+          sudo rm -rf changes.txt 2>/dev/null || true
+
       - name: Download changes
         uses: actions/download-artifact@v2
         with:
