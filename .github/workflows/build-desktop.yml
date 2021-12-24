@@ -28,9 +28,7 @@ jobs:
 
     name: Preparation
     runs-on: self-hosted
-    if: ${{ github.repository_owner == 'Armbian' }}
-    env:
-      BUILD_SUCCESS: false
+    if: ${{ github.repository_owner == 'Armbian' }}    
     steps:
       - name: Download changes
         uses: actions/download-artifact@v2
@@ -39,7 +37,8 @@ jobs:
           path: changes.txt
       - name: Extract
         run: |
-          #[ -s changes.txt ] || echo "BUILD_SUCCESS=false" >> $GITHUB_ENV
+          echo "::set-env name=BUILD_SUCCESS::true"
+          [ -s changes.txt ] || echo "::set-env name=BUILD_SUCCESS::false"
 
   Lists:
 
