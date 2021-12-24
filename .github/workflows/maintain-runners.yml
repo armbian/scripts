@@ -56,9 +56,11 @@ jobs:
           sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
-          sudo mkdir -p build/output/tmp || true
+          sudo mkdir -p build/output/tmp || true          
           sudo sshfs upload@users.armbian.com:/ build/output/tmp -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
-          ls -l build/output/tmp
+          sudo rm -rf build/output/tmp/debs/ || true
+          sudo rm -rf build/output/tmp/debs-beta/ || true
+          sudo rm -rf build/output/tmp/images/ || true
           sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
 
       - name: Prepare matrix
