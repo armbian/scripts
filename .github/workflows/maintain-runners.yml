@@ -3,6 +3,10 @@ name: Maintain Runners
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      checking:
+       required: false
+       type: boolean
     secrets:
       KEY_TORRENTS:
         required: true
@@ -24,6 +28,7 @@ jobs:
           sudo rm -rf changes 2>/dev/null || true
 
       - name: Download changes
+        if: ${{ inputs.checking }}
         uses: actions/download-artifact@v2
         with:
           name: changes
