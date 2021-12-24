@@ -279,28 +279,3 @@ jobs:
             sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
             sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
             sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-
-  check:
-  
-    needs: [gcc]
-    runs-on: ${{ inputs.runner }}
-    if: ${{ success() && github.repository_owner == 'Armbian' }}
-    steps:
-    
-      - name: Cache Gradle packages        
-        uses: actions/cache@v2
-        env:
-          cache-name: build-kernel
-        with:
-          path: build-kernel
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux 
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
-
-      - name: Clean cache
-        run: |
-
-          mkdir -p build-kernel
-          rm -f build-kernel/* || true          
-          sudo echo "no" > build-kernel/skip
