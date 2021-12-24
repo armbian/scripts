@@ -30,7 +30,7 @@ jobs:
     runs-on: self-hosted
     if: ${{ github.repository_owner == 'Armbian' }}
     env:
-      BUILD_SUCCESS: true
+      BUILD_SUCCESS: false
     steps:
       - name: Download changes
         uses: actions/download-artifact@v2
@@ -44,9 +44,9 @@ jobs:
   Lists:
 
     name: Find desktop variants
+    if: ${{ env.BUILD_SUCCESS == true }}
     needs: [ Prepare ]
-    runs-on: self-hosted
-    if: ${{ github.repository_owner == 'Armbian' }} && {{ env.BUILD_SUCCESS == false }}
+    runs-on: self-hosted    
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
