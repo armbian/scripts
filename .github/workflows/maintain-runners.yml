@@ -69,6 +69,8 @@ jobs:
               sleep 10
           done
 
+          sudo chown -r $USER:$USER build-kernel
+
           sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
           sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true          
           sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
@@ -76,7 +78,8 @@ jobs:
 
           # check if swap exists
           swapon
-
+          df
+          
           sudo echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y purge needrestart unattended-upgrades
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
