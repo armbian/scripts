@@ -1,0 +1,116 @@
+name: Changes
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      uploading:
+        type: string
+      reference:
+        type: string
+    secrets:
+      GPG_KEY1:
+        required: true
+      GPG_PASSPHRASE1:
+        required: true
+      GPG_KEY2:
+        required: true
+      GPG_PASSPHRASE2:
+        required: true
+      SCRIPTS_ACCESS_TOKEN:
+        required: true
+      KEY_TORRENTS:
+        required: true
+      KNOWN_HOSTS_UPLOAD:
+        required: true
+jobs:
+
+  Prepare:
+    runs-on: ubuntu-latest
+    name: "Looking for changes"
+    if: ${{ github.repository_owner == 'Armbian' }}
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/build
+          path: build
+          ref: nightly
+          clean: false
+
+      - name: Checkout support scripts
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/scripts
+          path: scripts
+          clean: false
+
+      - name: Determine changed kernels
+        run: |
+
+          # fake function
+          enable_extension ()
+          {
+          return 0
+          }
+
+          BOOTCONFIG=true
+          BETA=yes
+
+          for BRANCH in legacy current edge; do
+              FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
+              while IFS= read -r line; do
+                  unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE
+                  BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
+                  source "build/config/sources/families/${BOARDFAMILY}.conf"
+                  # exceptions handling
+                  [[ ${BOARDFAMILY} == *x86 ]] && BOARDFAMILY=x86
+                  [[ ${BOARDFAMILY} == *arm64 ]] && BOARDFAMILY=arm64
+                  [[ ${BOARDFAMILY} == sun*i ]] && BOARDFAMILY=sunxi
+                  [[ ${BOARDFAMILY} == sun8i-v3s ]] && BOARDFAMILY=sunxi
+                  [[ ${BOARDFAMILY} == sun*iw* && ${BRANCH} != legacy ]] && BOARDFAMILY=sunxi64
+                  [[ ${BOARDFAMILY} == meson8b ]] && BOARDFAMILY=meson
+                  [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]] && BOARDFAMILY=meson64
+                  [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
+                  source "build/config/sources/${ARCH}.conf"
+                  ref_type=${KERNELBRANCH%%:*}
+                  if [[ $ref_type == head ]]; then
+                      ref_name=HEAD
+                  else
+                      ref_name=${KERNELBRANCH##*:}
+                  fi
+                  [[ -z $LINUXFAMILY ]] && LINUXFAMILY=$BOARDFAMILY
+                  [[ -z ${KERNELPATCHDIR} ]] && KERNELPATCHDIR=$LINUXFAMILY-$BRANCH
+                  [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
+                  [[ -z ${KERNELSOURCE} ]] && KERNELSOURCE="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable"
+
+                  hash_watch_1=$(LC_COLLATE=C find -L "build/patch/kernel/${KERNELPATCHDIR}"/ -name '*.patch' -mindepth 1 -maxdepth 1 -printf '%s %P\n' 2> /dev/null | LC_COLLATE=C sort -n)
+                  hash_watch_2=$(cat "build/config/kernel/${LINUXCONFIG}.config" 2> /dev/null)
+                  patch_hash=$(echo "${hash_watch_1}${hash_watch_2}" | git hash-object --stdin)
+                  case $ref_type in
+                      branch) hash=$(git ls-remote "${KERNELSOURCE}" refs/heads/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
+                      tag) hash=$(git ls-remote "${KERNELSOURCE}" tags/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
+                      head) hash=$(git ls-remote "${KERNELSOURCE}" HEAD 2> /dev/null | awk '{print $1}') ;;
+                      commit) hash=$ref_name ;;
+                  esac
+                  # ignore diff checking in case of network errrors
+                  kernel_hash="scripts/hash"$([[ ${BETA} == yes ]] && echo "-beta")"/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
+                  if [[ "$hash" != "$(head -1 "${kernel_hash}" 2>/dev/null)" || "$patch_hash" != "$(tail -1 "${kernel_hash}" 2>/dev/null)" ]]; then
+                      echo "${BOARDFAMILY}:${BRANCH}:${line}"                      
+                  fi
+                  done <<< "$FILES"
+          done | sort | uniq | sort -u -t: -k1,2 > changes.txt
+         
+      - name: Upload changes
+
+        uses: actions/upload-artifact@v2
+        with:
+          name: hash
+          if-no-files-found: ignore
+          path: changes.txt
