@@ -26,9 +26,8 @@ jobs:
 
   Prepare:
     name: Build
-    runs-on: self-hosted
+    runs-on: fast
     if: ${{ github.repository_owner == 'Armbian' }}
-    
     steps:
 
       - name: Checkout repository
@@ -47,6 +46,7 @@ jobs:
           path: changes.txt
 
       - name: Check
+        run: |
           echo "SKIP=yes" >> $GITHUB_ENV
 
       - name: Checkout Armbian support scripts
