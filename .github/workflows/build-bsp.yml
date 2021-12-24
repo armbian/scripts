@@ -1,0 +1,49 @@
+name: Beta BSP
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      uploading:
+        type: string
+    secrets:
+      GPG_KEY1:
+        required: true
+      GPG_PASSPHRASE1:
+        required: true
+      GPG_KEY2:
+        required: true
+      GPG_PASSPHRASE2:
+        required: true
+      SCRIPTS_ACCESS_TOKEN:
+        required: true
+      KEY_TORRENTS:
+        required: true
+      KNOWN_HOSTS_UPLOAD:
+        required: true
+
+jobs:
+
+  Prepare:
+
+    name: Build
+    if: ${{ github.repository_owner == 'Armbian' }}
+    runs-on: self-hosted    
+    outputs:
+      matrix: ${{steps.list_dirs.outputs.matrix}}
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/build
+          path: build
+          ref: nightly
+          clean: false
+
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          name: changes
+          path: changes.txt
