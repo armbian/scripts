@@ -29,6 +29,8 @@ jobs:
     name: Preparation
     runs-on: self-hosted
     if: ${{ github.repository_owner == 'Armbian' }}
+    env:
+      BUILD_SUCCESS: true
     steps:
       - name: Download changes
         uses: actions/download-artifact@v2
@@ -38,18 +40,14 @@ jobs:
           path: changes.txt
       - name: Extract
         run: |
-          echo "BUILD=true" >> $GITHUB_ENV
-          [[ -f changes.txt ]] && echo "exits"
-          [ -s changes.txt ] || echo "BUILD=false" >> $GITHUB_ENV
-          ls -l
-          echo ${{ env.UPLOAD }}
+          [ -s changes.txt ] || echo "BUILD_SUCCESS=false" >> $GITHUB_ENV
 
   Lists:
 
     name: Find desktop variants
     needs: [ Prepare ]
     runs-on: self-hosted
-    if: ${{ github.repository_owner == 'Armbian' }} && {{ env.UPLOAD != '' }}
+    if: ${{ github.repository_owner == 'Armbian' }} && {{ env.BUILD_SUCCESS == true }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
