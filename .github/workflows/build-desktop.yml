@@ -43,7 +43,7 @@ jobs:
   Lists:
 
     name: Find desktop variants
-    if: ${{ BUILD_SUCCESS == true }}
+    if: $BUILD_SUCCESS == true
     needs: [ Prepare ]
     runs-on: self-hosted    
     outputs:
