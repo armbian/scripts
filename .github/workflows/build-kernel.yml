@@ -29,7 +29,7 @@ jobs:
 
   Prepare:
     runs-on: ${{ inputs.runner }}
-    name: "Looking for changes"
+    name: Build
     if: ${{ github.repository_owner == 'Armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
@@ -51,15 +51,12 @@ jobs:
           repository: armbian/scripts
           path: scripts
           clean: false
-          
-      - name: Cache build parameters
-        uses: actions/cache@v2
-        env:
-          cache-name: build-kernel
-        with:
-          path: build-kernel
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
 
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          name: changes
+          path: changes.txt
 
       - name: Determine changed kernels
         id: list_dirs
@@ -74,7 +71,7 @@ jobs:
           BOOTCONFIG=true
           BETA=yes
 
-          MATRIX=$(for BRANCH in legacy current edge; do
+          [ -s changes.txt ] || MATRIX=$(for BRANCH in legacy current edge; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
                   unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE
