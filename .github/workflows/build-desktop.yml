@@ -65,7 +65,7 @@ jobs:
           done)
 
           # don't build if there are no changes in kernels
-          [ -s changes.txt ] || unset MATRIX
+          [ ! -s changes.txt ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           
   Desktop:
