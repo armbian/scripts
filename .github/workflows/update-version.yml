@@ -92,3 +92,7 @@ jobs:
             git commit -m "Bumping to new version" -m "" -m "Adding following kernels:" -m "$(find output/debs-beta/ -type f -name "linux-image*${CURRENT_VERSION}*.deb" -printf "%f\n" | sort)"
             git push
           fi
+
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: changes
