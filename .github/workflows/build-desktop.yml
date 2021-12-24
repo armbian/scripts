@@ -156,7 +156,7 @@ jobs:
           if_key_exists: replace
 
       - name: Deploy to server
-        if: ${{ matrix.node != 'none:none' }} && {{ env.UPLOAD == true }}
+        if: ${{ env.UPLOAD == true }}
         run: |
 
           sudo apt-get -y -qq install lftp          
