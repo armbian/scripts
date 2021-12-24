@@ -8,7 +8,7 @@ jobs:
 
   Prepare:
 
-    name: Prepare runners
+    name: Prepare
     runs-on: small
     if: ${{ github.repository_owner == 'armbian' }}
     outputs:
@@ -41,7 +41,7 @@ jobs:
           [ ! -s changes.txt ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
-  Maint:
+  Purge:
   
     needs: [ Prepare ]
     runs-on: [self-hosted, Linux, small]
@@ -114,7 +114,7 @@ jobs:
           sudo shutdown -r 1
   Finish:
     name: Finish
-    needs: [Maint]
+    needs: [Purge]
     runs-on: [self-hosted, Linux, small]
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
