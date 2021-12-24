@@ -38,7 +38,7 @@ jobs:
           path: changes.txt
       - name: Extract
         run: |
-          echo "BUILD=true" >> $GITHUB_ENV
+          #echo "BUILD=true" >> $GITHUB_ENV
           [ -s changes.txt ] || echo "BUILD=false" >> $GITHUB_ENV
 
   Lists:
@@ -46,7 +46,7 @@ jobs:
     name: Find desktop variants
     needs: [ Prepare ]
     runs-on: self-hosted
-    if: ${{ github.repository_owner == 'Armbian' }} && {{ env.UPLOAD == false }}
+    if: ${{ github.repository_owner == 'Armbian' }} && {{ env.UPLOAD != '' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
