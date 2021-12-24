@@ -49,27 +49,18 @@ jobs:
           ref: nightly
           clean: false
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        env:
-          cache-name: build-kernel
+      - name: Download changes
+        uses: actions/download-artifact@v2
         with:
-          path: build-kernel
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-            
-      - name: Read value
-        run: |
-          echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
-          echo ${{ env.SKIP }} 
+          name: changes
+          path: changes.txt
 
       - name: Prepare matrix
         id: list_dirs
         run: |
 
           MATRIX="cat build/config/target*.conf | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed 's/\s\s*/ /g' | cut -d' ' -f1,2 | sed 's/ /:/g' | sort | uniq"
-          [[ "${{ env.SKIP }}" == "yes" ]] && unset MATRIX
+          [ ! -s changes.txt ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   U-boot:
