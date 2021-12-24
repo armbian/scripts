@@ -28,7 +28,7 @@ jobs:
 
     name: Build
     if: ${{ github.repository_owner == 'Armbian' }}
-    runs-on: self-hosted    
+    runs-on: self-hosted
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
@@ -45,7 +45,7 @@ jobs:
       - name: Download changes
         uses: actions/download-artifact@v2
         with:
-          name: changes.txt
+          path: changes.txt
 
       - name: Build desktops
         id: list_dirs
@@ -140,13 +140,13 @@ jobs:
           fi
       
       - name: Upload build artifacts
-        if: ${{ matrix.node != 'none:none' }}
+        if: ${{ inputs.uploading == true }}
         uses: actions/upload-artifact@v2
         with:
           name: armbian-${{ env.RELEASE }}-desktop-${{ env.DE }}
           path: build/output/debs-beta/${{ env.RELEASE }}/armbian-${{ env.RELEASE }}-desktop-${{ env.DE }}_*.deb
           if-no-files-found: ignore
-          retention-days: 10
+          retention-days: 30
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
