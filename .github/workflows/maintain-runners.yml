@@ -21,12 +21,11 @@ jobs:
 
       - name: Remove previous artefacts if any
         run: |
-          sudo rm -rf changes.txt 2>/dev/null || true
+          sudo rm -rf changes 2>/dev/null || true
 
       - name: Download changes
         uses: actions/download-artifact@v2
         with:
-          path: changes.txt
           name: changes
 
       - uses: geekyeggo/delete-artifact@v1
@@ -67,7 +66,7 @@ jobs:
         id: list_dirs
         run: |
           MATRIX="seq -w 01 50"
-          [ ! -s changes.txt ] || unset MATRIX
+          [ -s changes ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   Purge:
