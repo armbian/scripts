@@ -46,7 +46,7 @@ jobs:
     name: Find desktop variants
     needs: [ Prepare ]
     runs-on: self-hosted
-    if: ${{ github.repository_owner == 'Armbian' }} && {{ env.UPLOAD != false }}
+    if: ${{ github.repository_owner == 'Armbian' }} && ${{ env.UPLOAD != false }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
