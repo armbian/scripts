@@ -24,9 +24,9 @@ on:
 
 jobs:
 
-  Lists:
+  Prepare:
 
-    name: Find desktop variants
+    name: Build
     if: ${{ github.repository_owner == 'Armbian' }}
     runs-on: self-hosted    
     outputs:
@@ -71,7 +71,7 @@ jobs:
   Desktop:
   
       name: "Build package"
-      needs: [ Lists ]
+      needs: Prepare
       if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
       runs-on: ubuntu-latest
       timeout-minutes: 480
