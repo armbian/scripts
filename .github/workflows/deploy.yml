@@ -30,23 +30,19 @@ jobs:
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        env:
-          cache-name: build-kernel
+      - name: Download changes
+        uses: actions/download-artifact@v2
         with:
-          path: build-kernel
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux            
+          name: changes
+          path: changes.txt
 
       - name: Read value
         run: |
-          echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
-          echo ${{ env.SKIP }} 
+        
+          [ ! -s changes.txt ] || echo "SKIP=yes" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
-
+        if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -61,7 +57,6 @@ jobs:
         with:
           fetch-depth: 0
           repository: armbian/scripts
-          token: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
           path: scripts
           clean: true
 
@@ -98,37 +93,3 @@ jobs:
              git commit -m "Update hashes for ${{ env.FILE_DEST }} repository"
              git push
           fi
-
-      - name: Make board support packages
-        if: ${{ env.SKIP != 'yes' }}
-        run: |
-            cd build              
-            if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-               sudo mkdir -p cache/toolchain cache/rootfs || true
-               # umount 
-               sudo umount cache/toolchain || true
-               # erase below
-               sudo mountpoint -q cache/toolchain && sudo rm -rf cache/toolchain/*
-               ! sudo mountpoint -q cache/toolchain && sudo rm -rf cache/toolchain/* && sudo mount nas:/tank/armbian/toolchain.armbian.com cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
-               ! sudo mountpoint -q cache/rootfs && sudo rm -rf cache/rootfs/* && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
-            fi   
-            # use prepared configs
-            sudo cp ../scripts/configs/* userpatches/
-            [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes          
-            ./compile.sh all-new-beta-bsp
-            # wait until it finishes
-            while :
-            do
-                [[ $(sudo ps -uax | grep compile.sh | wc -l) -le 1 ]] && exit
-                echo "Waiting for background processes to finish."
-                sleep 10
-            done
-
-      - name: Deploy to server
-        if: ${{ env.SKIP != 'yes' }}
-        run: |
-
-              sudo apt-get -y -qq install lftp
-              sudo chown -R $USER:$USER build/output/debs*
-              lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/debs/ debs/ ;bye" sftp://users.armbian.com
-              lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
