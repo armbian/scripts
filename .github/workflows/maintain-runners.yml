@@ -25,6 +25,10 @@ jobs:
           path: changes.txt
           name: changes
 
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: changes
+
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
