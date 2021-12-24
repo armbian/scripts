@@ -67,6 +67,9 @@ jobs:
         id: list_dirs
         run: |
 
+
+          cat changes.txt
+
           # fake function
           enable_extension ()
           {
