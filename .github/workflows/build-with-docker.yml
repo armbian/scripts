@@ -62,6 +62,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: changes.txt
+          name: changes
 
       - name: Prepare matrix
         id: list_dirs
