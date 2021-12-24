@@ -85,7 +85,6 @@ jobs:
           done | sort | uniq | sort -u -t: -k1,2 > changes.txt
          
       - name: Upload changes
-
         uses: actions/upload-artifact@v2
         with:
           path: changes.txt
