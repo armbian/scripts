@@ -41,6 +41,7 @@ jobs:
           #echo "BUILD=true" >> $GITHUB_ENV
           [[ -f changes.txt ]] && echo "exits"
           [ -s changes.txt ] || echo "BUILD=false" >> $GITHUB_ENV
+          ls -l
 
   Lists:
 
