@@ -61,7 +61,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: /
-          name: changes.txt
+          name: changes.zip
 
       - name: Determine changed kernels
         id: list_dirs
