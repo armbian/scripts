@@ -61,14 +61,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: /
-          name: changes.zip
+          name: changes
 
       - name: Determine changed kernels
         id: list_dirs
         run: |
 
-
-          cat changes.txt
+          cat changes
 
           # fake function
           enable_extension ()
