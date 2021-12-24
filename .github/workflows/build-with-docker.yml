@@ -79,6 +79,7 @@ jobs:
        
   image:
     needs: Prepare
+    if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
       fail-fast: false
       matrix:
