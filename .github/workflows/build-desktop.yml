@@ -37,8 +37,7 @@ jobs:
           if-no-files-found: ignore
           path: changes.txt
       - name: Extract
-        run: |
-          unzip changes.zip
+        run: |          
           [ -s changes.txt ] || echo "file is empty" && exit 1
 
   Lists:
