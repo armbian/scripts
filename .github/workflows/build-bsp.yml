@@ -52,7 +52,7 @@ jobs:
       - name: Check
         run: |
 
-          [ -s changes.txt ] || echo "SKIP=yes" >> $GITHUB_ENV
+          [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
 
       - name: Checkout Armbian support scripts
         if: ${{ env.SKIP != 'yes' }}
