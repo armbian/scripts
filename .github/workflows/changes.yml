@@ -6,8 +6,8 @@ on:
 jobs:
 
   Prepare:
-    runs-on: ubuntu-latest
-    name: Changes
+    runs-on: small
+    name: Source changes
     if: ${{ github.repository_owner == 'Armbian' }}
 
     steps:
