@@ -29,7 +29,7 @@ jobs:
 
   Prepare:
     runs-on: ubuntu-latest
-    name: "Looking for changes"
+    name: Changes
     if: ${{ github.repository_owner == 'Armbian' }}
 
     steps:
@@ -40,7 +40,6 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: nightly
           clean: false
 
       - name: Checkout support scripts
@@ -111,6 +110,6 @@ jobs:
 
         uses: actions/upload-artifact@v2
         with:
-          name: hash
+          name: changes
           if-no-files-found: ignore
           path: changes.txt
