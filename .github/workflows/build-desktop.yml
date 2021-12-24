@@ -26,7 +26,25 @@ jobs:
 
   Prepare:
 
+    name: Preparation
+    runs-on: self-hosted
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          name: changes
+          if-no-files-found: ignore
+          path: changes.txt
+      - name: Extract
+        run: |
+          unzip changes.zip
+          [ -s changes.txt ] || echo "file is empty" && exit 1
+
+  Lists:
+
     name: Find desktop variants
+    needs: [ Prepare ]
     runs-on: self-hosted
     if: ${{ github.repository_owner == 'Armbian' }}
     outputs:
@@ -79,7 +97,7 @@ jobs:
   Desktop:
   
       name: "Build package"
-      needs: [ Prepare ]
+      needs: [ Lists ]
       if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
       runs-on: ubuntu-latest
       timeout-minutes: 480
