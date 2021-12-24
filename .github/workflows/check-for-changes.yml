@@ -83,7 +83,12 @@ jobs:
                   fi
                   done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,2 > changes.txt
-         
+
+      - name: Remove previous artefacts if any
+        run: |
+
+          sudo rm -rf changes.txt 2>/dev/null || true
+
       - name: Upload changes
         uses: actions/upload-artifact@v2
         with:
