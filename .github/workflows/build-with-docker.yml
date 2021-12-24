@@ -44,7 +44,7 @@ jobs:
   Prepare:
 
     name: targets
-    runs-on: ubuntu-latest
+    runs-on: small
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
