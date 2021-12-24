@@ -87,12 +87,12 @@ jobs:
                       echo "${BOARDFAMILY}:${BRANCH}:${line}"                      
                   fi
                   done <<< "$FILES"
-          done | sort | uniq | sort -u -t: -k1,2 > changes.txt
+          done | sort | uniq | sort -u -t: -k1,2 > changes
           
-          echo "test1234" > changes.txt
+          echo "test1234" > changes
 
       - name: Upload changes
         uses: actions/upload-artifact@v2
         with:
-          path: changes.txt
+          path: changes
           if-no-files-found: ignore
