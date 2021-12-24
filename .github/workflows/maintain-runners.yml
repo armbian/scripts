@@ -90,6 +90,7 @@ jobs:
           [[ -d cache ]] && sudo rm -rf cache || true
           sudo rm -rf build-* 2>/dev/null || true
           sudo rm -rf temp 2>/dev/null || true
+          sudo rm -rf changes.txt 2>/dev/null || true
           sudo rm *.conf 2>/dev/null || true
           sudo rm *.txt 2>/dev/null || true
           
