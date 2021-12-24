@@ -42,6 +42,7 @@ jobs:
           [[ -f changes.txt ]] && echo "exits"
           [ -s changes.txt ] || echo "BUILD=false" >> $GITHUB_ENV
           ls -l
+          echo ${{ env.UPLOAD }}
 
   Lists:
 
