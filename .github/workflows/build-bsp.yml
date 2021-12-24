@@ -25,12 +25,10 @@ on:
 jobs:
 
   Prepare:
-
     name: Build
+    runs-on: self-hosted
     if: ${{ github.repository_owner == 'Armbian' }}
-    runs-on: self-hosted    
-    outputs:
-      matrix: ${{steps.list_dirs.outputs.matrix}}
+    
     steps:
 
       - name: Checkout repository
