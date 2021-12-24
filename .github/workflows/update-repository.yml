@@ -20,36 +20,31 @@ on:
 
 jobs:
 
-    repository:
-      name: publishing
-      runs-on: [self-hosted, Linux, local]
-      if: ${{ github.repository_owner == 'Armbian' }}
-      steps:
+  repository:
+    name: publishing
+    runs-on: [self-hosted, Linux, local]
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
 
-        - name: Cache Gradle packages
-          uses: actions/cache@v2
-          env:
-            cache-name: build-kernel
-          with:
-            path: build-kernel
-            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-            restore-keys: |
-              ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          name: changes
+          path: changes.txt
 
-        - name: Read value
-          run: |
-            echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
-            echo ${{ env.SKIP }} 
+      - name: Check
+        run: |
+          [ ! -s changes.txt ] || echo "SKIP=yes" >> $GITHUB_ENV
 
-        - name: Install SSH key for repository
-          if: ${{ env.SKIP != 'yes' }}
-          uses: shimataro/ssh-key-action@v2
-          with:
-            key: ${{ secrets.KEY_REPOSITORY }}
-            name: ${{ inputs.KEY_ID }}
-            known_hosts: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
-            if_key_exists: replace
+      - name: Install SSH key for repository
+        if: ${{ env.SKIP != 'yes' }}
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_REPOSITORY }}
+          name: ${{ inputs.KEY_ID }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+          if_key_exists: replace
 
-        - name: Update beta repository
-          if: ${{ env.SKIP != 'yes' }}
-          run: ssh -T -i ~/.ssh/${{ inputs.KEY_ID }} ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
+      - name: Update beta repository
+        if: ${{ env.SKIP != 'yes' }}
+        run: ssh -T -i ~/.ssh/${{ inputs.KEY_ID }} ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
