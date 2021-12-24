@@ -24,27 +24,10 @@ on:
 
 jobs:
 
-  Prepare:
-
-    name: Preparation
-    runs-on: self-hosted
-    if: ${{ github.repository_owner == 'Armbian' }}    
-    steps:
-      - name: Download changes
-        uses: actions/download-artifact@v2
-        with:
-          name: changes
-          path: changes.txt
-      - name: Extract
-        run: |
-          echo "::set-env name=BUILD_SUCCESS::true"
-          [ -s changes.txt ] || echo "::set-env name=BUILD_SUCCESS::false"
-
   Lists:
 
     name: Find desktop variants
-    if: $BUILD_SUCCESS == true
-    needs: [ Prepare ]
+    if: ${{ github.repository_owner == 'Armbian' }}
     runs-on: self-hosted    
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
@@ -59,20 +42,11 @@ jobs:
           ref: nightly
           clean: false
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        env:
-          cache-name: build-kernel
+      - name: Download changes
+        uses: actions/download-artifact@v2
         with:
-          path: build-kernel
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux            
-
-      - name: Read value
-        run: |
-          echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
-          echo ${{ env.SKIP }} 
+          name: changes
+          path: changes.txt
 
       - name: Build desktops
         id: list_dirs
@@ -90,7 +64,8 @@ jobs:
             done
           done)
 
-          [[ "${{ env.SKIP }}" == "yes" ]] && unset MATRIX
+          # don't build if there are no changes in kernels
+          [ -s changes.txt ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           
   Desktop:
