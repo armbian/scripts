@@ -30,22 +30,18 @@ jobs:
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        env:
-          cache-name: build-kernel
+      - name: Download changes
+        uses: actions/download-artifact@v2
         with:
-          path: build-kernel
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
-
-      - name: Read value
+          name: changes
+          path: changes.txt
+ 
+      - name: Check
         run: |
-          echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
-          echo ${{ env.SKIP }} 
+          [ ! -s changes.txt ] || echo "SKIP=yes" >> $GITHUB_ENV
+ 
       - name: Checkout Armbian build script
-
+        if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -64,6 +60,7 @@ jobs:
           clean: false
 
       - name: Import GPG key
+        if: ${{ env.SKIP != 'yes' }}
         uses: crazy-max/ghaction-import-gpg@v3
         with:
           gpg-private-key: ${{ secrets.GPG_KEY2 }}
