@@ -9,11 +9,21 @@ jobs:
   Prepare:
 
     name: Prepare runners
-    runs-on: [self-hosted, Linux, small]
+    runs-on: small
     if: ${{ github.repository_owner == 'armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
+
+      - name: Remove previous artefacts if any
+        run: |
+          sudo rm -rf changes.txt 2>/dev/null || true
+
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          path: changes.txt
+          name: changes
 
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -26,14 +36,16 @@ jobs:
 
       - name: Prepare matrix
         id: list_dirs
-        run:
-          echo ::set-output name=matrix::$(for x in $(seq -w 01 50); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+        run: |
+          MATRIX="seq -w 01 50"
+          [ ! -s changes.txt ] || unset MATRIX
+          echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   Maint:
   
     needs: [ Prepare ]
     runs-on: [self-hosted, Linux, small]
-    if: ${{ github.repository_owner == 'armbian' }}
+    if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 480
     strategy:
       fail-fast: false
