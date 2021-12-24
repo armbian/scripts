@@ -28,7 +28,7 @@ jobs:
 
     name: Build
     if: ${{ github.repository_owner == 'Armbian' }}
-    runs-on: self-hosted
+    runs-on: small
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
