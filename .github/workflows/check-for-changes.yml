@@ -88,8 +88,8 @@ jobs:
                       echo "${BOARDFAMILY}:${BRANCH}:${line}"
                   fi
                   done <<< "$FILES"
-          done | LC_COLLATE=C sort | uniq | LC_COLLATE=C sort -u -t: -k1,2 )
-          echo "${MATRIX}" > changes
+          done | sort | uniq | sort -u -t: -k1,2 )
+          echo "${MATRIX}" |sed '/^$/d' > changes
 
       - name: Upload changes
         uses: actions/upload-artifact@v2
