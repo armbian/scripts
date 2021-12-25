@@ -105,7 +105,7 @@ jobs:
           id: list_dirs
           run: |
             ROOTFSARCH="${{ inputs.rootfsarch }}"
-            PARTS=$(cat ${ROOTFSARCH}.txt | wc -l)
+            PARTS=$(cat build-rootfs/${ROOTFSARCH}.txt | wc -l)
             echo $PARTS
             echo ::set-output name=matrix::$(for x in $(seq -w 1 $PARTS); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
