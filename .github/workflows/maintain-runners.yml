@@ -71,8 +71,8 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run: |
-          MATRIX="seq -w 01 50"          
-          [[ -s changes && ${{ inputs.checking }} ]] || unset MATRIX
+          MATRIX="seq -w 01 50"
+          #[[ -s changes && ${{ inputs.checking }} ]] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   Purge:
