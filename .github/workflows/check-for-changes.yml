@@ -83,10 +83,10 @@ jobs:
                   # ignore diff checking in case of network errrors
                   kernel_hash="scripts/hash"$([[ ${BETA} == yes ]] && echo "-beta")"/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
                   if [[ "$hash" != "$(head -1 "${kernel_hash}" 2>/dev/null)" || "$patch_hash" != "$(tail -1 "${kernel_hash}" 2>/dev/null)" ]]; then
-                      echo "${BOARDFAMILY}:${BRANCH}:${line}"                      
+                      echo "${BOARDFAMILY}:${BRANCH}:${line}"
                   fi
                   done <<< "$FILES"
-          done | sort | uniq | sort -u -t: -k1,2 )          
+          done | LC_COLLATE=C sort | uniq | LC_COLLATE=C sort -u -t: -k1,2 )
           echo "${MATRIX}" > changes
 
       - name: Upload changes
