@@ -82,9 +82,9 @@ jobs:
             CURRENT_VERSION=$(cat VERSION)
             NEW_VERSION="${CURRENT_VERSION%%-trunk}"
             if [[ $CURRENT_VERSION == *trunk* ]]; then
-               NEW_VERSION=$(echo "${CURRENT_VERSION}" | cut -d. -f1-3)"."$((${NEW_VERSION##*.} + 1))
+               NEW_VERSION=$(echo "${CURRENT_VERSION}" | cut -d. -f1-3)"."$(printf "%04d\n" $((${NEW_VERSION##*.} + 1)))               
                else
-                NEW_VERSION=$(echo "${CURRENT_VERSION}" | cut -d. -f1-2)"."$((${NEW_VERSION##*.} + 1))
+               NEW_VERSION=$(echo "${CURRENT_VERSION}" | cut -d. -f1-2)"."$((${NEW_VERSION##*.} + 1))
             fi
             sudo git checkout -f
             sudo chown -R $USER:$USER .git
