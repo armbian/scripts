@@ -77,7 +77,7 @@ jobs:
           else
             FILENAME="targets.conf | grep ${var%:*}"
           fi
-          MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< \$(cat build/config/"${FILENAME}" | grep -v \"^\$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }} cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3))
+          MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< \$(cat build/config/"${FILENAME}" | grep -v \"^\$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }} cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3))"
           echo $MATRIX
           eval $MATRIX
           #MATRIX=$(split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< $(cat build/config/${FILENAME} | grep -v "^$" | grep -v "^#" |  ${{ inputs.include }} ${{ inputs.exclude }} cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d":" -f2,3))
