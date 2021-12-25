@@ -72,7 +72,7 @@ jobs:
         id: list_dirs
         run: |
           MATRIX="seq -w 01 50"
-          #[[ -s changes && ! ${{ inputs.checking }} ]] || unset MATRIX
+          [[ -s changes && ${{ inputs.checking }} == true ]] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   Purge:
@@ -124,7 +124,7 @@ jobs:
 
           # check if swap exists
           swapon
-          df
+          #df
           
           sudo echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y purge needrestart unattended-upgrades
