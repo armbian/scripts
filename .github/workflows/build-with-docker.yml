@@ -77,7 +77,8 @@ jobs:
           else
             FILENAME="targets.conf | grep ${var%:*}"
           fi
-          MATRIX=$(split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< \$(cat build/config/${FILENAME} | grep -v \"^\$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }} cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3))
+          #MATRIX=$(split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< \$(cat build/config/${FILENAME} | grep -v \"^\$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }} cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3))
+          MATRIX=$(split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< $(cat build/config/${FILENAME} | grep -v "^$" | grep -v "^#" |  ${{ inputs.include }} ${{ inputs.exclude }} cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d":" -f2,3))
           [ -s changes ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $MATRIX; do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
