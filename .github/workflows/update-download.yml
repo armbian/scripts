@@ -8,6 +8,8 @@ on:
         required: true
       USER_TORRENTS:
         required: true
+      HOST_TORRENTS:
+        required: true
       KNOWN_HOSTS_TORRENTS:
         required: true
 
@@ -32,3 +34,5 @@ jobs:
         - name: Create torrents
 
           run: ssh -T -i ~/.ssh/id_torrent ${{ secrets.USER_TORRENTS }}@${{ secrets.HOST_TORRENTS }}
+
+
