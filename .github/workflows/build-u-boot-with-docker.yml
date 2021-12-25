@@ -139,12 +139,13 @@ jobs:
         
           # mount deploy target
           sudo apt-get -y -qq install sshfs
-          sudo mkdir -p /root/.ssh/
-          sudo cp ~/.ssh/known_hosts /root/.ssh/
-          sudo mkdir -p build/output/debs || true
-          sudo mkdir -p build/output/debs-beta || true
-          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
-          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          #sudo mkdir -p /root/.ssh/
+          #sudo cp ~/.ssh/known_hosts /root/.ssh/
+          #sudo mkdir -p build/output/debs || true
+          #sudo mkdir -p build/output/debs-beta || true
+          sudo addgroup ${USER} fuse
+          sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty
+          sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty
 
       - name: Build
         run: |
