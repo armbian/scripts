@@ -15,24 +15,35 @@ on:
 
 jobs:
 
-    torrents:
+  torrents:
 
-      name: Update
-      runs-on: [self-hosted, Linux, local]
-      if: ${{ github.repository_owner == 'Armbian' }}
-      steps:
+    name: Update
+    runs-on: [self-hosted, Linux, local]
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
 
-        - name: Install SSH key for torrent
+      - name: Remove previous artefacts if any
+        run: |
+          sudo rm -rf changes 2>/dev/null || true
 
-          uses: shimataro/ssh-key-action@v2
-          with:
-            key: ${{ secrets.KEY_TORRENTS }}
-            name: id_torrent # optional
-            known_hosts: ${{ secrets.KNOWN_HOSTS_TORRENTS }}
-            if_key_exists: replace
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          name: changes
 
-        - name: Create torrents
+      - name: Check
+        run: |
+          [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
 
-          run: ssh -T -i ~/.ssh/id_torrent ${{ secrets.USER_TORRENTS }}@${{ secrets.HOST_TORRENTS }}
+      - name: Install SSH key for torrent
+        if: ${{ env.SKIP != 'yes' }}
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          name: id_torrent # optional
+          known_hosts: ${{ secrets.KNOWN_HOSTS_TORRENTS }}
+          if_key_exists: replace
 
-
+      - name: Create torrents
+        if: ${{ env.SKIP != 'yes' }}
+        run: ssh -T -i ~/.ssh/id_torrent ${{ secrets.USER_TORRENTS }}@${{ secrets.HOST_TORRENTS }}
