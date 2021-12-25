@@ -30,7 +30,7 @@ jobs:
 
       - name: Remove previous artefacts if any
         run: |
-
+          printenv > 2.txt
           sudo rm -rf changes 2>/dev/null || true
 
       - name: Determine changed kernels
