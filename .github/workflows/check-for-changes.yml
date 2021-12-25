@@ -18,6 +18,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
+          ref: nightly
           clean: false
 
       - name: Checkout support scripts
@@ -26,6 +27,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/scripts
           path: scripts
+          ref: master
           clean: false
 
       - name: Remove previous artefacts if any
