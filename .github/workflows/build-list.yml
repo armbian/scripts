@@ -1,0 +1,21 @@
+name: Build list
+on:
+  workflow_dispatch:
+
+jobs:
+
+  Prepare:
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/build
+          path: build
+          ref: nightly
+      - name: Make lists
+        run: |
+          ls -1 build/config/boards/
