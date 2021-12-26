@@ -189,10 +189,9 @@ jobs:
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
-          echo "BOARD=$BOARD" >> $GITHUB_ENV
-          FILES="cat config/${FILENAME} | grep "$BOARD" | grep -v \"^$\" | grep -v \"^#\" | sed -n ''$LINE'p'"
+          echo "BOARD=$BOARD" >> $GITHUB_ENV          
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
-          <<< $(eval $FILES)
+          <<< $(cat config/${FILENAME} | grep "$BOARD" | grep -v "^$" | grep -v "^#" | sed -n ''$LINE'p')
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED//,/ }"
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
