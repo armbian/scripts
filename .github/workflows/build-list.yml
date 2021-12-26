@@ -16,6 +16,15 @@ jobs:
           repository: armbian/build
           path: build
           ref: nightly
+
+      - name: Checkout scripts
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/scripts
+          path: build
+          ref: nightly
+
       - name: Make lists
         run: |
           ls -1 build/config/boards/
@@ -35,11 +44,13 @@ jobs:
 
       - name: Add
         run: |
+          cd scripts
           git pull
           git add READ
 
       - name: Commit files
         run: |
+          cd scripts
           git config --local user.email "info@armbian.com"
           git config --local user.name "Armbianworker"
           git commit --allow-empty -m "Update github actions" -a
