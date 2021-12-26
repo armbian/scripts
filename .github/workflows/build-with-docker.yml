@@ -169,7 +169,7 @@ jobs:
           export TERM=dumb
           cd build
 
-          ! grep -q "GPG_PASS" userpatches/lib.config && echo "GPG_PASS=$GPG_PASSPHRASE1" >> userpatches/lib.config
+          ! grep -q "GPG_PASS" userpatches/lib.config && echo "GPG_PASS=$GPG_PASSPHRASE1" | sudo tee -a userpatches/lib.config  > /dev/null
 
           # use local resources if possible
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
