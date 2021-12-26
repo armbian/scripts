@@ -22,8 +22,8 @@ jobs:
         with:
           fetch-depth: 0
           repository: armbian/scripts
-          path: build
-          ref: nightly
+          path: scripts
+          ref: master
 
       - name: Make lists
         run: |
