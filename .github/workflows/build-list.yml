@@ -31,13 +31,12 @@ jobs:
               echo  "$i:$j"
             done
           done)
-          echo $MATRIX
+          echo $MATRIX > READ
 
       - name: Add
         run: |
           git pull
-          git add README.md
-          git add detailed.txt
+          git add READ
 
       - name: Commit files
         run: |
