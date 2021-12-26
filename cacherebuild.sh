@@ -25,7 +25,7 @@ source "$SCRIPT_DIR/cacherebuild-functions.sh"
 [[ -f cacherebuild.conf ]] && source "$SCRIPT_DIR/cacherebuild.conf" || display_alert "Using defaults" "" "info"
 
 # hardcoded variables and calculations
-DAYSBEFORE=4
+DAYSBEFORE=6
 START_TIME=$(date +%s)
 MONTH=$(date -d "$M" '+%m' | sed 's/\<0//g')
 DAYINMONTH=$(date -d "$D" '+%d' | sed 's/\<0//g')
