@@ -167,6 +167,7 @@ jobs:
         run: |
 
           export TERM=dumb
+          export GPG_PASS="${{ secrets.GPG_PASSPHRASE1 }}"
           cd build
           
           # use local resources if possible
