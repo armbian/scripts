@@ -27,7 +27,18 @@ jobs:
 
       - name: Make lists
         run: |
-          ls -1 build/config/boards/
+          echo "
+          name: CI
+            on:
+            workflow_dispatch:
+            inputs:
+            choice:
+             type: choice
+             description: Make a choice
+            options:
+            - test
+            - avc
+            " > .github/workflows/go.yml
           find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' 
           MATRIX=$(
           set +e          
@@ -46,7 +57,7 @@ jobs:
         run: |
           cd scripts
           git pull
-          git add READ
+          git add .github/workflows/go.yml
 
       - name: Commit files
         run: |
