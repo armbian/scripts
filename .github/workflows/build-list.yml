@@ -32,3 +32,21 @@ jobs:
             done
           done)
           echo $MATRIX
+
+      - name: Add
+        run: |
+          git pull
+          git add README.md
+          git add detailed.txt
+
+      - name: Commit files
+        run: |
+          git config --local user.email "info@armbian.com"
+          git config --local user.name "Armbianworker"
+          git commit --allow-empty -m "Update github actions" -a
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.ACCESS_TOKEN }}
+          branch: ${{ github.ref }}
