@@ -168,7 +168,9 @@ jobs:
 
           export TERM=dumb
           cd build
-          
+
+          ! grep -q "GPG_PASS" userpatches/lib.config && echo "GPG_PASS=$GPG_PASSPHRASE1" >> userpatches/lib.config
+
           # use local resources if possible
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
               sudo rm -rf cache/toolchain/*
@@ -217,9 +219,6 @@ jobs:
           REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
-          
-          echo $GPG_PASSPHRASE1 | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/*.img.xz
-
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
