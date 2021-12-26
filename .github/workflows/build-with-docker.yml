@@ -153,15 +153,15 @@ jobs:
           [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
          
-#      - name: Import GPG key
+      - name: Import GPG key
 
-#        uses: crazy-max/ghaction-import-gpg@v3
-#        with:
-#          gpg-private-key: ${{ inputs.GPG_KEY1 }}
-#          passphrase: ${{ inputs.GPG_PASSPHRASE1 }}
-#          workdir: scripts
-#          git-user-signingkey: true
-#          git-commit-gpgsign: true
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ inputs.GPG_KEY1 }}
+          passphrase: ${{ inputs.GPG_PASSPHRASE1 }}
+          workdir: scripts
+          git-user-signingkey: true
+          git-commit-gpgsign: true
         
       - name: Assemble
         run: |
@@ -217,6 +217,9 @@ jobs:
           REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
+          
+          echo $GPG_PASSPHRASE1 | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/*.img.xz
+
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
