@@ -129,6 +129,7 @@ jobs:
           sudo echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y purge needrestart unattended-upgrades
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install jq
           sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y  -y -qq --with-new-pkgs upgrade
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y autoremove
           [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
