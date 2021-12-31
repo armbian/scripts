@@ -169,8 +169,6 @@ jobs:
           export TERM=dumb
           cd build
 
-          ! grep -q "GPG_PASS" userpatches/lib.config && echo "GPG_PASS=$GPG_PASSPHRASE1" | sudo tee -a userpatches/lib.config  > /dev/null
-
           # use local resources if possible
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
               sudo rm -rf cache/toolchain/*
@@ -220,6 +218,8 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
           
+          sudo chown -R $USER.$USER output/images/$BOARD/nightly/
+          sudo chmod -R 644 output/images/$BOARD/nightly/
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/nightly/*.img.xz
 
       - name: Install SSH key for storage
