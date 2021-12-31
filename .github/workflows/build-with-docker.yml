@@ -218,7 +218,7 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
           
-          sudo chown $USER.$USER output/images/$BOARD/nightly/*.xz
+          sudo chown -R $USER.$USER output/images/$BOARD/nightly
           sudo chmod 644 output/images/$BOARD/nightly/*.xz
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/nightly/*.img.xz
 
