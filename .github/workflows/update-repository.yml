@@ -50,6 +50,6 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
           if_key_exists: replace
 
-      - name: Update beta repository
+      - name: Update repository
         if: ${{ env.SKIP != 'yes' }}
         run: ssh -T -i ~/.ssh/${{ inputs.KEY_ID }} ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
