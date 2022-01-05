@@ -223,9 +223,10 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
           
-          sudo chown -R $USER.$USER output/images/$BOARD/nightly
-          sudo chmod 644 output/images/$BOARD/nightly/*.xz
-          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/nightly/*.img.xz
+          sudo chown -R $USER.$USER output/images/$BOARD || true
+          sudo chmod 644 output/images/$BOARD/*/*.xz || true
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/nightly/*.img.xz || true
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/archive/*.img.xz || true
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
