@@ -185,12 +185,18 @@ jobs:
             FOLDER=archive
           fi
           echo "FOLDER=$FOLDER" >> $GITHUB_ENV
+          var="${{ inputs.variant }}"
+          BETA="no"
+          if [[ "$var" != *stable ]]; then
+          BETA="yes"
+          fi
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
-          echo "BOARD=$BOARD" >> $GITHUB_ENV          
+          echo "BOARD=$BOARD" >> $GITHUB_ENV
+          LINIJA="cat config/${FILENAME} | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed -n ''$LINE'p'"
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
-          <<< $(cat config/${FILENAME} | grep -v "^$" | grep -v "^#" | ${{ inputs.include }} ${{ inputs.exclude }} sed -n ''$LINE'p')
+          <<< $(eval $LINIJA)
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED//,/ }"
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
@@ -199,7 +205,7 @@ jobs:
 
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           ./compile.sh docker \
-          BETA="yes" \
+          BETA="${BETA}" \
           RELEASE="${RELEASE}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
