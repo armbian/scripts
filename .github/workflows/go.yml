@@ -1,11 +1,11 @@
 
-name: CI
+name: Build single
 on:
   workflow_dispatch:
     inputs:
       choice:
         type: choice
-        description: Make a choice
+        description: Choose a board
         options:
         - bananapi
         - bananapim2plus
