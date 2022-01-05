@@ -125,7 +125,6 @@ on:
         - xt-q8l-v10
         - z28pro
         - zeropi
-        board_list
 jobs:
 
   fake:
