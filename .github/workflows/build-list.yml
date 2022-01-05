@@ -30,16 +30,16 @@ jobs:
         run: |
           echo "
           name: CI
-            on:
+          on:
             workflow_dispatch:
-            inputs:
-            choice:
-             type: choice
-             description: Make a choice
-            options:
-            - test
-            - avc
-            " > scripts/.github/workflows/go.yml
+              inputs:
+                choice:
+                  type: choice
+                  description: Make a choice
+                  options:
+                  - test
+                  - avc
+                  " > scripts/.github/workflows/go.yml
           find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' 
           MATRIX=$(
           set +e          
