@@ -191,7 +191,7 @@ jobs:
               BETA="yes"
           else
               BETA="no"
-              OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
+              OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)
               sudo git checkout master              
               sudo cp ../scripts/VERSION .
               docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)
