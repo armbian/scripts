@@ -7,9 +7,6 @@ on:
         type: choice
         description: Make a choice
         options:
-        - test
-        - avc
-        
         - bananapi
         - bananapim2plus
         - bananapim2ultra
@@ -129,3 +126,25 @@ on:
         - xt-q8l-v10
         - z28pro
         - zeropi
+
+jobs:
+  desktop:
+    uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
+
+    with:
+      variant: 'desktop:beta'
+      runner: "big"
+      part: 1
+      of: 1      
+      include: 'grep ${{ github.event.inputs.choice }}" | '
+      exclude: ''
+      uploading: false
+
+    secrets:
+      GPG_KEY1: ${{ secrets.GPG_KEY1 }}
+      GPG_PASSPHRASE1: ${{ secrets.GPG_PASSPHRASE1 }}
+      GPG_KEY2: ${{ secrets.GPG_KEY2 }}
+      GPG_PASSPHRASE2: ${{ secrets.GPG_PASSPHRASE2 }}
+      SCRIPTS_ACCESS_TOKEN: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
+      SSH_KEY_TORRENTS: ${{ secrets.KEY_TORRENTS }}
+      KNOWN_HOSTS_UPLOAD: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
