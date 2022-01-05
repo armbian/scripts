@@ -187,6 +187,9 @@ jobs:
           echo "FOLDER=$FOLDER" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
           BETA="no"
+          sudo git checkout master
+          cp ../scripts/VERSION .
+          
           if [[ "$var" != *stable ]]; then
           BETA="yes"
           fi
@@ -202,6 +205,7 @@ jobs:
           BUILD_MINIMAL="no"
           [[ ${BUILD_TARGET} == "desktop" ]] && BUILD_DESKTOP="yes"
           [[ ${BUILD_TARGET} == "minimal" ]] && BUILD_MINIMAL="yes"
+          [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes
 
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           ./compile.sh docker \
