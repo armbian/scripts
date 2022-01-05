@@ -1,12 +1,11 @@
-
 name: CI
-  on:
+on:
   workflow_dispatch:
-  inputs:
-  choice:
-   type: choice
-   description: Make a choice
-  options:
-  - test
-  - avc
-  
+    inputs:
+      choice:
+        type: choice
+        description: Make a choice
+        options:
+        - foo
+        - bar
+        - baz
