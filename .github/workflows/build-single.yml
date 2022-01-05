@@ -6,7 +6,6 @@ on:
         type: choice
         description: Choose a board
         options:
-        board_list
         - bananapi
         - bananapim2plus
         - bananapim2ultra
