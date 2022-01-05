@@ -143,6 +143,7 @@ jobs:
           if-no-files-found: ignore
 
   desktop:
+    needs: [ fake ]
     uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
 
     with:
