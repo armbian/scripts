@@ -194,7 +194,7 @@ jobs:
               OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)
               sudo git checkout master              
               sudo cp ../scripts/VERSION .
-              sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)
+              sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
           fi
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
