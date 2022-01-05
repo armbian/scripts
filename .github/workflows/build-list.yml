@@ -28,25 +28,14 @@ jobs:
 
       - name: Make lists
         run: |
-          echo "
-          name: CI
-          on:
-            workflow_dispatch:
-              inputs:
-                choice:
-                  type: choice
-                  description: Make a choice
-                  options:
-                  - test
-                  - avc
-                  " > scripts/.github/workflows/go.yml
-          cat build/config/targets*.conf | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | sort | uniq | sed  's/^/        - /' >> scripts/.github/workflows/go.yml
-
+          cat build/config/targets*.conf | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | sort | uniq | sed  's/^/        - /' >> targets.txt
+          sed '/board_list/r.github/workflows/targets.txt' .github/workflows/build-single.template > .github/workflows/build-single.yml
+          
       - name: Add
         run: |
           cd scripts
           git pull
-          git add .github/workflows/go.yml
+          git add .github/workflows/build-single.yml
 
       - name: Commit files
         run: |
