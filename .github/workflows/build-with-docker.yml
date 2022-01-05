@@ -186,12 +186,15 @@ jobs:
           fi
           echo "FOLDER=$FOLDER" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
-          BETA="no"
-          sudo git checkout master
-          sudo cp ../scripts/VERSION .
           
           if [[ "$var" != *stable ]]; then
-          BETA="yes"
+              BETA="yes"
+          else
+              BETA="no"
+              OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
+              sudo git checkout master              
+              sudo cp ../scripts/VERSION .
+              docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)
           fi
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
