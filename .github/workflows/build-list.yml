@@ -22,6 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           repository: armbian/scripts
+          token: ${{ secrets.ACTION }}
           path: scripts
           ref: master
 
