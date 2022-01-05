@@ -128,6 +128,20 @@ on:
         - zeropi
 
 jobs:
+
+  fake:
+    runs-on: ubuntu-latest
+    name: Source changes
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
+      - run: |
+          echo "not empty" > changes
+      - uses: actions/upload-artifact@v2
+        with:
+          path: changes
+          name: changes
+          if-no-files-found: ignore
+
   desktop:
     uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
 
