@@ -188,7 +188,7 @@ jobs:
           var="${{ inputs.variant }}"
           BETA="no"
           sudo git checkout master
-          cp ../scripts/VERSION .
+          sudo cp ../scripts/VERSION .
           
           if [[ "$var" != *stable ]]; then
           BETA="yes"
