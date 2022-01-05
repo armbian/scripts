@@ -1,3 +1,4 @@
+
 name: CI
 on:
   workflow_dispatch:
@@ -6,6 +7,6 @@ on:
         type: choice
         description: Make a choice
         options:
-        - foo
-        - bar
-        - baz
+        - test
+        - avc
+        
