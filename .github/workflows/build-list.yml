@@ -30,7 +30,7 @@ jobs:
         run: |
 
           cat build/config/targets*.conf | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | sort | uniq | sed  's/^/        - /' > targets.txt
-          sed '/board_list/rtargets.txt' script/.github/workflows/build-single.template > script/.github/workflows/build-single.yml
+          sed '/board_list/rtargets.txt' scripts/.github/workflows/build-single.template > scripts/.github/workflows/build-single.yml
           
       - name: Add
         run: |
