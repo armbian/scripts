@@ -9,7 +9,7 @@ on:
 jobs:
 
   fake:
-    runs-on: ubuntu-latest
+    runs-on: small
     name: Source changes
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
@@ -44,7 +44,7 @@ jobs:
       KNOWN_HOSTS_UPLOAD: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
 
   cleanup:
-    runs-on: ubuntu-latest
+    runs-on: small
     needs: [ single ]
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
