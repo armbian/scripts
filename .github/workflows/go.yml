@@ -147,7 +147,7 @@ jobs:
     uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
 
     with:
-      variant: 'desktop:beta'
+      variant: ''
       runner: "big"
       part: 1
       of: 1      
