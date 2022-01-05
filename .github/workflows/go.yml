@@ -142,7 +142,7 @@ jobs:
           name: changes
           if-no-files-found: ignore
 
-  desktop:
+  single:
     needs: [ fake ]
     uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
 
