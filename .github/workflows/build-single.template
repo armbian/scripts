@@ -1,0 +1,54 @@
+name: Build single
+on:
+  workflow_dispatch:
+    inputs:
+      choice:
+        type: choice
+        description: Choose a board
+        options:
+        board_list
+jobs:
+
+  fake:
+    runs-on: ubuntu-latest
+    name: Source changes
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
+      - run: |
+          echo "not empty" > changes
+      - uses: actions/upload-artifact@v2
+        with:
+          path: changes
+          name: changes
+          if-no-files-found: ignore
+
+  single:
+    needs: [ fake ]
+    uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
+
+    with:
+      variant: 'yes:stable'
+      runner: "big"
+      part: 1
+      of: 1      
+      include: 'grep -w ${{ github.event.inputs.choice }} | '
+      exclude: ''
+      uploading: false
+
+    secrets:
+      GPG_KEY1: ${{ secrets.GPG_KEY1 }}
+      GPG_PASSPHRASE1: ${{ secrets.GPG_PASSPHRASE1 }}
+      GPG_KEY2: ${{ secrets.GPG_KEY2 }}
+      GPG_PASSPHRASE2: ${{ secrets.GPG_PASSPHRASE2 }}
+      SCRIPTS_ACCESS_TOKEN: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
+      SSH_KEY_TORRENTS: ${{ secrets.KEY_TORRENTS }}
+      KNOWN_HOSTS_UPLOAD: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: [ single ]
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: changes
