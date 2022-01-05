@@ -28,8 +28,9 @@ jobs:
 
       - name: Make lists
         run: |
-          cat build/config/targets*.conf | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | sort | uniq | sed  's/^/        - /' >> targets.txt
-          sed '/board_list/r.github/workflows/targets.txt' .github/workflows/build-single.template > .github/workflows/build-single.yml
+
+          cat build/config/targets*.conf | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | sort | uniq | sed  's/^/        - /' > targets.txt
+          sed '/board_list/rbuild/.github/workflows/targets.txt' build/.github/workflows/build-single.template > build/.github/workflows/build-single.yml
           
       - name: Add
         run: |
