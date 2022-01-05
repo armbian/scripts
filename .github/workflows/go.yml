@@ -151,7 +151,7 @@ jobs:
       runner: "big"
       part: 1
       of: 1      
-      include: 'grep ${{ github.event.inputs.choice }}" | '
+      include: 'grep -w ${{ github.event.inputs.choice }} | '
       exclude: ''
       uploading: false
 
