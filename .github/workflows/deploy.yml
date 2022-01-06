@@ -61,7 +61,7 @@ jobs:
         with:
           fetch-depth: 0
           repository: armbian/scripts
-          token: ${{ secrets.ACTION }}
+          token: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
           path: scripts
           clean: true
 
@@ -101,6 +101,6 @@ jobs:
         if: ${{ env.SKIP != 'yes' }}
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.ACTION }}
+          github_token: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
           branch: ${{ github.ref }}
           directory: scripts
