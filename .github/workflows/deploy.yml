@@ -61,6 +61,7 @@ jobs:
         with:
           fetch-depth: 0
           repository: armbian/scripts
+          token: ${{ secrets.ACTION }}
           path: scripts
           clean: true
 
@@ -92,8 +93,14 @@ jobs:
              git config --global user.name "Armbianworker"
              git config pull.rebase false
              git pull
-             echo "update"
              git add .
-             git commit -m "Update hashes for ${{ env.FILE_DEST }} repository"
-             git push
+             git commit --allow-empty -m "Update hashes for ${{ env.FILE_DEST }} repository"
           fi
+
+      - name: Push changes
+        if: ${{ env.SKIP != 'yes' }}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.ACTION }}
+          branch: ${{ github.ref }}
+          directory: scripts
