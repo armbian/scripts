@@ -149,7 +149,17 @@ jobs:
 
           export TERM=dumb
           cd build
-          
+
+          if [[ "${{ inputs.destref }}" != "master" ]]; then
+              BETA="yes"
+          else
+              BETA="no"
+              OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)
+              sudo git checkout -f ${{ inputs.destref }}              
+              sudo cp ../scripts/VERSION .
+              sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
+          fi
+
           # use local resources if possible
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
               sudo rm -rf cache/toolchain/*
@@ -170,7 +180,7 @@ jobs:
           ARMBIAN_MIRROR="https://github.com/armbian/mirror/releases/download/" \
           BOARD="$BOARD" \
           PRIVATE_CCACHE="yes" \
-          BETA="yes" \
+          BETA="$BETA" \
           USE_TORRENT="yes" \
           KERNEL_ONLY="no" \
           KERNEL_KEEP_CONFIG="no" \
@@ -196,7 +206,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: u-boot-${{ env.BOARD }}-${{ env.BRANCH }}
-          path: build/output/debs-beta/*u-boot*
+          path: |
+            build/output/debs-beta/*u-boot*
+            build/output/debs/*u-boot*
           if-no-files-found: ignore
 
       - name: Deploy to server
@@ -205,5 +217,6 @@ jobs:
 
           while fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do sleep 1; done;
           sudo apt-get -y -qq install lftp
-          sudo chown -R $USER:$USER build/output/debs-beta/
+          sudo chown -R $USER:$USER build/output/debs-beta/ build/output/debs/
           lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
+          lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/debs/ debs/ ;bye" sftp://users.armbian.com
