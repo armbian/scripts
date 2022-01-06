@@ -95,12 +95,5 @@ jobs:
              git pull
              git add .
              git commit --allow-empty -m "Update hashes for ${{ env.FILE_DEST }} repository"
+             git push
           fi
-
-      - name: Push changes
-        if: ${{ env.SKIP != 'yes' }}
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
-          branch: ${{ github.ref }}
-          directory: scripts
