@@ -14,6 +14,8 @@ on:
         type: string
       uploading:
         type: string
+      destref:
+        type: string
     secrets:
       GPG_KEY1:
         required: true
@@ -46,7 +48,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: nightly
+          ref: ${{ inputs.destref }}
           clean: false
 
       - name: Remove previous artefacts if any
@@ -84,7 +86,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: nightly
+          ref: ${{ inputs.destref }}
           clean: false
 
       - name: Checkout support scripts
