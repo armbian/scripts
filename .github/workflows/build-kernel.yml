@@ -202,7 +202,7 @@ jobs:
               echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
               echo "UPLOAD=true" >> $GITHUB_ENV
               # Cleanup
-              sudo find output/debs-beta/. -type f -not \( -name 'linux*' -or -name 'armbian*' \) -print0 | sudo xargs -0 -I {} rm {}
+              sudo find output/debs-beta/. -type f -not \( -name 'linux*' -or -name 'armbian*' -or -name '.*' \) -print0 | sudo xargs -0 -I {} rm {}
               # copy edge brach to stable repo
               sudo cp output/debs-beta/linux-{dtb,image,source,headers}-edge-* output/debs/ || true
           fi
