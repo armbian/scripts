@@ -146,7 +146,8 @@ jobs:
           sudo rm -rf cache/sources/ || true
           sudo rm -rf output/debs/ || true
           sudo rm -rf output/debs-beta/ || true
-          sudo shutdown -r 1
+          # lets keep this disabled for a while
+          #sudo shutdown -r 1
   Finish:
     name: Finish
     needs: [Purge]
