@@ -1,4 +1,4 @@
-name: Update Armbian on hardware
+name: Update on hardware and reboot
 on:
   workflow_dispatch:
 
