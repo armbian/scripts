@@ -142,7 +142,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         uses: juliangruber/sleep-action@v1
         with:
-          time: 3m
+          time: 2m
 
       - name: Ping
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
