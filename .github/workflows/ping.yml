@@ -29,4 +29,5 @@ jobs:
         run: |
           echo "Ping ${{ matrix.name }}"
           ping -w5 ${{ matrix.ip }}
-          echo $?         
+          echo $?
+          ssh root@${{ matrix.ip }} -o StrictHostKeyChecking=no "apt-get -y update"
