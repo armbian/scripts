@@ -4,7 +4,7 @@ on:
 
 jobs:
   
-  Build:
+  Test:
     runs-on: igor
     timeout-minutes: 480
     strategy:
@@ -114,3 +114,11 @@ jobs:
           ping -w5 ${{ matrix.ip }}
           echo $?
           [[ $? -eq 0 ]] && ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+  Stop:
+    runs-on: igor
+    needs: Test
+    steps:
+    - name: Stop
+      run: |
+        echo "Stop"
+    
