@@ -116,6 +116,7 @@ jobs:
           [[ $? -eq 0 ]] && ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
   Stop:
     runs-on: igor
+    if: ${{ always() }}
     needs: Test
     steps:
     - name: Stop
