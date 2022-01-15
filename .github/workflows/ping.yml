@@ -14,58 +14,85 @@ jobs:
         include:
           - ip: "10.0.50.252" 
             name: "Orange Pi Zero Plus 2"
+            power-socket: 6
           - ip: "10.0.30.101" 
             name: "Orange Pi Zero Plus"
+            power-socket: 6
           - ip: "10.0.30.103" 
             name: "Orange Pi One"
+            power-socket: 6
           - ip: "10.0.30.105" 
             name: "Cubieboard"
+            power-socket: 6
           - ip: "10.0.30.107" 
             name: "Orange Pi Win"
+            power-socket: 15
           - ip: "10.0.30.108" 
             name: "Orange Pi Prime"
+            power-socket: 9
           - ip: "10.0.30.112" 
             name: "Orange Pi+ 2E"
+            power-socket: 13
           - ip: "10.0.30.113" 
             name: "Orange Pi 3"
+            power-socket: 16
           - ip: "10.0.30.115" 
             name: "Odroid XU4"
+            power-socket: 66
           - ip: "10.0.30.117" 
             name: "Rockpi 4B"
+            power-socket: 6
           - ip: "10.0.30.119" 
             name: "Tinkerboard"
+            power-socket: 14
           - ip: "10.0.30.120" 
             name: "RockPro 64"
+            power-socket: 6
           - ip: "10.0.30.121" 
             name: "Odroid C4"
+            power-socket: 2
           - ip: "10.0.30.126" 
             name: "Nanopi R2S"
+            power-socket: 6
           - ip: "10.0.30.134" 
-            name: "Cubox i2eX/i4"
+            name: "Cubox i2eX/i4"            
+            power-socket: 64
           - ip: "10.0.30.140" 
             name: "NanoPi Neo 2 Black"
+            power-socket: 65
           - ip: "10.0.30.141" 
             name: "ZeroPi"
+            power-socket: 1
           - ip: "10.0.30.144" 
             name: "Banana Pi M2U"
+            power-socket: 4
           - ip: "10.0.30.150" 
             name: "Orange Pi R1"
+            power-socket: 6
           - ip: "10.0.30.167" 
             name: "Cubietruck"
+            power-socket: 3
           - ip: "10.0.30.169" 
             name: "Clearfog Pro"
-          - ip: "10.0.30.189" 
+            power-socket: 200
+          - ip: "10.0.30.189"
             name: "Pine H64"
+            power-socket: 21
           - ip: "10.0.30.193" 
             name: "Odroid C2"
+            power-socket: 8
           - ip: "10.0.30.219" 
             name: "Rockpi E"
+            power-socket: 6
           - ip: "10.0.30.241" 
             name: "Banana Pi Pro"
+            power-socket: 6
           - ip: "10.0.30.246" 
             name: "NanoPi M4"
+            power-socket: 6
           - ip: "10.0.30.254" 
             name: "Orange Pi Zero"  
+            power-socket: 6
     steps:
     
       - name: Install SSH key for storage
@@ -99,6 +126,7 @@ jobs:
       - name: Reboot
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
+          echo "Power port ${{ matrix.power-socket }}"
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "shutdown -r 1"
 
       - name: Sleep for 3m
