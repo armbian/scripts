@@ -127,7 +127,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
 
-      - name: Updat 
+      - name: Update
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade"
@@ -138,11 +138,11 @@ jobs:
           echo "Power port ${{ matrix.power-socket }}"
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "shutdown -r 1"
 
-      - name: Sleep for 2 min
+      - name: Sleep for 3 min
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         uses: juliangruber/sleep-action@v1
         with:
-          time: 2m
+          time: 3m
 
       - name: Ping
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
