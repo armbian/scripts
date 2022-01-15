@@ -84,6 +84,7 @@ jobs:
           else
             echo "$server ✗"
           fi
+          echo "PROCEED=true" >> $GITHUB_ENV
     
       - name: Login
         if: ${{ env.PROCEED == 'true' }}
