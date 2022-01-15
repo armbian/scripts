@@ -12,8 +12,10 @@ jobs:
       fail-fast: false # let other jobs try to complete if one fails
       matrix: 
         include:
+          - ip: 10.0.50.252
+            name: "Orange Pi Zero Plus 2"
           - ip: 10.0.30.221
-            name: "Banana"
+            name: "Banana Pi PRO"
           - ip: 10.0.30.241
             name: "Rpi"
     steps:
