@@ -17,6 +17,13 @@ jobs:
           - ip: 10.0.30.241
             name: "Rpi"
     steps:
+    
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_CI }}
+          if_key_exists: replace
+    
       - name: Ping
         run: |
           echo "Ping ${{ matrix.name }}"
