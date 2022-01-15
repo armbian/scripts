@@ -8,7 +8,7 @@ jobs:
     runs-on: igor
     timeout-minutes: 480
     strategy:
-      max-parallel: 4
+      max-parallel: 16
       fail-fast: false
       matrix: 
         include:
