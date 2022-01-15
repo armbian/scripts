@@ -26,9 +26,9 @@ jobs:
       max-parallel: 4
       fail-fast: false # let other jobs try to complete if one fails
       matrix: 
-        include: # build this way: cat userdata.csv | cut -d"/" -f1 | uniq | sed 's/.*/          - board: &/'
-          - "10.0.30.221":"NanoPC T4"
-          - "10.0.30.241":"Banana Pi Pro"          
+        include:
+          - ip: 10.0.30.221
+          - ip: 10.0.30.241
     steps:
       - name: Install depen
         run: sudo apt-get -y install parallel jq axel
