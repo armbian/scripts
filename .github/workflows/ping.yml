@@ -17,5 +17,7 @@ jobs:
           - ip: 10.0.30.241
             name: "Rpi"
     steps:
-      - name: Install depen
-        run: sudo apt-get -y install parallel jq axel
+      - name: Ping
+        run:
+          echo "Ping ${{ matrix.name }}"
+          ping -w5 ${{ matrix.ip }}
