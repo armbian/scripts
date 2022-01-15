@@ -3,24 +3,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  Prepare:
-    runs-on: ubuntu-20.04
-    if: ${{ github.repository_owner == 'Armbian' }}
-    steps:
-      -
-        run: |
-          wget -P temp https://www.armbian.com/userdata.csv
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-build
-        with:
-          path: temp
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
-
+  
   Build: # short name because GH will expand with the matrix values
-    needs: [ Prepare ]
-    runs-on: ubuntu-20.04
+    runs-on: igor
     timeout-minutes: 480
     strategy:
       max-parallel: 4
