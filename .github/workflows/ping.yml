@@ -18,6 +18,7 @@ jobs:
             name: "Rpi"
     steps:
       - name: Ping
-        run:
+        run: |
           echo "Ping ${{ matrix.name }}"
           ping -w5 ${{ matrix.ip }}
+          echo $?         
