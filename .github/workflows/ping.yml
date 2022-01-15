@@ -92,28 +92,34 @@ jobs:
           server="${{ matrix.ip }}"
           if nc -z $server 22 2>/dev/null; then
             echo "$server ✓"
+            echo "PROCEED=true" >> $GITHUB_ENV
           else
             echo "$server ✗"
           fi
     
       - name: Login
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
 
-      - name: Update
+      - name: Updat 
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y upgrade"
 
       - name: Reboot
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "shutdown -r 1"
 
       - name: Sleep for 3m
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         uses: juliangruber/sleep-action@v1
         with:
           time: 3m
 
       - name: Ping
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
           echo "Ping ${{ matrix.name }}"
           ping -w5 ${{ matrix.ip }}
