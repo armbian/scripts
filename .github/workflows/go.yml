@@ -1,0 +1,12 @@
+
+  name: CI
+    on:
+    workflow_dispatch:
+    inputs:
+    choice:
+     type: choice
+     description: Make a choice
+    options:
+    - test
+    - avc
+    
