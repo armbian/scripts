@@ -8,7 +8,7 @@ jobs:
     runs-on: igor
     timeout-minutes: 480
     strategy:
-      max-parallel: 16
+      #max-parallel: 16
       fail-fast: false
       matrix: 
         include:
@@ -95,10 +95,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y upgrade"
 
-      - name: Sleep for 5m
+      - name: Reboot
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "shutdown -r 1"
+
+      - name: Sleep for 3m
         uses: juliangruber/sleep-action@v1
         with:
-          time: 5m
+          time: 3m
 
       - name: Ping
         run: |
