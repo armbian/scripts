@@ -28,7 +28,9 @@ jobs:
       matrix: 
         include:
           - ip: 10.0.30.221
+            name: "Banana"
           - ip: 10.0.30.241
+            name: "Rpi"
     steps:
       - name: Install depen
         run: sudo apt-get -y install parallel jq axel
