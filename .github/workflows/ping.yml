@@ -96,6 +96,12 @@ jobs:
           - ip: "10.0.30.254" 
             name: "Orange Pi Zero"  
             power-socket: 6
+          - ip: "10.0.30.170" 
+            name: "Udoo Quad"  
+            power-socket: 3
+          - ip: "10.0.30.153" 
+            name: "UEFI x86"
+            power-socket: 0
     steps:
     
       - name: Install SSH key for storage
