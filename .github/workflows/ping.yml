@@ -119,7 +119,7 @@ jobs:
             echo "PROCEED=true" >> $GITHUB_ENV
           else
             echo "$server ✗ needs to be power cycled"
-            [[ -n ${{ matrix.power-socket }} ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
+            [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
           fi
     
       - name: Login
@@ -154,7 +154,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
           else
           # power cycle
-          [[ -n ${{ matrix.power-socket }} ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
+          [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
           fi
   Stop:
     runs-on: igor
