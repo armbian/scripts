@@ -141,7 +141,12 @@ jobs:
           echo "Ping ${{ matrix.name }}"
           ping -w5 ${{ matrix.ip }}
           echo $?
-          [[ $? -eq 0 ]] && ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+          if [[ $? -eq 0 ]]; then
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+          else
+          # power cycle
+          ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
+          fi
   Stop:
     runs-on: igor
     if: ${{ always() }}
