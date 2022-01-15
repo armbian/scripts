@@ -9,7 +9,7 @@ on:
 jobs:
   
   Test:
-    name: "Smoke tests"
+    name: "Smoke test"
     runs-on: igor
     if: ${{ github.repository_owner == 'Armbian' }}
     timeout-minutes: 480
