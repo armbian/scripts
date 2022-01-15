@@ -1,4 +1,4 @@
-name: Update on hardware and reboot
+name: Update and reboot
 on:
   workflow_dispatch:
 
