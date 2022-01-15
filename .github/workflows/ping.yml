@@ -1,6 +1,10 @@
 name: Update DUTs and reboot
 on:
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      KEY_CI:
+        required: true
 
 jobs:
   
