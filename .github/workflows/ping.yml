@@ -6,6 +6,7 @@ jobs:
   
   Test:
     runs-on: igor
+    if: ${{ github.repository_owner == 'Armbian' }}
     timeout-minutes: 480
     strategy:
       #max-parallel: 16
@@ -113,6 +114,7 @@ jobs:
 
       - name: Is online?
         run: |
+
           server="${{ matrix.ip }}"
           if nc -z $server 22 2>/dev/null; then
             echo "$server ✓"
@@ -123,19 +125,21 @@ jobs:
           fi
     
       - name: Login
-        if: ${{ env.PROCEED == 'true' }}
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
+
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
 
       - name: Update
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
+
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade"
 
       - name: Reboot
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
-          echo "Power port ${{ matrix.power-socket }}"
+
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "shutdown -r 1"
 
       - name: Sleep for 3 min
@@ -147,14 +151,13 @@ jobs:
       - name: Ping
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
-          echo "Ping ${{ matrix.name }}"
+
           ping -w5 ${{ matrix.ip }}
-          echo $?
           if [[ $? -eq 0 ]]; then
-          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+              ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
           else
-          # power cycle
-          [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
+              # power cycle
+              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
           fi
   Stop:
     runs-on: igor
@@ -163,5 +166,5 @@ jobs:
     steps:
     - name: Stop
       run: |
+
         echo "Stop"
-    
