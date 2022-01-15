@@ -30,4 +30,5 @@ jobs:
           echo "Ping ${{ matrix.name }}"
           ping -w5 ${{ matrix.ip }}
           echo $?
-          ssh root@${{ matrix.ip }} -o StrictHostKeyChecking=no "apt-get -y update"
+          ssh root@10.0.30.241 "run-parts /etc/update-motd.d/"
+          ssh root@${{ matrix.ip }} -o StrictHostKeyChecking=no "apt-get -y update; apt-get -y upgrade"
