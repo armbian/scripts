@@ -14,10 +14,10 @@ jobs:
         include:
           - ip: "10.0.50.252" 
             name: "Orange Pi Zero Plus 2"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.101" 
             name: "Orange Pi Zero Plus"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.103" 
             name: "Orange Pi One"
             power-socket: 6
@@ -41,19 +41,19 @@ jobs:
             power-socket: 66
           - ip: "10.0.30.117" 
             name: "Rockpi 4B"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.119" 
             name: "Tinkerboard"
             power-socket: 14
           - ip: "10.0.30.120" 
             name: "RockPro 64"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.121" 
             name: "Odroid C4"
             power-socket: 2
           - ip: "10.0.30.126" 
             name: "Nanopi R2S"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.134" 
             name: "Cubox i2eX/i4"            
             power-socket: 64
@@ -68,7 +68,7 @@ jobs:
             power-socket: 4
           - ip: "10.0.30.150" 
             name: "Orange Pi R1"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.167" 
             name: "Cubietruck"
             power-socket: 3
@@ -86,22 +86,22 @@ jobs:
             power-socket: 198
           - ip: "10.0.30.219" 
             name: "Rockpi E"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.241" 
             name: "Banana Pi Pro"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.246" 
             name: "NanoPi M4"
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.254" 
             name: "Orange Pi Zero"  
             power-socket: 6
           - ip: "10.0.30.170" 
             name: "Udoo Quad"  
             power-socket: 3
-#          - ip: "10.0.30.153" 
-#            name: "UEFI x86"
-#            power-socket: 0
+          - ip: "10.0.30.153"
+            name: "UEFI x86"
+            power-socket: ""
     steps:
     
       - name: Install SSH key for storage
