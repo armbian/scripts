@@ -1,15 +1,15 @@
-name: Ping boards
+name: Update Armbian on hardware
 on:
   workflow_dispatch:
 
 jobs:
   
-  Build: # short name because GH will expand with the matrix values
+  Build:
     runs-on: igor
     timeout-minutes: 480
     strategy:
       max-parallel: 4
-      fail-fast: false # let other jobs try to complete if one fails
+      fail-fast: false
       matrix: 
         include:
           - ip: "10.0.50.252" 
@@ -87,10 +87,21 @@ jobs:
           known_hosts: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
           if_key_exists: replace
     
+      - name: Login
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+
+      - name: Update
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y upgrade"
+
+      - name: Sleep for 5m
+        uses: juliangruber/sleep-action@v1
+        with:
+          time: 5m
+
       - name: Ping
         run: |
           echo "Ping ${{ matrix.name }}"
           ping -w5 ${{ matrix.ip }}
           echo $?
-          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
-          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y upgrade"
