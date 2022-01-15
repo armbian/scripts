@@ -130,7 +130,7 @@ jobs:
       - name: Updat 
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y upgrade"
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade"
 
       - name: Reboot
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
