@@ -64,8 +64,6 @@ jobs:
             name: "Odroid N2"
           - ip: "10.0.30.219" 
             name: "Rockpi E"
-          - ip: "10.0.30.221" 
-            name: "NanoPC T4"
           - ip: "10.0.30.241" 
             name: "Banana Pi Pro"
           - ip: "10.0.30.246" 
