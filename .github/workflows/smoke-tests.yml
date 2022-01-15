@@ -1,4 +1,4 @@
-name: Update DUTs and reboot
+name: Smoke tests
 on:
   workflow_dispatch:
   workflow_call:
@@ -9,6 +9,7 @@ on:
 jobs:
   
   Test:
+    name: "Smoke tests"
     runs-on: igor
     if: ${{ github.repository_owner == 'Armbian' }}
     timeout-minutes: 480
