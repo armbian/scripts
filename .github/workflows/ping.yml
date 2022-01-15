@@ -18,6 +18,8 @@ jobs:
             name: "Orange Pi Zero Plus"
           - ip: 10.0.30.221
             name: "Banana Pi Pro"
+          - ip: 10.0.10.169
+            name: "Clearfog Pro"
           - ip: 10.0.30.241
             name: "Rpi"
     steps:
