@@ -58,8 +58,6 @@ jobs:
             name: "Pine H64"
           - ip: "10.0.30.193" 
             name: "Odroid C2"
-          - ip: "10.0.30.217"
-            name: "Odroid N2"
           - ip: "10.0.30.219" 
             name: "Rockpi E"
           - ip: "10.0.30.241" 
