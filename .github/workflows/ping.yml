@@ -109,9 +109,9 @@ jobs:
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
           else
-            echo "$server ✗"
+            echo "$server ✗ needs to be power cycled"
+            ssh -o StrictHostKeyChecking=no root@$10.0.40.6 "./restart ${{ matrix.power-socket }}"
           fi
-          echo "PROCEED=true" >> $GITHUB_ENV
     
       - name: Login
         if: ${{ env.PROCEED == 'true' }}
