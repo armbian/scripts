@@ -1,30 +1,34 @@
-
-name: Build single
+name: Ping boards
 on:
   workflow_dispatch:
-    inputs:
-      choice:
-        type: choice
-        description: Choose a board
-        options:
-        - bananapi
-        - bananapim2plus
-        - bananapim64
-jobs:
 
-  fake:
-    runs-on: small
-    name: Source changes
+jobs:
+  Prepare:
+    runs-on: ubuntu-20.04
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
-      - run: |
-          echo "not empty" > changes
-      - uses: actions/upload-artifact@v2
+      -
+        run: |
+          wget -P temp https://www.armbian.com/userdata.csv
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-build
         with:
-          path: changes
-          name: changes
-          if-no-files-found: ignore
+          path: temp
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
 
-  single:
-    needs: [ fake ]
-    uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
+  Build: # short name because GH will expand with the matrix values
+    needs: [ Prepare ]
+    runs-on: ubuntu-20.04
+    timeout-minutes: 480
+    strategy:
+      max-parallel: 4
+      fail-fast: false # let other jobs try to complete if one fails
+      matrix: 
+        include: # build this way: cat userdata.csv | cut -d"/" -f1 | uniq | sed 's/.*/          - board: &/'
+          - "10.0.30.221":"NanoPC T4"
+          - "10.0.30.241":"Banana Pi Pro"          
+    steps:
+      - name: Install depen
+        run: sudo apt-get -y install parallel jq axel
