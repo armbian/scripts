@@ -1,4 +1,4 @@
-name: Update and reboot
+name: Update DUTs and reboot
 on:
   workflow_dispatch:
 
