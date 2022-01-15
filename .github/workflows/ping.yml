@@ -110,7 +110,7 @@ jobs:
             echo "PROCEED=true" >> $GITHUB_ENV
           else
             echo "$server ✗ needs to be power cycled"
-            ssh -o StrictHostKeyChecking=no root@$10.0.40.6 "./restart ${{ matrix.power-socket }}"
+            ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
           fi
     
       - name: Login
