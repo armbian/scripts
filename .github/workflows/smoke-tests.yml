@@ -75,7 +75,7 @@ jobs:
           - ip: "10.0.30.126" 
             name: "Nanopi R2S"
             power-socket: ""
-          - ip: "10.0.30.151"
+          - ip: "10.0.40.254"
             name: "NanoPi R1"
             power-socket: ""
           - ip: "10.0.30.134" 
