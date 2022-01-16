@@ -30,9 +30,6 @@ jobs:
           - ip: "10.0.30.160"
             name: "Khadas VIM1"
             power-socket: ""
-#         - ip: "10.0.30.161"
-#           name: "Khadas Edge"
-#           power-socket: ""
           - ip: "10.0.30.162"
             name: "Khadas VIM3"
             power-socket: ""
@@ -63,9 +60,6 @@ jobs:
           - ip: "10.0.30.119" 
             name: "Tinkerboard"
             power-socket: 14
-#          - ip: "10.0.30.164"
-#            name: "Lime A64"
-#            power-socket: 14
           - ip: "10.0.30.165"
             name: "Orange Pi One+"
             power-socket: 14
@@ -102,9 +96,6 @@ jobs:
           - ip: "10.0.30.167" 
             name: "Cubietruck"
             power-socket: 3
-          - ip: "10.0.30.105" 
-            name: "Cubieboard"
-            power-socket: ""
           - ip: "10.0.30.169" 
             name: "Clearfog Pro"
             power-socket: 200
