@@ -105,7 +105,7 @@ jobs:
           - ip: "10.0.30.170" 
             name: "Udoo Quad"  
             power-socket: 3
-          - ip: "10.0.30.153"
+          - ip: "10.0.40.250"
             name: "UEFI x86"
             power-socket: ""
           - ip: "10.0.40.202"
