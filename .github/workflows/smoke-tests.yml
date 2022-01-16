@@ -39,7 +39,7 @@ jobs:
           - ip: "10.0.30.163"
             name: "Khadas VIM2"            
             power-socket: ""            
-          - ip: "10.0.40.252" 
+          - ip: "10.0.30.166" 
             name: "Raspberrypi 3+"
             power-socket: ""
           - ip: "10.0.30.107" 
