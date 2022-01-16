@@ -63,9 +63,9 @@ jobs:
           - ip: "10.0.30.119" 
             name: "Tinkerboard"
             power-socket: 14
-          - ip: "10.0.30.164"
-            name: "Lime A64"
-            power-socket: 14
+#          - ip: "10.0.30.164"
+#            name: "Lime A64"
+#            power-socket: 14
           - ip: "10.0.30.165"
             name: "Orange Pi One+"
             power-socket: 14
