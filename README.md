@@ -1,3 +1,5 @@
+ [![Smoke tests](https://github.com/armbian/scripts/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/armbian/scripts/actions/workflows/smoke-tests.yml)
+ 
  - cacherebuild.sh is a script which can run at PUSH + once per day. It regenerates cache:
 	 - all cache 4 days before end of the month (for next month) which is enough that cache is sync across our network
 	 - changed cache where packages were changed
