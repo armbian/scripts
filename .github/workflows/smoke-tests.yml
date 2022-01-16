@@ -54,6 +54,9 @@ jobs:
           - ip: "10.0.30.120" 
             name: "RockPro 64"
             power-socket: ""
+          - ip: "10.0.40.251" 
+            name: "Rock64 v3"
+            power-socket: ""
           - ip: "10.0.30.121" 
             name: "Odroid C4"
             power-socket: 2
@@ -93,6 +96,9 @@ jobs:
           - ip: "10.0.30.219" 
             name: "Rockpi E"
             power-socket: ""
+          - ip: "10.0.40.253" 
+            name: "Rockpi S"
+            power-socket: ""
           - ip: "10.0.30.241" 
             name: "Banana Pi Pro"
             power-socket: ""
@@ -106,7 +112,7 @@ jobs:
             name: "Udoo Quad"  
             power-socket: 3
           - ip: "10.0.40.250"
-            name: "UEFI x86"
+            name: "Rockpi X"
             power-socket: ""
           - ip: "10.0.40.202"
             name: "XFCE desktop x86"
