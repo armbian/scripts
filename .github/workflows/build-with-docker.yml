@@ -118,6 +118,8 @@ jobs:
 
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
+          sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
+          sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
           
       - name: Pull Docker image
         run: |
