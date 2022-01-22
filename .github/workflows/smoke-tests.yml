@@ -93,7 +93,7 @@ jobs:
           - ip: "10.0.30.150" 
             name: "Orange Pi R1"
             power-socket: ""
-          - ip: "10.0.30.102" 
+          - ip: "10.0.30.182" 
             name: "Orange Pi 4"
             power-socket: "56"
           - ip: "10.0.30.167" 
