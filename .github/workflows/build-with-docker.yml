@@ -75,7 +75,7 @@ jobs:
           if [[ "$var" != *stable ]]; then
             FILENAME="targets-${var#*:}-beta.conf"
           else
-            FILENAME="targets.conf | grep ${var%:*}"
+            FILENAME="targets.conf | grep \"yes\|adv\""
           fi
           
           # if we want to split more
@@ -183,7 +183,7 @@ jobs:
             FILENAME="targets-${var#*:}-beta.conf"
             FOLDER=nightly
           else
-            FILENAME="targets.conf | grep ${var%:*}"
+            FILENAME="targets.conf | grep \"yes\|adv\""
             FOLDER=archive
           fi
           echo "FOLDER=$FOLDER" >> $GITHUB_ENV
