@@ -100,7 +100,7 @@ jobs:
           clean: false
 
       - name: Install SSH key for storage
-        
+        if: ${{ inputs.uploading == 'true' }}
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_TORRENTS }}
@@ -132,6 +132,7 @@ jobs:
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Mount upload folders
+        if: ${{ inputs.uploading == 'true' }}
         run: |
         
           # use this only on our runners
