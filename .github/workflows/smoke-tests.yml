@@ -95,7 +95,7 @@ jobs:
             power-socket: ""
           - ip: "10.0.30.182" 
             name: "Orange Pi 4"
-            power-socket: "56"
+            power-socket: "17"
           - ip: "10.0.30.167" 
             name: "Cubietruck"
             power-socket: 3
