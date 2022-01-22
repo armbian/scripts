@@ -91,7 +91,7 @@ jobs:
     uses: armbian/scripts/.github/workflows/build-with-docker.yml@master
 
     with:
-      variant: 'yes:stable'
+      variant: '"yes\|adv":stable'
       runner: "big"
       part: 1
       of: 1      
