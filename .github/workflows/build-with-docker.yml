@@ -182,8 +182,12 @@ jobs:
           if [[ "$var" != *stable ]]; then
             FILENAME="targets-${var%:*}-beta.conf"
             FOLDER=nightly
+            SKIP_EXTERNAL_TOOLCHAINS="yes"
+            REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           else
             FILENAME="targets.conf | grep \"yes\|adv\""
+            SKIP_EXTERNAL_TOOLCHAINS="no"
+            REPOSITORY_INSTALL="kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
             FOLDER=archive
           fi
           echo "FOLDER=$FOLDER" >> $GITHUB_ENV
@@ -217,7 +221,7 @@ jobs:
           BETA="${BETA}" \
           RELEASE="${RELEASE}" \
           KERNEL_ONLY="no" \
-          SKIP_EXTERNAL_TOOLCHAINS="no" \
+          SKIP_EXTERNAL_TOOLCHAINS="$SKIP_EXTERNAL_TOOLCHAINS" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="$DESKTOP_ENVIRONMENT_CONFIG_NAME" \
           BUILD_DESKTOP="$BUILD_DESKTOP" \
           BUILD_MINIMAL="$BUILD_MINIMAL" \
@@ -228,7 +232,7 @@ jobs:
           MAKE_FOLDERS="yes" \
           ARMBIAN_CACHE_TOOLCHAIN_PATH="${ARMBIAN_CACHE_TOOLCHAIN_PATH}" \
           ARMBIAN_CACHE_ROOTFS_PATH="${ARMBIAN_CACHE_ROOTFS_PATH}" \
-          REPOSITORY_INSTALL="kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh" \
+          REPOSITORY_INSTALL="$REPOSITORY_INSTALL" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
           
