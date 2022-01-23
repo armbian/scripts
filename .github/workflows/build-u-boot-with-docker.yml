@@ -1,4 +1,4 @@
-name: Build with Docker
+name: Build u-boot with Docker
 on:
   workflow_dispatch:
   workflow_call:
