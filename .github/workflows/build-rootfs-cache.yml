@@ -107,7 +107,7 @@ jobs:
             ROOTFSARCH="${{ inputs.rootfsarch }}"
             PARTS=$(cat build-rootfs/${ROOTFSARCH}.txt | wc -l)
             echo $PARTS
-            echo ::set-output name=matrix::$(for x in $(seq -w 1 $PARTS); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+            echo ::set-output name=matrix::$(for x in $(seq -w 001 $PARTS); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   cache:
 
