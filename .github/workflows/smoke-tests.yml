@@ -12,7 +12,7 @@ jobs:
     name: "Smoke test"
     runs-on: igor
     if: ${{ github.repository_owner == 'Armbian' }}
-    timeout-minutes: 480
+    timeout-minutes: 15
     strategy:
       #max-parallel: 16
       fail-fast: false
