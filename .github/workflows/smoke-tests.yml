@@ -110,7 +110,7 @@ jobs:
           - ip: "10.0.30.193" 
             name: "Odroid C2"
             power-socket: 8
-          - ip: "10.0.30.217" 
+          - ip: "10.0.30.196" 
             name: "Odroid N2"
             power-socket: 198
           - ip: "10.0.30.219" 
