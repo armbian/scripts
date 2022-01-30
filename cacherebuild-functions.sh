@@ -61,7 +61,7 @@ function boards
         fi
 
         PARAMETER+=" DESKTOP_ENVIRONMENT_CONFIG_NAME=\"$4\" DESKTOP_APPGROUPS_SELECTED=\"$5\" ROOT_FS_CREATE_ONLY=\"${FORCE}\" KERNEL_ONLY=\"no\" BETA=\"yes\" "
-        PARAMETER+=" KERNEL_CONFIGURE=\"no\" OFFLINE_WORK=\"yes\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\"  "
+        PARAMETER+=" KERNEL_CONFIGURE=\"no\" OFFLINE_WORK=\"yes\" FORCED_MONTH_OFFSET=\"${FORCED_MONTH_OFFSET}\" IGNORE_UPDATES=\"yes\" SYNC_CLOCK=\"no\" NO_APT_CACHER=\"yes\" "
         PARAMETER+=" NO_HOST_RELEASE_CHECK=\"yes\" REPOSITORY_INSTALL=\"u-boot,kernel,bsp,armbian-config,armbian-firmware\" EXPERT=\"yes\" USE_TORRENT=\"no\" CUSTOM_UBUNTU_MIRROR=\"si.archive.ubuntu.com/ubuntu\""
 
 ##        [[ $USE_SCREEN != yes ]] && PARAMETER+=" &"
