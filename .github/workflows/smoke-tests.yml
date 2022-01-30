@@ -53,7 +53,7 @@ jobs:
           - ip: "10.0.30.113" 
             name: "Orange Pi 3"
             power-socket: 16
-          - ip: "10.0.30.115" 
+          - ip: "10.0.30.198" 
             name: "Odroid XU4"
             power-socket: 66
           - ip: "10.0.30.117" 
@@ -62,7 +62,7 @@ jobs:
           - ip: "10.0.30.119" 
             name: "Tinkerboard"
             power-socket: 14
-          - ip: "10.0.30.165"
+          - ip: "10.0.30.203"
             name: "Orange Pi One+"
             power-socket: 14
           - ip: "10.0.30.120" 
@@ -79,6 +79,15 @@ jobs:
             power-socket: ""
           - ip: "10.0.40.254"
             name: "NanoPi R1"
+            power-socket: ""
+          - ip: "10.0.30.204"
+            name: "NanoPi Neo 3"
+            power-socket: "14"
+          - ip: "10.0.30.221"
+            name: "NanoPC T4"
+            power-socket: ""
+          - ip: "10.0.30.105"
+            name: "Le Potato"
             power-socket: ""
           - ip: "10.0.30.134" 
             name: "Cubox i2eX/i4"            
@@ -101,6 +110,9 @@ jobs:
           - ip: "10.0.30.167" 
             name: "Cubietruck"
             power-socket: 3
+          - ip: "10.0.30.105" 
+            name: "Cubieboard"
+            power-socket: ""
           - ip: "10.0.30.169" 
             name: "Clearfog Pro"
             power-socket: 200
