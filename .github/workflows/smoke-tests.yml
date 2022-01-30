@@ -86,7 +86,7 @@ jobs:
           - ip: "10.0.30.221"
             name: "NanoPC T4"
             power-socket: ""
-          - ip: "10.0.30.105"
+          - ip: "10.0.30.130"
             name: "Le Potato"
             power-socket: ""
           - ip: "10.0.30.134" 
@@ -110,7 +110,7 @@ jobs:
           - ip: "10.0.30.167" 
             name: "Cubietruck"
             power-socket: 3
-          - ip: "10.0.30.105" 
+          - ip: "10.0.30.206" 
             name: "Cubieboard"
             power-socket: ""
           - ip: "10.0.30.169" 
