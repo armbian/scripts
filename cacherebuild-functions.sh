@@ -49,7 +49,7 @@ function boards
 
         [[ $PARALLEL_BUILDS -gt 1 && $USE_SCREEN == yes ]] && PARAMETER="screen -dmSL ${h}$1 "
 
-        PARAMETER+="${BLTPATH}compile.sh BOARD=\"$h\" BRANCH=\"current\" RELEASE=\"$1\""
+        PARAMETER+="${BLTPATH}compile.sh docker BOARD=\"$h\" BRANCH=\"current\" RELEASE=\"$1\""
         if [[ $2 == cli* ]]; then
 
             PARAMETER+=" BUILD_MINIMAL=\"$4\" BUILD_DESKTOP=\"no\" DESKTOP_ENVIRONMENT=\"\""
