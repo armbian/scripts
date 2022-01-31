@@ -128,7 +128,8 @@ jobs:
           sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
           sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
-
+          # just in case
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
           
       - name: Fix permissions
         run: |
