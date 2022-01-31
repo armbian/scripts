@@ -178,6 +178,12 @@ jobs:
               ! sudo mountpoint -q cache/rootfs && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
           fi
           
+          if [[ $(curl -s http://ifconfig.me) == "188.227.12.36" ]]; then              
+              sudo mkdir -p cache/toolchain build/cache/rootfs || true
+              ! sudo mountpoint -q cache/toolchain && sudo mount --bind /mnt/armbian/cache/toolchain/ cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
+              ! sudo mountpoint -q cache/rootfs && sudo mount --bind /mnt/armbian/cache/rootfs/ cache/rootfs/ rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
+          fi
+          
           var="${{ inputs.variant }}"
           if [[ "$var" != *stable ]]; then
             FILENAME="targets-${var%:*}-beta.conf"
