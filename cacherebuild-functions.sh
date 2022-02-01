@@ -122,6 +122,13 @@ function releases
 	local releases=($(grep -rw config/distributions/*/ -e 'supported' | cut -d"/" -f3))
 	[[ -n $FORCE_RELEASE ]] && local releases+=($FORCE_RELEASE)
 
+        # support excluding
+        delete=($EXCLUDE_RELEASE)
+        for del in ${delete[@]}
+        do
+                releases=( "${releases[@]/$del}" )
+        done
+
 	for i in ${releases[@]}
 	do
 		variants "$i"
