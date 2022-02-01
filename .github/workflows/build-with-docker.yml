@@ -75,7 +75,7 @@ jobs:
           if [[ "$var" != *stable ]]; then
             FILENAME="targets-${var%:*}-beta.conf"
           else
-            FILENAME="targets.conf | grep \"yes\|adv\""
+            FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
           fi
           
           # if we want to split more
@@ -190,7 +190,7 @@ jobs:
             SKIP_EXTERNAL_TOOLCHAINS="yes"
             REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           else
-            FILENAME="targets.conf | grep \"yes\|adv\""
+            FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             SKIP_EXTERNAL_TOOLCHAINS="no"
             REPOSITORY_INSTALL="kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
             FOLDER=archive
