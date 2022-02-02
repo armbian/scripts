@@ -233,6 +233,7 @@ jobs:
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           KERNEL_CONFIGURE="no" \
           BOARD="$BOARD" \
+          LOG_SUBPATH="debug/$BOARD" \
           BRANCH="$BRANCH" \
           MAKE_FOLDERS="yes" \
           ARMBIAN_CACHE_TOOLCHAIN_PATH="${ARMBIAN_CACHE_TOOLCHAIN_PATH}" \
