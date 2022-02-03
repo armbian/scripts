@@ -236,7 +236,7 @@ jobs:
           LOG_SUBPATH="debug/$BOARD" \
           BRANCH="$BRANCH" \
           MAKE_FOLDERS="yes" \
-          IMAGE_PRESENT="yes" \
+          IMAGE_PRESENT="no" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
           ARMBIAN_CACHE_TOOLCHAIN_PATH="${ARMBIAN_CACHE_TOOLCHAIN_PATH}" \
           ARMBIAN_CACHE_ROOTFS_PATH="${ARMBIAN_CACHE_ROOTFS_PATH}" \
