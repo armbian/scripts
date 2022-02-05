@@ -185,6 +185,7 @@ jobs:
           fi
           
           var="${{ inputs.variant }}"
+          RC="no"
           if [[ "$var" != *beta ]]; then
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             SKIP_EXTERNAL_TOOLCHAINS="no"
@@ -202,15 +203,16 @@ jobs:
           echo "FOLDER=$FOLDER" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
           
-          if [[ "$var" != *stable ]]; then
-              BETA="yes"
-          else
+          if [[ "$var" != *beta ]]; then
               BETA="no"
               OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)
               sudo git checkout master              
               sudo cp ../scripts/VERSION .
               sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
+              else
+              BETA="yes"
           fi
+
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
