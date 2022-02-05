@@ -193,6 +193,7 @@ jobs:
             FOLDER=archive
             if [[ "$var" == *rc ]]; then
               RC="yes"
+              FOLDER=rc
             fi
           else
             FILENAME="targets-${var%:*}-beta.conf"
@@ -253,11 +254,7 @@ jobs:
           
           sudo chown -R $USER.$USER output/images/$BOARD 2> /dev/null || true
           sudo chmod 644 output/images/$BOARD/*/*.xz  2> /dev/null || true
-          if [[ $BETA == yes ]]; then
-             echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/nightly/*.img.xz
-          else
-             echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/archive/*.img.xz
-          fi
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/$FOLDER/*.img.xz
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
