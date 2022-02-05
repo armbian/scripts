@@ -72,10 +72,11 @@ jobs:
         id: list_dirs
         run: |
           var="${{ inputs.variant }}"
-          if [[ "$var" != *stable ]]; then
-            FILENAME="targets-${var%:*}-beta.conf"
-          else
+          if [[ "$var" != *beta ]]; then
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
+          else
+            FILENAME="targets-${var%:*}-beta.conf"
+            
           fi
           
           # if we want to split more
@@ -184,16 +185,19 @@ jobs:
           fi
           
           var="${{ inputs.variant }}"
-          if [[ "$var" != *stable ]]; then
-            FILENAME="targets-${var%:*}-beta.conf"
-            FOLDER=nightly
-            SKIP_EXTERNAL_TOOLCHAINS="yes"
-            REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
-          else
+          if [[ "$var" != *beta ]]; then
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             SKIP_EXTERNAL_TOOLCHAINS="no"
             REPOSITORY_INSTALL="kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
             FOLDER=archive
+            if [[ "$var" == *rc ]]; then
+              RC="yes"
+            fi
+          else
+            FILENAME="targets-${var%:*}-beta.conf"
+            FOLDER=nightly
+            SKIP_EXTERNAL_TOOLCHAINS="yes"
+            REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           fi
           echo "FOLDER=$FOLDER" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
@@ -233,6 +237,7 @@ jobs:
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           KERNEL_CONFIGURE="no" \
           BOARD="$BOARD" \
+          RC="$RC"\
           LOG_SUBPATH="debug/$BOARD" \
           BRANCH="$BRANCH" \
           MAKE_FOLDERS="yes" \
