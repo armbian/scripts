@@ -61,6 +61,7 @@ jobs:
                   [[ ${BOARDFAMILY} == sun*iw* && ${BRANCH} != legacy ]] && BOARDFAMILY=sunxi64
                   [[ ${BOARDFAMILY} == meson8b ]] && BOARDFAMILY=meson
                   [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]] && BOARDFAMILY=meson64
+                  [[ ${BOARDFAMILY} == rk35xx && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                   [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                   [[ ${BOARDFAMILY} == jetson-nano && ${BRANCH} != legacy ]] && BOARDFAMILY=media
                   [[ ${BOARDFAMILY} == bcm2711 && ${BRANCH} == legacy ]] && continue
