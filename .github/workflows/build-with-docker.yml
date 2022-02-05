@@ -239,7 +239,7 @@ jobs:
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           KERNEL_CONFIGURE="no" \
           BOARD="$BOARD" \
-          RC="$RC"\
+          RC="$RC" \
           LOG_SUBPATH="debug/$BOARD" \
           BRANCH="$BRANCH" \
           MAKE_FOLDERS="yes" \
