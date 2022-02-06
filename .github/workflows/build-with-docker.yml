@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      sourcerepo:
+       required: true
+       type: string    
       variant:
        required: true
        type: string
@@ -55,7 +58,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: nightly
+          ref: ${{ inputs.sourcerepo }}
           clean: false
 
       - name: Remove previous artefacts if any
@@ -103,7 +106,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: nightly
+          ref: ${{ inputs.sourcerepo }} 
           clean: false
 
       - name: Checkout support scripts
