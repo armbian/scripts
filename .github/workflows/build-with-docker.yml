@@ -193,18 +193,18 @@ jobs:
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             SKIP_EXTERNAL_TOOLCHAINS="no"
             REPOSITORY_INSTALL="kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
-            FOLDER=archive
+            DEPLOYFOLDER=archive
             if [[ "$var" == *rc ]]; then
               RC="yes"
-              FOLDER=rc
+              DEPLOYFOLDER=rc
             fi
           else
             FILENAME="targets-${var%:*}-beta.conf"
-            FOLDER=nightly
+            DEPLOYFOLDER=nightly
             SKIP_EXTERNAL_TOOLCHAINS="yes"
             REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           fi
-          echo "FOLDER=$FOLDER" >> $GITHUB_ENV
+          echo "DEPLOYFOLDER=$DEPLOYFOLDER" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
           
           if [[ "$var" != *beta ]]; then
@@ -257,7 +257,7 @@ jobs:
           
           sudo chown -R $USER.$USER output/images/$BOARD 2> /dev/null || true
           sudo chmod 644 output/images/$BOARD/*/*.xz  2> /dev/null || true
-          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/$FOLDER/*.img.xz
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/$DEPLOYFOLDER/*.img.xz
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
@@ -278,7 +278,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/output/images/Armbian*
-          tag: "${{ env.BOARD }}/${{ env.FOLDER }}"
+          tag: "${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}"
           overwrite: true
           file_glob: true
           body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
