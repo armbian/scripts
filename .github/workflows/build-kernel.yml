@@ -209,7 +209,7 @@ jobs:
           fi
 
       - name: Upload hash
-        if: ${{ env.UPLOAD == 'true' }}
+        if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: hash
@@ -217,7 +217,7 @@ jobs:
           path: build/${{ env.FILE_HASH }}
 
       - name: Upload build artifacts
-
+        if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.FILE_NAME }}
