@@ -143,7 +143,7 @@ jobs:
               sudo pkill arm-binfmt-P || true
               sudo pkill aarch64-binfmt-P || true
               sudo pkill pixz || true
-              if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
+              if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "188.227.12.36" ]]; then
                   sudo mountpoint -q build/cache/rootfs &&  sudo fusermount -u build/cache/rootfs || true
                   sudo mountpoint -q build/cache/toolchain &&  sudo fusermount -u build/cache/toolchain || true
               fi
