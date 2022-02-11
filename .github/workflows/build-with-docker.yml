@@ -194,28 +194,25 @@ jobs:
             SKIP_EXTERNAL_TOOLCHAINS="no"
             REPOSITORY_INSTALL="kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
             DEPLOYFOLDER=archive
+            BETA="no"
+            OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)
+            sudo git checkout master              
+            sudo cp ../scripts/VERSION .
+            sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
             if [[ "$var" == *rc ]]; then
               RC="yes"
+              BETA="yes"
               DEPLOYFOLDER=rc
             fi
           else
             FILENAME="targets-${var%:*}-beta.conf"
             DEPLOYFOLDER=nightly
             SKIP_EXTERNAL_TOOLCHAINS="yes"
+            BETA="yes"
             REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           fi
           echo "DEPLOYFOLDER=$DEPLOYFOLDER" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
-          
-          if [[ "$var" != *beta ]]; then
-              BETA="no"
-              OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)
-              sudo git checkout master              
-              sudo cp ../scripts/VERSION .
-              sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
-              else
-              BETA="yes"
-          fi
 
           CHUNK="${{ matrix.node }}"
           LINE=$(echo $CHUNK | cut -d":" -f1)
