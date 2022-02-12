@@ -64,6 +64,7 @@ jobs:
                   [[ ${BOARDFAMILY} == rk35xx && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                   [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                   [[ ${BOARDFAMILY} == jetson-nano && ${BRANCH} != legacy ]] && BOARDFAMILY=media
+                  [[ $line == station-p2 || $line == station-m2 ]] && [[ ${BRANCH} == legacy ]] && BOARDFAMILY=station-p2 && LINUXFAMILY=station-p2
                   [[ ${BOARDFAMILY} == bcm2711 && ${BRANCH} == legacy ]] && continue
                   source "build/config/sources/${ARCH}.conf"
                   ref_type=${KERNELBRANCH%%:*}
