@@ -29,7 +29,8 @@ jobs:
       variant: 'yes:stable'
       runner: "big"
       part: 1
-      of: 1      
+      of: 1
+      sourcerepo: 'master'
       include: 'grep -w ${{ github.event.inputs.choice }} | '
       exclude: ''
       uploading: false
