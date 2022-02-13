@@ -9,9 +9,11 @@ on:
         - bananapi
         - bananapim2plus
         - bananapim64
+        - bananapipro
         - clearfogbase
         - clearfogpro
         - cubox-i
+        - firefly-rk3399
         - helios4
         - helios64
         - jethubj100
@@ -32,6 +34,7 @@ on:
         - nanopi-r2s
         - nanopi-r4s
         - nanopik1plus
+        - nanopim4
         - nanopim4v2
         - nanopineo
         - nanopineo2black
@@ -59,13 +62,17 @@ on:
         - orangepizeroplus
         - pinebook-a64
         - pinebook-pro
+        - radxa-zero
         - renegade
         - rk322x-box
         - rock-3a
         - rpi4b
         - station-m1
+        - station-m2
         - station-p1
+        - station-p2
         - tinkerboard
+        - tinkerboard-2
         - uefi-arm64
         - uefi-x86
         - virtual-qemu
