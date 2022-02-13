@@ -76,7 +76,8 @@ jobs:
         run: |
           var="${{ inputs.variant }}"
           if [[ "$var" != *beta ]]; then
-            FILENAME="targets.conf | grep \"yes\|adv\""
+            #FILENAME="targets.conf | grep \"yes\|adv\""
+            FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
           else
             FILENAME="targets-${var%:*}-beta.conf"
             
