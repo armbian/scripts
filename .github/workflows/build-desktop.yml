@@ -133,6 +133,7 @@ jobs:
           KERNEL_ONLY="yes" \
           KERNEL_CONFIGURE="no" \
           BOARD="uefi-x86" \
+          USE_MAINLINE_GOOGLE_MIRROR="yes" \
           BRANCH="current" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
           OFFLINE_WORK="yes" \
