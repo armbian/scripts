@@ -188,6 +188,7 @@ jobs:
           BSP_BUILD="yes" \
           BUILD_MINIMAL="no" \
           BUILD_DESKTOP="no" \
+          USE_MAINLINE_GOOGLE_MIRROR="yes" \
           BRANCH="$BRANCH" \
           KERNEL_CONFIGURE="no" \
           OFFLINE="no" \
