@@ -38,6 +38,7 @@ on:
         - nanopim4v2
         - nanopineo
         - nanopineo2black
+        - nanopineoplus2
         - odroidc2
         - odroidc4
         - odroidhc4
@@ -45,6 +46,7 @@ on:
         - odroidxu4
         - orangepi-r1
         - orangepi-r1plus
+        - orangepi-r1plus-lts
         - orangepi3
         - orangepi4
         - orangepilite
