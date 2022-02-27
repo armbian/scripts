@@ -135,7 +135,7 @@ jobs:
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
           sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
           sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
           
       - name: Fix permissions
         run: |
@@ -200,7 +200,7 @@ jobs:
             REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
             DEPLOYFOLDER=archive
             BETA="no"
-            OLD="ghcr.io/armbian/build:$(cat VERSION  | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)
+            OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
             sudo git checkout master              
             sudo cp ../scripts/VERSION .
             sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
