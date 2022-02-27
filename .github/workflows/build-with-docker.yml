@@ -196,10 +196,7 @@ jobs:
           RC="no"
           if [[ "$var" != *beta ]]; then
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
-            SKIP_EXTERNAL_TOOLCHAINS="no"
-            REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
-            DEPLOYFOLDER=archive
-            BETA="yes"
+            MAKE_FOLDERS=archive
             OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
             sudo git checkout master              
             sudo cp ../scripts/VERSION .
@@ -208,17 +205,16 @@ jobs:
             echo "#!""/bin/bash" | sudo tee userpatches/customize-image.sh
             echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
             if [[ "$var" == *rc ]]; then
-              RC="yes"
-              DEPLOYFOLDER=rc
+              MAKE_FOLDERS=rc
             fi
           else
             FILENAME="targets-${var%:*}-beta.conf"
-            DEPLOYFOLDER=nightly
-            SKIP_EXTERNAL_TOOLCHAINS="yes"
-            BETA="yes"
-            REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
+            MAKE_FOLDERS=nightly
           fi
-          echo "DEPLOYFOLDER=$DEPLOYFOLDER" >> $GITHUB_ENV
+          BETA="yes"
+          SKIP_EXTERNAL_TOOLCHAINS="yes"
+          REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
+          echo "DEPLOYFOLDER=$MAKE_FOLDERS" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
 
           CHUNK="${{ matrix.node }}"
@@ -249,10 +245,9 @@ jobs:
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           KERNEL_CONFIGURE="no" \
           BOARD="$BOARD" \
-          RC="$RC" \
           LOG_SUBPATH="debug/$BOARD" \
           BRANCH="$BRANCH" \
-          MAKE_FOLDERS="yes" \
+          MAKE_FOLDERS="$MAKE_FOLDERS" \
           IMAGE_PRESENT="no" \
           BUILD_ALL="yes" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
