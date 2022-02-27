@@ -75,4 +75,5 @@ jobs:
      - name: Push Docker image
        run: |
 
-         docker push ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
+         #docker push ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
+         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
