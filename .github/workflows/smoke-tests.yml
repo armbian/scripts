@@ -175,6 +175,8 @@ jobs:
         run: |
 
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "neofetch"
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "dmesg --color=always"
 
       - name: Update
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
