@@ -141,9 +141,9 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="" \
           EXPERT="yes"
 
-          if [[ $? -eq 0 ]]; then
+          #if [[ $? -eq 0 ]]; then
             echo "UPLOAD=true" >> $GITHUB_ENV
-          fi
+          #fi
       
       - name: Upload build artifacts
         if: ${{ inputs.uploading == true }}
