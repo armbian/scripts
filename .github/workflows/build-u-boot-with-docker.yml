@@ -186,6 +186,7 @@ jobs:
           KERNEL_KEEP_CONFIG="no" \
           RELEASE="focal" \
           BSP_BUILD="yes" \
+          BUILD_ALL="yes" \
           BUILD_MINIMAL="no" \
           BUILD_DESKTOP="no" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
