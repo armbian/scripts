@@ -204,13 +204,12 @@ jobs:
             sudo git checkout master              
             sudo cp ../scripts/VERSION .
             sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
+            # we use nightly repository, but change back to stable right before closing image
+            echo "#!""/bin/bash" | sudo tee userpatches/customize-image.sh
+            echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
             if [[ "$var" == *rc ]]; then
               RC="yes"
               DEPLOYFOLDER=rc
-            else
-              # we use nightly repository, but change back to stable right before closing image
-              echo "#!""/bin/bash" | sudo tee userpatches/customize-image.sh
-              echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
             fi
           else
             FILENAME="targets-${var%:*}-beta.conf"
