@@ -141,9 +141,9 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="" \
           EXPERT="yes"
 
-          #if [[ $? -eq 0 ]]; then
+          if [[ $? -eq 0 ]]; then
             echo "UPLOAD=true" >> $GITHUB_ENV
-          #fi
+          fi
       
       - name: Upload build artifacts
         if: ${{ inputs.uploading == true }}
@@ -162,7 +162,7 @@ jobs:
           if_key_exists: replace
 
       - name: Deploy to server
-        if: ${{ env.UPLOAD == true }}
+#        if: ${{ env.UPLOAD == true }}
         run: |
 
           sudo apt-get -y -qq install lftp          
