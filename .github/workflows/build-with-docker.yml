@@ -199,15 +199,18 @@ jobs:
             SKIP_EXTERNAL_TOOLCHAINS="no"
             REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
             DEPLOYFOLDER=archive
-            BETA="no"
+            BETA="yes"
             OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
             sudo git checkout master              
             sudo cp ../scripts/VERSION .
             sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
             if [[ "$var" == *rc ]]; then
               RC="yes"
-              BETA="yes"
               DEPLOYFOLDER=rc
+            else
+              # we use nightly repository, but change back to stable right before closing image
+              echo "#!""/bin/bash" | sudo tee userpatches/customize-image.sh
+              echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
             fi
           else
             FILENAME="targets-${var%:*}-beta.conf"
