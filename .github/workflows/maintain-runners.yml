@@ -125,7 +125,8 @@ jobs:
           # check if swap exists
           swapon
           #df
-          
+          # remove aptly - we don't need it anymore
+          sudo rm -f /etc/apt/sources.list.d/aptly.list
           sudo echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y purge needrestart unattended-upgrades
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
