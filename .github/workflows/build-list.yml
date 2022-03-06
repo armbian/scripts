@@ -1,7 +1,11 @@
 name: Build list
 on:
   workflow_dispatch:
-
+    inputs:
+      sourcerepo:
+        description: Source repository
+        required: true
+        default: 'nightly'
 jobs:
 
   Prepare:
@@ -15,7 +19,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: nightly
+          ref: ${{ github.event.inputs.sourcerepo }}
 
       - name: Checkout scripts
         uses: actions/checkout@v2
