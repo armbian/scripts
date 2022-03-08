@@ -71,7 +71,7 @@ on:
         - pine64
         - pinebook-a64
         - pinebook-pro
-        - pineh64
+        - pineh64-b
         - radxa-zero
         - renegade
         - rk322x-box
