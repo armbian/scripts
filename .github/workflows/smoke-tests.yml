@@ -131,7 +131,7 @@ jobs:
           - ip: "10.0.40.253" 
             name: "Rockpi S"
             power-socket: ""
-          - ip: "10.0.30.241" 
+          - ip: "10.0.30.122" 
             name: "Banana Pi Pro"
             power-socket: ""
           - ip: "10.0.30.246" 
