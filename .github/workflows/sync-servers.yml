@@ -31,10 +31,10 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_UPLOAD }}
-          name: ${{ inputs.KEY_ID }}
+          name: upload
           known_hosts: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
           if_key_exists: replace
 
       - name: Update repository
         if: ${{ env.SKIP != 'yes' }}
-        run: ssh -T -i ~/.ssh/${{ inputs.KEY_ID }} ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
+        run: ssh -T -i ~/.ssh/upload ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
