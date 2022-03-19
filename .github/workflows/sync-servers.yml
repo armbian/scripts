@@ -37,7 +37,7 @@ jobs:
           name: changes
 
       - name: Check
-       run: |
+        run: |
 
           [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
 
