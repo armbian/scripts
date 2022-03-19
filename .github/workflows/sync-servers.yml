@@ -3,6 +3,21 @@ name: Sync servers
 on:
   workflow_dispatch:
 
+  workflow_call:
+    inputs:
+      KEY_ID:
+        required: true
+        type: string        
+    secrets:
+      KEY_UPLOAD:
+        required: true
+      USER_REPOSITORY:
+        required: true
+      HOST_REPOSITORY:
+        required: true
+      KNOWN_HOSTS_REPOSITORY:
+        required: true
+
 jobs:
 
   sync:
@@ -16,25 +31,25 @@ jobs:
 
           sudo rm -rf changes 2>/dev/null || true
 
-#      - name: Download changes
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: changes
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          name: changes
 
-#      - name: Check
-#        run: |
-#
-#          [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
+      - name: Check
+       run: |
+
+          [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
 
       - name: Install SSH key for repository
         if: ${{ env.SKIP != 'yes' }}
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_UPLOAD }}
-          name: upload
+          name: ${{ inputs.KEY_ID }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
           if_key_exists: replace
 
       - name: Update repository
         if: ${{ env.SKIP != 'yes' }}
-        run: ssh -T -i ~/.ssh/upload ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
+        run: ssh -T -i ~/.ssh/${{ inputs.KEY_ID }} ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
