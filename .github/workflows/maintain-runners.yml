@@ -59,7 +59,7 @@ jobs:
 
           # full clenaing temporally
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-          sudo umount -a
+          sudo umount -a || true
           sudo rm -rf /home/igorp/actions-runner/_work/build /home/igorp/actions-runner/_work/distribution  /home/igorp/actions-runner/_work/scripts
           sudo reboot
           fi
