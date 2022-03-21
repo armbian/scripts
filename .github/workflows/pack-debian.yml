@@ -1,0 +1,171 @@
+name: Build, release, upload to GH & server
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      matrix:
+        required: true
+        type: string
+      maintainer:
+        required: true
+        type: string
+      package:
+        required: true
+        type: string
+      licence:
+        required: false
+        type: string
+      homepage:
+        required: false
+        type: string
+      depends:
+        required: false
+        type: string
+      section:
+        required: false
+        type: string
+      priority:
+        required: false
+        type: string
+      description:
+        required: false
+        type: string
+
+    secrets:
+      GPG_PRIVATE_KEY:
+        required: true
+      PASSPHRASE:
+        required: true
+      SSH_KEY_TORRENTS: 
+        required: true
+      KNOWN_HOSTS_UPLOAD: 
+        required: true
+
+jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare release ID
+        id: prep
+        run: |
+          for x in $(echo ${{ inputs.matrix }}); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq
+          echo ::set-output name=matrix::$(for x in $(echo ${{ inputs.matrix }}); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo ::set-output name=created::$(date -u +'%Y%m%d-%H%M')
+
+    outputs:
+      created: ${{ steps.prep.outputs.created }} # refer to as ${{needs.prepare.outputs.created}}
+      matrix: ${{steps.prep.outputs.matrix}}
+   
+  build:
+    needs: [ prepare ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ${{fromJson(needs.prepare.outputs.matrix)}}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:          
+          path: source
+
+      - name: Build ${{ matrix.node }}
+        run: |
+
+          ARCH=$(echo ${{ matrix.node }} | cut -d":" -f1)
+          PKG_NAME=${{ inputs.package }}_${{needs.prepare.outputs.created}}_${ARCH}
+
+          mkdir -p output/${PKG_NAME}/DEBIAN
+          cat <<-END > output/${PKG_NAME}/DEBIAN/control
+          Package: ${{ inputs.package }}
+          Version: ${{needs.prepare.outputs.created}}
+          Architecture: ${ARCH}
+          END
+          if [[ -n "${{ inputs.maintainer }}" ]]; then
+          echo "Maintainer: ${{ inputs.maintainer }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.depends }}" ]]; then
+          echo "Depends: ${{ inputs.depends }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.section }}" ]]; then
+          echo "Section: ${{ inputs.section }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.priority }}" ]]; then
+          echo "Priority: ${{ inputs.priority }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.description }}" ]]; then
+          echo "Description: ${{ inputs.description }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+
+          if [[ -f source/package-map.conf ]]; then
+            while read p; do
+            FILE=$(echo $p | cut -d":" -f1)
+            LOCATION=$(echo $p | cut -d":" -f2 | cut -d"/" -f2-)
+            if [[ -n $LOCATION && -n $FILE ]]; then
+                mkdir -p "output/${PKG_NAME}/$LOCATION"
+                cp source/$FILE "output/${PKG_NAME}/$LOCATION"
+            fi
+            done < source/package-map.conf
+          fi
+          
+          fakeroot dpkg-deb -b output/${PKG_NAME}/
+          cd output/${PKG_NAME}/
+          tar cvfz ../${PKG_NAME}.tar.gz . 
+
+      - name: Upload deb as artifact ${{ matrix.node }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: deb
+          path: output/*.deb
+
+      - name: Upload tarball as artifact ${{ matrix.node }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: tar
+          path: output/*.tar.gz
+
+  release:
+    needs: [ prepare, build ]
+    if: "${{ always() }}"
+    runs-on: ubuntu-latest
+    steps:
+   
+      - uses: actions/download-artifact@v2
+        name: Download deb artifacts
+        with:
+          name: deb
+          path: output
+
+      - uses: actions/download-artifact@v2
+        name: Download tarball artifacts
+        with:
+          name: tar
+          path: output
+
+#      - name: Install SSH key for storage
+#        uses: shimataro/ssh-key-action@v2
+#        with:
+#          key: ${{ secrets.SSH_KEY_TORRENTS }}
+#          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+#          if_key_exists: replace
+
+#      - name: Deploy to server
+#        run: |
+#          ls -l build/output/images/*/*/
+#          sudo apt-get -y -qq install lftp          
+#          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
+
+      - name: "GH specific release"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{needs.prepare.outputs.created}}"
+          prerelease: false
+          title: "${{needs.prepare.outputs.created}}"
+          files: |
+            output/*.deb
+            output/*.tar.gz
