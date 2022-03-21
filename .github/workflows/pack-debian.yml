@@ -101,7 +101,7 @@ jobs:
           echo "Description: ${{ inputs.description }}" >> output/${PKG_NAME}/DEBIAN/control
           fi
 
-          if [[ -f source/package-map.conf ]]; then
+          if [[ -f source/debian.conf ]]; then
             while read p; do
             FILE=$(echo $p | cut -d":" -f1)
             LOCATION=$(echo $p | cut -d":" -f2 | cut -d"/" -f2-)
@@ -109,7 +109,7 @@ jobs:
                 mkdir -p "output/${PKG_NAME}/$LOCATION"
                 cp source/$FILE "output/${PKG_NAME}/$LOCATION"
             fi
-            done < source/package-map.conf
+            done < source/debian.conf
           fi
           
           fakeroot dpkg-deb -b output/${PKG_NAME}/
