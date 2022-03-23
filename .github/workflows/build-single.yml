@@ -76,6 +76,7 @@ on:
         - renegade
         - rk322x-box
         - rock-3a
+        - rock64pro
         - rpi4b
         - station-m1
         - station-m2
