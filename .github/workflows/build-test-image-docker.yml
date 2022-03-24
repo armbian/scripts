@@ -19,7 +19,7 @@ jobs:
         release: [focal,bullseye,jammy]
         desktop: [xfce,gnome,mate,cinnamon]
 
-    if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
+    if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
     name: Variant
     runs-on: ${{ inputs.runner }}
     steps:
