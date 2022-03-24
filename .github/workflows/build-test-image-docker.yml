@@ -2,6 +2,13 @@ name: Build test images with Docker
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      reference:
+       required: true
+       type: string
+      runner:
+        required: true
+        type: string
 
 jobs:
   gradle:
@@ -14,7 +21,7 @@ jobs:
 
     if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
     name: Variant
-    runs-on: ubuntu-latest    
+    runs-on: ${{ inputs.runner }}
     steps:
 
       - name: Cache Gradle packages
@@ -39,6 +46,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
+          ref: ${{ inputs.reference }}
           clean: true
 
       - name: Checkout support scripts
