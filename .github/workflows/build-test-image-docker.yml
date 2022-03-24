@@ -10,7 +10,7 @@ jobs:
       matrix:
         board: [uefi-x86,rpi4b]
         release: [focal,bullseye,jammy]
-        desktop: [xfce,gnome,mate]
+        desktop: [xfce,gnome,mate,cinnamon]
 
     if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
     name: Variant
