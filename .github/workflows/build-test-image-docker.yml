@@ -4,8 +4,8 @@ on:
   workflow_call:
     inputs:
       reference:
-       required: true
-       type: string
+        required: false
+        type: string
       runner:
         required: true
         type: string
