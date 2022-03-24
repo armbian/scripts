@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         board: [uefi-x86,rpi4b]
-        release: [focal,bullseye,jammy,sid]
+        release: [focal,bullseye,jammy]
         desktop: [xfce,gnome,mate]
 
     if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
