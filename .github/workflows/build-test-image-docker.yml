@@ -10,16 +10,17 @@ on:
         required: true
         type: string
 
-jobs:
+jobs:  
+
   gradle:
+    if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
     strategy:
       fail-fast: false
       matrix:
         board: [uefi-x86,rpi4b]
         release: [focal,bullseye,jammy]
         desktop: [xfce,gnome,mate,cinnamon]
-
-    if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
+    
     name: Variant
     runs-on: ${{ inputs.runner }}
     steps:
