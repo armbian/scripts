@@ -8,9 +8,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        board: [uefi-arm64,uefi-x86,virtual-qemu]
-        release: [focal,buster,bullseye,hirsute,jammy]
-        desktop: [xfce]
+        board: [uefi-x86,rpi4b]
+        release: [focal,bullseye,jammy,sid]
+        desktop: [xfce,gnome,mate]
 
     if: ${{ github.repository_owner == 'Armbian' && github.event.workflow_run.conclusion == 'success' }} || github.event_name == 'workflow_dispatch'
     name: Variant
@@ -79,10 +79,11 @@ jobs:
           KERNEL_CONFIGURE=prebuilt \
           COMPRESS_OUTPUTIMAGE=no \
           IGNORE_UPDATES=yes \
+          REPOSITORY_INSTALL="u-boot,kernel" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
           DESKTOP_ENVIRONMENT=${{ matrix.desktop }} \
           SKIP_EXTERNAL_TOOLCHAINS=yes \
-          DESKTOP_APPGROUPS_SELECTED=""
+          DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
 
       - name: Upload artefacts
         uses: actions/upload-artifact@v2
@@ -90,4 +91,4 @@ jobs:
           name: "${{ matrix.board }}-${{ matrix.release }}-${{ matrix.desktop }}"
           path: build/output/images/*
           if-no-files-found: ignore
-          retention-days: 10
+          retention-days: 7
