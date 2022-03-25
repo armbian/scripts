@@ -35,13 +35,20 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Clean temporally folders
+        run: |
+          sudo rm -rf build/.tmp 2>/dev/null || true
+          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+          sudo chown -R $USER:$USER build || true
+
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           repository: armbian/build
           path: build
           ref: nightly
+          fetch-depth: '100'
           clean: false
 
       - name: Checkout support scripts
