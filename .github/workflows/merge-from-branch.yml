@@ -35,9 +35,8 @@ jobs:
           sudo chown -R $USER:$USER build || true
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           repository: armbian/build
           path: build
           ref: nightly
