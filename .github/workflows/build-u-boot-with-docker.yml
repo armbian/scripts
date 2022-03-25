@@ -49,13 +49,13 @@ jobs:
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           sudo chown -R $USER:$USER build || true
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           repository: armbian/build
           path: build
           ref: ${{ inputs.destref }}
+          fetch-depth: '100'
           clean: false
 
       - name: Remove previous artefacts if any
