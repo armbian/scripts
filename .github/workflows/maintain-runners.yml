@@ -149,6 +149,7 @@ jobs:
           sudo rm -rf cache/sources/ || true
           sudo rm -rf output/debs/ || true
           sudo rm -rf output/debs-beta/ || true
+          sudo chown -R $USER:$USER build/. || true
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
