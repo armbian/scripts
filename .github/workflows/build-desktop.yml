@@ -179,8 +179,10 @@ jobs:
           if_key_exists: replace
 
       - name: Deploy to server
-#        if: ${{ env.UPLOAD == true }}
         run: |
-
-          sudo apt-get -y -qq install lftp          
+        
+          if [[ "$(sudo fuser /var/lib/dpkg/lock 2>/dev/null; echo $?)" != 0 && "$(sudo fuser /var/lib/dpkg/lock-frontend 2>/dev/null; echo $?)" != 0 ]]; then
+          sudo apt-get -y -qq install lftp
+          fi
+          
           lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --include-glob=armbian-${{ env.RELEASE }}-desktop-${{ env.DE }}_*.deb  --no-perms $(pwd)/build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
