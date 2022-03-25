@@ -97,7 +97,7 @@ jobs:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
     steps:
    
-      - name: Make a test build and cleanup
+      - name: Cleaning
         run: |
           
           # Check where we are
@@ -112,10 +112,8 @@ jobs:
               sudo pkill pixz || true              
               sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
               sudo mountpoint -q build/output/tmp && sudo fusermount -u build/output/tmp || true
-              if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-                  sudo mountpoint -q build/cache/rootfs &&  sudo fusermount -u build/cache/rootfs || true
-                  sudo mountpoint -q build/cache/toolchain &&  sudo fusermount -u build/cache/toolchain || true
-              fi
+              sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+              sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true              
               [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
               echo "Mounted temp directories. Trying to unmount."
               df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
@@ -133,7 +131,7 @@ jobs:
           
           # check if swap exists
           swapon
-          #df
+
           # remove aptly - we don't need it anymore
           sudo rm -f /etc/apt/sources.list.d/aptly.list
           sudo echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
@@ -144,7 +142,6 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y autoremove
           [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
-          [[ -d cache ]] && sudo rm -rf cache || true
           sudo rm -rf build-* 2>/dev/null || true
           sudo rm -rf temp 2>/dev/null || true
           sudo rm -rf changes.txt 2>/dev/null || true
@@ -160,7 +157,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          clean: true
+          clean: false
 
       - name: Ignore changes
         run: |
