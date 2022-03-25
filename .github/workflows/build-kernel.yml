@@ -87,8 +87,6 @@ jobs:
 
     steps:
    
-      - name: Checkout Armbian support scripts
-
       - name: Clean temporally folders
         run: |
           sudo rm -rf build/.tmp 2>/dev/null || true
