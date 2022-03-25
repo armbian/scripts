@@ -31,7 +31,8 @@ jobs:
 
           sudo rm -rf build/.tmp 2>/dev/null || true
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
-          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true   
+          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+          sudo chown -R $USER:$USER build || true
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
