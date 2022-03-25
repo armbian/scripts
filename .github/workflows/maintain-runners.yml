@@ -161,8 +161,8 @@ jobs:
 
       - name: Ignore changes
         run: |
-        
-          [[ ! -f build/.ignore_changes ]] && sudo touch build/.ignore_changes
+
+          [[ -d build ]] && sudo touch build/.ignore_changes || true
 
   Finish:
     name: Finish
