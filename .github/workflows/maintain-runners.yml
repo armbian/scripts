@@ -95,15 +95,6 @@ jobs:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
     steps:
    
-      - name: Checkout Armbian build script
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          repository: armbian/build
-          path: build
-          ref: nightly
-          clean: false
-
       - name: Make a test build and cleanup
         run: |
           # make sure no temporally dirs are mounted from previous runs
@@ -151,14 +142,21 @@ jobs:
           sudo rm -rf changes.txt 2>/dev/null || true
           sudo rm *.conf 2>/dev/null || true
           sudo rm *.txt 2>/dev/null || true
-          
-          cd build
+
+          cd build || true
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes
           sudo rm -rf cache/sources/ || true
           sudo rm -rf output/debs/ || true
           sudo rm -rf output/debs-beta/ || true
-          # lets keep this disabled for a while
-          #sudo shutdown -r 1
+
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/build
+          path: build
+          clean: true
+
   Finish:
     name: Finish
     needs: [Purge]
