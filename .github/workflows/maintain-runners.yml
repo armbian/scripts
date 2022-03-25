@@ -143,7 +143,7 @@ jobs:
           sudo rm -rf changes.txt 2>/dev/null || true
           sudo rm *.conf 2>/dev/null || true
           sudo rm *.txt 2>/dev/null || true
-
+          df
           cd build || true
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes
           sudo rm -rf cache/sources/ || true
