@@ -40,7 +40,8 @@ jobs:
           repository: armbian/build
           path: build
           ref: nightly
-          clean: true
+          fetch-depth: '100'
+          clean: false
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v3
