@@ -26,6 +26,7 @@ jobs:
       - name: Remove previous artefacts if any
         run: |
           sudo rm -rf changes 2>/dev/null || true
+          sudo rm -rf build/.tmp 2>/dev/null || true
 
       - name: Download changes
         if: ${{ inputs.checking }}
