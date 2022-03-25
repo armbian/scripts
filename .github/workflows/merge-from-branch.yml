@@ -29,8 +29,7 @@ jobs:
       - name: Clean temporally folders
         run: |
 
-          pwd
-          sudo rm -rf build./tmp 2>/dev/null || true
+          sudo rm -rf build/.tmp 2>/dev/null || true
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
