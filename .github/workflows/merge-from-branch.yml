@@ -39,7 +39,6 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          ref: nightly
           fetch-depth: '100'
           clean: false
 
