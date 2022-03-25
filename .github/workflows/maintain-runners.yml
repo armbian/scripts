@@ -75,6 +75,7 @@ jobs:
           sudo rm -rf build/output/tmp/debs-beta/* || true
           sudo rm -rf build/output/tmp/images/* || true
           sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
+          sudo mountpoint -q build/output/tmp && sudo fusermount -u build/output/tmp || true
 
       - name: Prepare matrix
         id: list_dirs
