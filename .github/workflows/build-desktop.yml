@@ -6,6 +6,9 @@ on:
     inputs:
       uploading:
         type: string
+      runner:
+        required: true
+        type: string
     secrets:
       GPG_KEY1:
         required: true
@@ -28,7 +31,7 @@ jobs:
 
     name: Build
     if: ${{ github.repository_owner == 'Armbian' }}
-    runs-on: small
+    runs-on: ${{ inputs.runner }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
@@ -77,7 +80,7 @@ jobs:
       name: "Build package"
       needs: Prepare
       if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
-      runs-on: ubuntu-latest
+      runs-on: ${{ inputs.runner }}
       timeout-minutes: 480
       strategy:
         fail-fast: false
