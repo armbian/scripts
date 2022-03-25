@@ -155,7 +155,7 @@ jobs:
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes
           sudo rm -rf cache/sources/ || true
           sudo rm -rf output/ || true          
-          sudo chown -R $USER:$USER build/. || true
+          sudo chown -R $USER:$USER build
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
