@@ -41,7 +41,14 @@ jobs:
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
-    
+
+      - name: Clean temporally folders
+        run: |
+          sudo rm -rf build/.tmp 2>/dev/null || true
+          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+          sudo chown -R $USER:$USER build || true
+
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -79,6 +86,13 @@ jobs:
 
     runs-on: ${{ inputs.runner }}
     steps:
+
+      - name: Clean temporally folders
+        run: |
+          sudo rm -rf build/.tmp 2>/dev/null || true
+          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+          sudo chown -R $USER:$USER build || true
 
       - name: Checkout repository
         uses: actions/checkout@v2
