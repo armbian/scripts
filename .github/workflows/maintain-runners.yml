@@ -27,6 +27,11 @@ jobs:
         run: |
           sudo rm -rf changes 2>/dev/null || true
           sudo rm -rf build/.tmp 2>/dev/null || true
+          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
+              sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+              sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+          fi
+          sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
 
       - name: Download changes
         if: ${{ inputs.checking }}
@@ -46,7 +51,7 @@ jobs:
           repository: armbian/build
           path: build
           ref: nightly
-          clean: false
+          clean: true
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
