@@ -32,6 +32,7 @@ jobs:
               sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           fi
           sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
+          sudo pkill sshfs || true
 
       - name: Download changes
         if: ${{ inputs.checking }}
@@ -111,6 +112,7 @@ jobs:
               sudo pkill arm-binfmt-P || true
               sudo pkill aarch64-binfmt-P || true
               sudo pkill pixz || true
+              sudo pkill sshfs || true
               sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
               if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
                   sudo mountpoint -q build/cache/rootfs &&  sudo fusermount -u build/cache/rootfs || true
