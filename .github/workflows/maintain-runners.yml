@@ -41,7 +41,8 @@ jobs:
         with:
           name: changes
 
-      - uses: geekyeggo/delete-artifact@v1
+      - name: Delete control artefact
+        uses: geekyeggo/delete-artifact@v1
         if: ${{ inputs.checking }}
         with:
           name: changes
