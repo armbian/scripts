@@ -42,11 +42,6 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
     
-      - name: Preparing runner
-        uses: armbian/scripts/.github/workflows/prepare-runner.yml@master
-        with:
-          runner: small
-
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -54,7 +49,7 @@ jobs:
           repository: armbian/build
           path: build
           ref: ${{ inputs.destref }}
-          clean: true
+          clean: false
 
       - name: Remove previous artefacts if any
         run: |
