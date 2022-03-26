@@ -92,6 +92,7 @@ jobs:
           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
           DESKTOP_ENVIRONMENT=${{ matrix.desktop }} \
           SKIP_EXTERNAL_TOOLCHAINS=yes \
+          FORCED_MONTH_OFFSET=12 \
           DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
 
       - name: Upload artefacts
