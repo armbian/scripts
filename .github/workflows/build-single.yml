@@ -72,11 +72,12 @@ on:
         - pinebook-a64
         - pinebook-pro
         - pineh64-b
+        - quartz64a
         - radxa-zero
         - renegade
         - rk322x-box
         - rock-3a
-        - rock64pro
+        - rockpro64
         - rpi4b
         - station-m1
         - station-m2
