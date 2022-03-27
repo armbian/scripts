@@ -74,8 +74,8 @@ jobs:
          NO_HOST_RELEASE_CHECK="yes"
          
          # change template
-         sed -i "s/^GCC_COMPILER=.*/GCC_COMPILER=$COMPILER/" userpatches/config-docker.conf
-         sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=$RELEASE/" userpatches/config-docker.conf
+         sudo sed -i "s/^GCC_COMPILER=.*/GCC_COMPILER=$COMPILER/" userpatches/config-docker.conf
+         sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=$RELEASE/" userpatches/config-docker.conf
 
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
