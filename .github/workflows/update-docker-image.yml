@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-latest,aarch64]
-        target: ["bullseye:10","sid:12","hirsute:8","jammy:12"]
+        target: ["debian:bullseye:10","debian:sid:12","ubuntu:hirsute:8","ubuntu:jammy:12"]
 
     name: ${{ matrix.runner }} ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
@@ -56,8 +56,9 @@ jobs:
              sudo rm -rf build/userpatches || true
          fi
 
-         RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f1)
-         COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f2)
+         DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
+         RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+         COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
 
          cd build
          
@@ -74,8 +75,8 @@ jobs:
          NO_HOST_RELEASE_CHECK="yes"
          
          # change template
-         sudo sed -i "s/^GCC_COMPILER=.*/GCC_COMPILER=$COMPILER/" userpatches/config-docker.conf
-         sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=$RELEASE/" userpatches/config-docker.conf
+         sudo sed -i "s/^GCC_COMPILER=.*/GCC_COMPILER=g++-${COMPILER}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+         sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=$DISRO:$RELEASE/" userpatches/config-docker.conf
 
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
