@@ -36,10 +36,10 @@ jobs:
          path: scripts
          clean: false
 
-     - name: Sync
-       run: |
-         mkdir -p build/userpatches
-         sudo cp scripts/configs/* build/userpatches/
+#     - name: Sync
+#       run: |
+#         mkdir -p build/userpatches
+#         sudo cp scripts/configs/* build/userpatches/
 
      - name: Login to GitHub Container Registry
        uses: docker/login-action@v1
@@ -81,5 +81,5 @@ jobs:
      - name: Push Docker image
        run: |
 
-         #docker push ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
+         sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ matrix.target }}-$(dpkg --print-architecture)"
          docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ matrix.target }}-$(dpkg --print-architecture)"
