@@ -62,7 +62,7 @@ jobs:
          ./compile.sh JUST_INIT="yes" OFFLINE_WORK="yes" BRANCH=current RELEASE=focal  BUILD_MINIMAL=yes BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no BOARD="zeropi" NO_HOST_RELEASE_CHECK="yes"
          
          # change template
-         ln -fs dockerfiles/${{ matrix.target }}.dockerfile userpatches/Dockerfile
+         sudo cp config/template/dockerfiles/${{ matrix.target }}.dockerfile userpatches/Dockerfile
 
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
