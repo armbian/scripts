@@ -58,6 +58,7 @@ jobs:
 
          DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+         echo "RELEASE=$RELEASE" >> $GITHUB_ENV
          COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
 
          cd build
@@ -94,8 +95,8 @@ jobs:
      - name: Push Docker image
        run: |
 
-         sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${RELEASE}-$(dpkg --print-architecture)"
-         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${RELEASE}-$(dpkg --print-architecture)"
+         sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
          if [[ ${{ matrix.target }} == hirsute ]]; then
             sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
             docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
