@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-latest,aarch64]
+        target: [bullseye,sid,hirsute,jammy]
 
     name: ${{ matrix.runner }}
     runs-on: ${{ matrix.runner }}
@@ -24,7 +25,7 @@ jobs:
          fetch-depth: 0
          repository: armbian/build
          path: build
-         ref: master
+         ref: "AR-1085"
          clean: false
 
      - name: Checkout support scripts
@@ -57,6 +58,9 @@ jobs:
          sudo docker images -a  | awk '{print $3}' | xargs docker rmi --force  2>/dev/null || true 
 
          cd build
+         
+         # change template
+         ln -fs dockerfiles/${{ matrix.target }}.dockerfile userpatches/Dockerfile
 
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
@@ -76,4 +80,4 @@ jobs:
        run: |
 
          #docker push ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
-         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ matrix.runner }}-$(dpkg --print-architecture)"
