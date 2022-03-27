@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-latest,aarch64]
-        target: [bullseye:10,sid:12,hirsute:8,jammy:12]
+        target: ["bullseye:10","sid:12","hirsute:8","jammy:12"]
 
     name: ${{ matrix.runner }} ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
