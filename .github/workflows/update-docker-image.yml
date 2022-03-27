@@ -14,7 +14,7 @@ jobs:
         runner: [ubuntu-latest,aarch64]
         target: [bullseye,sid,hirsute,jammy]
 
-    name: ${{ matrix.runner }}
+    name: ${{ matrix.runner }} ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
@@ -52,10 +52,10 @@ jobs:
 
        run: |
 
-         sudo docker stop $(docker ps -a -q) 2>/dev/null || true
-         sudo docker rm $(docker ps -a -q) 2>/dev/null || true
-         sudo docker image rm $(docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
-         sudo docker images -a  | awk '{print $3}' | xargs docker rmi --force  2>/dev/null || true 
+         #sudo docker stop $(docker ps -a -q) 2>/dev/null || true
+         #sudo docker rm $(docker ps -a -q) 2>/dev/null || true
+         #sudo docker image rm $(docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
+         #sudo docker images -a  | awk '{print $3}' | xargs docker rmi --force  2>/dev/null || true 
 
          cd build
          
@@ -82,4 +82,4 @@ jobs:
        run: |
 
          #docker push ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
-         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ matrix.runner }}-$(dpkg --print-architecture)"
+         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ matrix.target }}-$(dpkg --print-architecture)"
