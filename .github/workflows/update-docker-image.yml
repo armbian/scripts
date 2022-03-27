@@ -12,8 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-latest,aarch64]
+        target: ["debian:bullseye:10","debian:sid:12","ubuntu:hirsute:8","ubuntu:jammy:12"]
 
-    name: ${{ matrix.runner }}
+    name: ${{ matrix.runner }} ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
@@ -24,7 +25,7 @@ jobs:
          fetch-depth: 0
          repository: armbian/build
          path: build
-         ref: master
+         ref: "AR-1085"
          clean: false
 
      - name: Checkout support scripts
@@ -34,11 +35,6 @@ jobs:
          repository: armbian/scripts
          path: scripts
          clean: false
-
-     - name: Sync
-       run: |
-         mkdir -p build/userpatches
-         sudo cp scripts/configs/* build/userpatches/
 
      - name: Login to GitHub Container Registry
        uses: docker/login-action@v1
@@ -51,13 +47,37 @@ jobs:
 
        run: |
 
-         sudo docker stop $(docker ps -a -q) 2>/dev/null || true
-         sudo docker rm $(docker ps -a -q) 2>/dev/null || true
-         sudo docker image rm $(docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
-         sudo docker images -a  | awk '{print $3}' | xargs docker rmi --force  2>/dev/null || true 
+         # arm64 are only our runners, where we have to clean
+         if [[ "$(dpkg --print-architecture)" == arm64 ]]; then
+             sudo docker stop $(docker ps -a -q) 2>/dev/null || true
+             sudo docker rm $(docker ps -a -q) 2>/dev/null || true
+             sudo docker image rm $(docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
+             sudo docker images -a  | awk '{print $3}' | xargs docker rmi --force  2>/dev/null || true 
+             sudo rm -rf build/userpatches || true
+         fi
+
+         DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
+         RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+         echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+         COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
 
          cd build
-
+         
+         # framework init
+         ./compile.sh JUST_INIT="yes" \
+         OFFLINE_WORK="yes" \
+         BRANCH=current \
+         RELEASE=focal \
+         BUILD_MINIMAL=yes \
+         BUILD_DESKTOP=no \
+         KERNEL_ONLY=no \
+         KERNEL_CONFIGURE=no \
+         BOARD="zeropi" \
+         NO_HOST_RELEASE_CHECK="yes"
+         
+         # change template
+         sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${COMPILER}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+         sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${DISTRO}:${RELEASE}/" userpatches/config-docker.conf
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
          ./compile.sh docker \
@@ -75,5 +95,9 @@ jobs:
      - name: Push Docker image
        run: |
 
-         #docker push ghcr.io/armbian/build:$(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)"
-         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+         sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         if [[ ${{ env.RELEASE }} == jammy ]]; then
+            sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+            docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+         fi
