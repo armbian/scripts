@@ -76,7 +76,7 @@ jobs:
          
          # change template
          sudo sed -i "s/^GCC_COMPILER=.*/GCC_COMPILER=g++-${COMPILER}-arm-linux-gnueabihf/" userpatches/config-docker.conf
-         sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=$DISRO:$RELEASE/" userpatches/config-docker.conf
+         sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=$DISTRO:$RELEASE/" userpatches/config-docker.conf
 
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
