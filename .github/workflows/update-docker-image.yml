@@ -59,10 +59,20 @@ jobs:
 
          cd build
          
-         ./compile.sh JUST_INIT="yes" OFFLINE_WORK="yes" BRANCH=current RELEASE=focal  BUILD_MINIMAL=yes BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no BOARD="zeropi" NO_HOST_RELEASE_CHECK="yes"
+         # framework init
+         ./compile.sh JUST_INIT="yes" \
+         OFFLINE_WORK="yes" \
+         BRANCH=current \
+         RELEASE=focal \
+         BUILD_MINIMAL=yes \
+         BUILD_DESKTOP=no \
+         KERNEL_ONLY=no \
+         KERNEL_CONFIGURE=no \
+         BOARD="zeropi" \
+         NO_HOST_RELEASE_CHECK="yes"
          
          # change template
-         sudo cp config/templates/dockerfiles/${{ matrix.target }}.dockerfile userpatches/Dockerfile
+         sudo cp --remove-destination config/templates/dockerfiles/${{ matrix.target }}.dockerfile userpatches/Dockerfile
 
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
@@ -83,3 +93,7 @@ jobs:
 
          sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ matrix.target }}-$(dpkg --print-architecture)"
          docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ matrix.target }}-$(dpkg --print-architecture)"
+         if [[ ${{ matrix.target }} == hirsute ]]; then
+            sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+            docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+         fi
