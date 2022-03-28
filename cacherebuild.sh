@@ -6,7 +6,7 @@ FORCED_MONTH_OFFSET=0                           # cache is valid one month. This
 MAKEFORALLAPPS="no"                             # yes = make all app combinations. It might be too much. If not set, hardcoded values are choosen
 PARALLEL_BUILDS=""                              # choose how many you want to run in parallel. Leave empty for auto
 USE_SCREEN="no"                                 # run commands in screen
-FORCE_RELEASE="jammy sid"              # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
+FORCE_RELEASE="jammy"              # we only build supported releases caches. her you can add unsupported ones which you wish to experiment
 EXCLUDE_RELEASE="buster hirsute"                # we might not want to make caches for old stable releses
 FORCE_DESKTOP="cinnamon"                        # we only build supported desktop caches. here you can add unsupported ones which you wish to build anyway
 PURGEDAYS="4"                                   # delete files that are older then n days and are not used anymore
