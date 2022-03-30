@@ -31,8 +31,8 @@ jobs:
         run: |
 
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
-          USERLAND=$DISTRO
-          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)          
+          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+          USERLAND=$RELEASE
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
           BOARD=${{ matrix.board }}
           
