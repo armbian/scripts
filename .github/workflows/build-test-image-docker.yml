@@ -83,7 +83,8 @@ jobs:
 
           # framework init
 
-          ./compile.sh JUST_INIT="yes" \
+          ./compile.sh \
+          JUST_INIT="yes" \
           OFFLINE_WORK="yes" \
           BRANCH=current \
           RELEASE=focal \
@@ -106,6 +107,7 @@ jobs:
           export TERM=dumb
           sed -i "s/COMPRESS_OUTPUTIMAGE=.*/COMPRESS_OUTPUTIMAGE=\"no\"/" userpatches/lib.config
           ./compile.sh docker \
+          JUST_INIT="yes" \
           BETA=yes \
           EXPERT=yes \
           BOARD=${{ matrix.board }} \
