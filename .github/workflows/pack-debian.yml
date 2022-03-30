@@ -133,7 +133,12 @@ jobs:
     if: "${{ always() }}"
     runs-on: ubuntu-latest
     steps:
-   
+
+      - name: Install dependencies
+        run: |
+          echo 'man-db man-db/auto-update boolean false' | sudo debconf-set-selections
+          sudo apt-get -q -y install reprepro
+
       - uses: actions/download-artifact@v2
         name: Download deb artifacts
         with:
