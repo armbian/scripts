@@ -33,12 +33,20 @@ jobs:
 
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
-          USERLAND=$RELEASE
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
+          
+          DOCKER_DISTRO=$DISTRO
+          DOCKER_RELEASE=$RELEASE          
+          DOCKER_COMPILER=$COMPILER
+          
           BOARD=${{ matrix.board }}
           
           # Bullseye can't build even itself
-          [[ "$RELEASE" == "bullseye" ]] && USERLAND="jammy"
+          if [[ "$RELEASE" == "bullseye" ]]; then
+          DOCKER_DISTRO="ubuntu"
+          DOCKER_RELEASE="jammy"
+          DOCKER_COMPILER="12"
+          fi
           
           if [[ "$DISTRO" == "debian" ]] && [[ "$BOARD" == "rpi4b" ]]; then
              echo "SKIP=yes" >> $GITHUB_ENV
@@ -47,9 +55,11 @@ jobs:
           # export to environment
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "BOARD=$BOARD" >> $GITHUB_ENV
-          echo "DISTRO=$DISTRO" >> $GITHUB_ENV
-          echo "USERLAND=$USERLAND" >> $GITHUB_ENV
           echo "COMPILER=$COMPILER" >> $GITHUB_ENV
+          
+          echo "DOCKER_DISTRO=$DOCKER_DISTRO" >> $GITHUB_ENV
+          echo "DOCKER_RELEASE=$DOCKER_RELEASE" >> $GITHUB_ENV
+          echo "DOCKER_COMPILER=$DOCKER_COMPILER" >> $GITHUB_ENV
 
 #      - name: Handle exceptions
 #        run: |
@@ -89,7 +99,7 @@ jobs:
         if: ${{ env.SKIP != 'yes' }}
         run: |
 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.USERLAND }}-$(dpkg --print-architecture)"
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.DOCKER_RELEASE }}-$(dpkg --print-architecture)"
 
       - name: Build test image
         if: ${{ env.SKIP != 'yes' }}
@@ -112,8 +122,8 @@ jobs:
          
           # change template
           sudo sed -i "s/^#DOCKER_FLAGS+=(--privileged)/DOCKER_FLAGS+=(--privileged)/" userpatches/config-docker.conf
-          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
-          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DISTRO }}:${{ env.RELEASE }}/" userpatches/config-docker.conf
+          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.DOCKER_COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DOCKER_DISTRO }}:${{ env.DOCKER_RELEASE }}/" userpatches/config-docker.conf
           sudo sed -i "s/^VERSION=.*/VERSION=\$(cat \$SRC\/VERSION | cut -d\".\" -f1-2)\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
           sudo sed -i 's/armbian:/ghcr.io\/armbian\/build:/g' userpatches/config-docker.conf 
           sudo sed -i "s/ -it/ -i/" userpatches/config-docker.conf
