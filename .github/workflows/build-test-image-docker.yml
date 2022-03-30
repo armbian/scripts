@@ -48,7 +48,7 @@ jobs:
       - name: Handle exceptions
         run: |
         
-          if (( "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" )); then
+          if [[ "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" ]]; then
           echo "SKIP=yes" >> $GITHUB_ENV
           fi
 
