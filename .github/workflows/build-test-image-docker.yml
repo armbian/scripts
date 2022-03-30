@@ -31,13 +31,17 @@ jobs:
         run: |
 
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
+          USERLAND=$DISTRO
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)          
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
           BOARD=${{ matrix.board }}
           
-#          if [[ "$DISTRO" == "debian" ]] && [[ "$BOARD" == "rpi4b" ]]; then
-#          echo "SKIP=yes" >> $GITHUB_ENV
-#          fi
+          # Bullseye can't build even itself
+          [[ "$DISTRO" == "bullseye" ]] && USERLAND="jammy"
+          
+          if [[ "$DISTRO" == "debian" ]] && [[ "$BOARD" == "rpi4b" ]]; then
+             echo "SKIP=yes" >> $GITHUB_ENV
+          fi
           
           # export to environment
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
@@ -45,12 +49,12 @@ jobs:
           echo "DISTRO=$DISTRO" >> $GITHUB_ENV
           echo "COMPILER=$COMPILER" >> $GITHUB_ENV
 
-      - name: Handle exceptions
-        run: |
-        
-          if [[ "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" ]]; then
-          echo "SKIP=yes" >> $GITHUB_ENV
-          fi
+#      - name: Handle exceptions
+#        run: |
+#        
+#          if [[ "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" ]]; then
+#          echo "SKIP=yes" >> $GITHUB_ENV
+#          fi
 
       - name: Checkout repository
         if: ${{ env.SKIP != 'yes' }}
@@ -83,7 +87,7 @@ jobs:
         if: ${{ env.SKIP != 'yes' }}
         run: |
 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.USERLAND }}-$(dpkg --print-architecture)"
 
       - name: Build test image
         if: ${{ env.SKIP != 'yes' }}
