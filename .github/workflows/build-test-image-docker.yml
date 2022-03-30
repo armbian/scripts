@@ -40,8 +40,10 @@ jobs:
 
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
-          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          echo "DISTRO=$DISTRO" >> $GITHUB_ENV
+          echo "COMPILER=$COMPILER" >> $GITHUB_ENV
           echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
           echo ${{ env.SKIP }} 
 
@@ -93,8 +95,8 @@ jobs:
           NO_HOST_RELEASE_CHECK="yes"
          
           # change template
-          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${COMPILER}-arm-linux-gnueabihf/" userpatches/config-docker.conf
-          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${DISTRO}:${RELEASE}/" userpatches/config-docker.conf
+          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DISTRO }}:${{ env.RELEASE }}/" userpatches/config-docker.conf
           sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
           touch .ignore_changes
 
