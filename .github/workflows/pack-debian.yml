@@ -187,12 +187,12 @@ jobs:
           # Configure reprepro
           mkdir -p ${REPO_DIR}/conf
           cat <<EOD >${REPO_DIR}/conf/distributions
-          Origin: lab.armbian.com
-          Label: lab.armbian.com
+          Origin: armbian.github.io/configurator
+          Label: armbian.github.io/configurator
           Codename: stable
-          Architectures: amd64 ppc64el arm64 armel armhf s390x source
+          Architectures: amd64 arm64 armhf
           Components: main
-          Description: Armbian development
+          Description: Armbian development repo
           SignWith: DF00FAF1C577104B50BF1D0093D6889F9F0E78D5
           EOD
 
