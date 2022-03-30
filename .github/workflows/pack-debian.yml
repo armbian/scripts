@@ -146,6 +146,18 @@ jobs:
           name: tar
           path: output
 
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v4.3.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+
+      - name: Deploy to server
+        run: |
+        
+          gpg -K
+
 #      - name: Install SSH key for storage
 #        uses: shimataro/ssh-key-action@v2
 #        with:
