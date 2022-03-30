@@ -47,6 +47,7 @@ jobs:
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "BOARD=$BOARD" >> $GITHUB_ENV
           echo "DISTRO=$DISTRO" >> $GITHUB_ENV
+          echo "USERLAND=$USERLAND" >> $GITHUB_ENV
           echo "COMPILER=$COMPILER" >> $GITHUB_ENV
 
 #      - name: Handle exceptions
