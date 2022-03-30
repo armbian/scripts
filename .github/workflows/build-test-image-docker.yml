@@ -101,7 +101,7 @@ jobs:
           sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DISTRO }}:${{ env.RELEASE }}/" userpatches/config-docker.conf
           sudo sed -i "s/^VERSION=.*/VERSION=\$(cat \$SRC\/VERSION | cut -d\".\" -f1-2)\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
           sudo sed -i 's/armbian:/ghcr.io\/armbian\/build:/g' userpatches/config-docker.conf 
-          sudo sed -i "s/-it --/-i --/" userpatches/config-docker.conf 
+          sudo sed -i "s/ -it/ -i/" userpatches/config-docker.conf 
           
           cat userpatches/config-docker.conf 
           
