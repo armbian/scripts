@@ -25,7 +25,7 @@ jobs:
          fetch-depth: 0
          repository: armbian/build
          path: build
-         ref: "AR-1085"
+         ref: "master"
          clean: false
 
      - name: Checkout support scripts
