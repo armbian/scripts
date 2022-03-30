@@ -68,7 +68,8 @@ jobs:
         run: |
 
           mkdir -p build/userpatches
-          sudo cp scripts/configs/* build/userpatches/
+          sudo cp scripts/configs/lib.config build/userpatches/
+          sudo cp scripts/configs/config-default.conf build/userpatches/
           
       - name: Pull Docker image
         run: |
