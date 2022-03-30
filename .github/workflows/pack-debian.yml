@@ -146,6 +146,11 @@ jobs:
           name: tar
           path: output
 
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:          
+          path: repository
+
       - name: Import GPG key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v4.3.0
@@ -153,10 +158,65 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
 
-      - name: Deploy to server
+      - name: Configure git identity
+        working-directory: repository
         run: |
         
+          echo "Testing signing" | gpg --sign --armor
+          
           gpg -K
+          echo "#"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Deploy packages
+        run: |        
+       
+          PACKAGES_DIR="$(pwd)"/output
+          REPO_DIR="$(pwd)"/repository
+
+          [[ ! -d "${PACKAGES_DIR}" ]] && echo "Packages dir ${PACKAGES_DIR} is not there." && exit 2
+          mkdir -p "${REPO_DIR}" "${REPO_DIR}"/pool
+
+          # Configure reprepro
+          mkdir -p ${REPO_DIR}/conf
+          cat <<EOD >${REPO_DIR}/conf/distributions
+          Origin: lab.armbian.com
+          Label: lab.armbian.com
+          Codename: stable
+          Architectures: amd64 arm64 armhf
+          Components: main
+          Description: Armbian development
+          SignWith: DF00FAF1C577104B50BF1D0093D6889F9F0E78D5
+          EOD
+
+          # Determine a list of binary debs to include in the repo
+          # reprepro does not accept identical package(-names) with different contents (sha1)
+          # our build does generate different contents (in different runs) and I'd like to keep old versions around
+          LIST_DEBS_NEW=""
+          for ONE_DEB in ${PACKAGES_DIR}/*.deb; do
+          echo "Considering adding to repo: $ONE_DEB"
+          BASE_ONE_DEB=$(basename ${ONE_DEB})
+          EXISTING_DEB_IN_REPO=$(find ${REPO_DIR}/pool -type f -name ${BASE_ONE_DEB})
+          if [[ "a${EXISTING_DEB_IN_REPO}" == "a" ]]; then
+          echo "- New .deb to include in repo: ${BASE_ONE_DEB}"
+          LIST_DEBS_NEW="${LIST_DEBS_NEW} ${ONE_DEB}"
+          else
+          echo "- Existing .deb: ${BASE_ONE_DEB}"
+          fi
+          done
+
+          echo "** Final list of DEBs to include: ${LIST_DEBS_NEW}"
+          if [[ "a${LIST_DEBS_NEW}a" == "aa" ]]; then
+            echo "No new packages, nothing to do."
+          else
+          echo "New packages, running reprepro..."
+          reprepro -b "${REPO_DIR}" includedeb stable ${LIST_DEBS_NEW}
+          echo "Repository generated at ${REPO_DIR}/"
+          fi
+
+
+
 
 #      - name: Install SSH key for storage
 #        uses: shimataro/ssh-key-action@v2
