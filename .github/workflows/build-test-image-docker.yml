@@ -35,9 +35,9 @@ jobs:
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
           BOARD=${{ matrix.board }}
           
-          if [[ "$DISTRO" == "debian" ]] && [[ "$BOARD" == "rpi4b" ]]; then
-          echo "SKIP=yes" >> $GITHUB_ENV
-          fi
+#          if [[ "$DISTRO" == "debian" ]] && [[ "$BOARD" == "rpi4b" ]]; then
+#          echo "SKIP=yes" >> $GITHUB_ENV
+#          fi
           
           # export to environment
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
@@ -45,12 +45,12 @@ jobs:
           echo "DISTRO=$DISTRO" >> $GITHUB_ENV
           echo "COMPILER=$COMPILER" >> $GITHUB_ENV
 
-#      - name: Handle exceptions
-#        run: |
-#        
-#          if (( "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" )); then
-#          echo "SKIP=true" >> $GITHUB_ENV
-#          fi
+      - name: Handle exceptions
+        run: |
+        
+          if (( "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" )); then
+          echo "SKIP=yes" >> $GITHUB_ENV
+          fi
 
       - name: Checkout repository
         if: ${{ env.SKIP != 'yes' }}
