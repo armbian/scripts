@@ -38,7 +38,7 @@ jobs:
           BOARD=${{ matrix.board }}
           
           # Bullseye can't build even itself
-          [[ "$DISTRO" == "bullseye" ]] && USERLAND="jammy"
+          [[ "$RELEASE" == "bullseye" ]] && USERLAND="jammy"
           
           if [[ "$DISTRO" == "debian" ]] && [[ "$BOARD" == "rpi4b" ]]; then
              echo "SKIP=yes" >> $GITHUB_ENV
