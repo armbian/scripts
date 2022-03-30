@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         board: [uefi-x86,rpi4b]
-        release: [focal,bullseye,jammy]
+        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
         desktop: [xfce,gnome,mate,cinnamon]
     
     name: Variant
@@ -35,9 +35,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}-linux
 
-      - name: Read value
+      - name: Read values
         run: |
 
+          DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
+          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
           echo "SKIP=$(cat build-kernel/skip 2> /dev/null || true)" >> $GITHUB_ENV
           echo ${{ env.SKIP }} 
 
@@ -62,26 +66,45 @@ jobs:
         run: |
 
           mkdir -p build/userpatches
-          sudo cp scripts/configs/* build/userpatches/
+          sudo cp scripts/configs/lib.config build/userpatches/
           
       - name: Pull Docker image
         run: |
 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
 
       - name: Build test image
         run: |
 
           cd build
+
+          # framework init
           export TERM=dumb
-          sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
+
+          ./compile.sh JUST_INIT="yes" \
+          OFFLINE_WORK="yes" \
+          BRANCH=current \
+          RELEASE=focal \
+          BUILD_MINIMAL=yes \
+          BUILD_DESKTOP=no \
+          KERNEL_ONLY=no \
+          KERNEL_CONFIGURE=no \
+          BOARD="zeropi" \
+          NO_HOST_RELEASE_CHECK="yes"
+         
+          # change template
+          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${COMPILER}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${DISTRO}:${RELEASE}/" userpatches/config-docker.conf
+          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
+          touch .ignore_changes
+
           sed -i "s/COMPRESS_OUTPUTIMAGE=.*/COMPRESS_OUTPUTIMAGE=\"no\"/" userpatches/lib.config
           ./compile.sh docker \
           BETA=yes \
           EXPERT=yes \
           BOARD=${{ matrix.board }} \
           BRANCH=current \
-          RELEASE=${{ matrix.release }} \
+          RELEASE=${{ env.RELEASE }} \
           BUILD_MINIMAL=no \
           BUILD_DESKTOP=yes \
           KERNEL_ONLY=no \
@@ -98,7 +121,7 @@ jobs:
       - name: Upload artefacts
         uses: actions/upload-artifact@v2
         with:
-          name: "${{ matrix.board }}-${{ matrix.release }}-${{ matrix.desktop }}"
+          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
           path: build/output/images/*
           if-no-files-found: ignore
           retention-days: 7
