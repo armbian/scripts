@@ -190,7 +190,7 @@ jobs:
           Origin: lab.armbian.com
           Label: lab.armbian.com
           Codename: stable
-          Architectures: amd64 arm64 armhf
+          Architectures: amd64 ppc64el arm64 armel armhf s390x source
           Components: main
           Description: Armbian development
           SignWith: DF00FAF1C577104B50BF1D0093D6889F9F0E78D5
