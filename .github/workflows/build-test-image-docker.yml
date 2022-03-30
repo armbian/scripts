@@ -45,15 +45,15 @@ jobs:
           echo "DISTRO=$DISTRO" >> $GITHUB_ENV
           echo "COMPILER=$COMPILER" >> $GITHUB_ENV
 
-#      - name: Handle exceptions
-#        run: |
-#        
-#          if (( "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" )); then
-#          echo "SKIP=true" >> $GITHUB_ENV
-#          fi
+      - name: Handle exceptions
+        run: |
+        
+          if (( "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" )); then
+          echo "SKIP=true" >> $GITHUB_ENV
+          fi
 
       - name: Checkout repository
-        if: ${{ env.SKIP == true }}
+        if: ${{ env.SKIP != true }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 100
@@ -63,7 +63,7 @@ jobs:
           clean: true
 
       - name: Checkout support scripts
-        if: ${{ env.SKIP == true }}
+        if: ${{ env.SKIP != true }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 100
@@ -72,7 +72,7 @@ jobs:
           clean: true
 
       - name: Sync
-        if: ${{ env.SKIP == true }}
+        if: ${{ env.SKIP != true }}
         run: |
 
           mkdir -p build/userpatches
@@ -80,13 +80,13 @@ jobs:
           sudo cp scripts/configs/config-default.conf build/userpatches/
           
       - name: Pull Docker image
-        if: ${{ env.SKIP == true }}
+        if: ${{ env.SKIP != true }}
         run: |
 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
 
       - name: Build test image
-        if: ${{ env.SKIP == true }}
+        if: ${{ env.SKIP != true }}
         run: |
 
           cd build
@@ -136,8 +136,8 @@ jobs:
           FORCED_MONTH_OFFSET=12 \
           DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
 
-      - name: Upload artefacts
-        if: ${{ env.SKIP == true }}
+      - name: Upload artefacts        
+        if: ${{ env.SKIP != true }}
         uses: actions/upload-artifact@v3
         with:
           name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
