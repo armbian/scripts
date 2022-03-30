@@ -64,12 +64,12 @@ jobs:
           path: scripts
           clean: true
 
-      - name: Sync
-        run: |
-
-          mkdir -p build/userpatches
-          sudo cp scripts/configs/lib.config build/userpatches/
-          sudo cp scripts/configs/config-default.conf build/userpatches/
+#      - name: Sync
+#        run: |
+#
+#          mkdir -p build/userpatches
+#          sudo cp scripts/configs/lib.config build/userpatches/
+#          sudo cp scripts/configs/config-default.conf build/userpatches/
           
       - name: Pull Docker image
         run: |
