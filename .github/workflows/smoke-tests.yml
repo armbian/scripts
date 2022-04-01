@@ -23,6 +23,8 @@ jobs:
             power-socket: ""
           - ip: "10.0.30.101" 
             name: "Orange Pi Zero Plus"
+          - ip: "10.0.30.135" 
+            name: "Espressobin"
           - ip: "10.0.50.189" 
             name: "Orange Pi Lite 2"
             power-socket: ""
