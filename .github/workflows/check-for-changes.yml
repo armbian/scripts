@@ -51,7 +51,7 @@ jobs:
           MATRIX=$(for BRANCH in legacy current edge; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
-                  unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE
+                  unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
                   BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
                   source "build/config/sources/families/${BOARDFAMILY}.conf"
                   # exceptions handling
