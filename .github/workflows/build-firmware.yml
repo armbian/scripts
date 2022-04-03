@@ -1,0 +1,69 @@
+name: Build firmware
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      reference:
+        required: false
+        type: string
+      runner:
+        required: true
+        type: string
+
+jobs:  
+
+  gradle:
+#    if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [bananapi]
+        release: [focal]
+    
+    name: Variant
+#    runs-on: ${{ inputs.runner }}
+    runs-on: small
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 10
+          repository: armbian/build
+          path: build
+          ref: nightly
+#          ref: ${{ inputs.reference }}
+          clean: true
+
+      - name: Pull Docker image
+        run: |
+
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+
+      - name: Build test image
+        run: |
+
+          cd build
+          export TERM=dumb
+          sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
+          ./compile.sh docker \
+          BETA=yes \
+          EXPERT=yes \
+          BOARD=${{ matrix.board }} \
+          BRANCH=current \
+          RELEASE=${{ matrix.release }} \
+          BUILD_MINIMAL=no \
+          KERNEL_ONLY=yes \
+          KERNEL_CONFIGURE=no \
+          IGNORE_UPDATES=yes \
+          REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli" \
+          SKIP_EXTERNAL_TOOLCHAINS=yes \
+          USE_MAINLINE_GOOGLE_MIRROR="yes"
+
+      - name: Upload artefacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.board }}-${{ matrix.release }}-${{ matrix.desktop }}"
+          path: build/output/debs-beta/*
+          if-no-files-found: ignore
+          retention-days: 7
