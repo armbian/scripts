@@ -75,7 +75,7 @@ jobs:
                       ref_name=${KERNELBRANCH##*:}
                   fi
                   [[ -z $LINUXFAMILY ]] && LINUXFAMILY=$BOARDFAMILY
-                  [[ -z ${KERNELPATCHDIR} ]] && KERNELPATCHDIR=$LINUXFAMILY-$BRANCH
+                  #[[ -z ${KERNELPATCHDIR} ]] && KERNELPATCHDIR=$LINUXFAMILY-$BRANCH
                   [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
                   [[ -z ${KERNELSOURCE} ]] && KERNELSOURCE="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable"                  
                   hash_watch_1=$(LC_COLLATE=C find -L "build/patch/kernel/${KERNELPATCHDIR}"/ -type f \( -iname \*.patch -o -iname \series.* \) -mindepth 1 -maxdepth 1 -printf '%s %P\n' 2> /dev/null | LC_COLLATE=C sort -n)
