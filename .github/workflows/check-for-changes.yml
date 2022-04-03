@@ -38,7 +38,7 @@ jobs:
       - name: Determine changed kernels
         run: |
 
-          shell: bash
+          #!/bin/bash
           # fake function
           enable_extension ()
           {
