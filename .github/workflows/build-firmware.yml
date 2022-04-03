@@ -1,4 +1,4 @@
-name: Build firmware
+name: Build other
 on:
   workflow_dispatch:
   workflow_call:
@@ -9,11 +9,16 @@ on:
       runner:
         required: true
         type: string
+    secrets:
+      KEY_TORRENTS:
+        required: true
+      KNOWN_HOSTS_UPLOAD:
+        required: true
 
 jobs:  
 
   gradle:
-#    if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
+    if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -21,8 +26,7 @@ jobs:
         release: [focal]
     
     name: Variant
-#    runs-on: ${{ inputs.runner }}
-    runs-on: small
+    runs-on: ${{ inputs.runner }}
     steps:
 
       - name: Checkout support scripts
@@ -39,8 +43,7 @@ jobs:
           fetch-depth: 10
           repository: armbian/build
           path: build
-          ref: nightly
-#          ref: ${{ inputs.reference }}
+          ref: ${{ inputs.reference }}
           clean: true
 
       - name: Pull Docker image
@@ -73,7 +76,22 @@ jobs:
       - name: Upload artefacts
         uses: actions/upload-artifact@v2
         with:
-          name: "${{ matrix.board }}-${{ matrix.release }}-${{ matrix.desktop }}"
+          name: firmware-zsh-armbian-config
           path: build/output/debs-beta/*
           if-no-files-found: ignore
           retention-days: 7
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Deploy to server
+        run: |
+
+          if [[ "$(sudo fuser /var/lib/dpkg/lock 2>/dev/null; echo $?)" != 0 && "$(sudo fuser /var/lib/dpkg/lock-frontend 2>/dev/null; echo $?)" != 0 ]]; then
+          sudo apt-get -y -qq install lftp
+          fi
+          lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --include-glob=armbian-*.deb  --no-perms $(pwd)/build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
