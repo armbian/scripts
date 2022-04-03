@@ -6,7 +6,7 @@ on:
 jobs:
 
   Prepare:
-    runs-on: small
+    runs-on: ubuntu-latest
     name: Source changes
     if: ${{ github.repository_owner == 'Armbian' }}
 
@@ -38,6 +38,7 @@ jobs:
       - name: Determine changed kernels
         run: |
 
+          shell: bash
           # fake function
           enable_extension ()
           {
