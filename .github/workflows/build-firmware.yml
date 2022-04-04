@@ -86,7 +86,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: firmware-zsh-armbian-config
-          path: build/output/debs-beta/*
+          path: build/output/debs-beta/*.deb
           if-no-files-found: ignore
           retention-days: 7
 
