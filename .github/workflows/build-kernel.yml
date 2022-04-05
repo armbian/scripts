@@ -103,6 +103,7 @@ jobs:
         with:
           repository: armbian/build
           path: build
+          fetch-depth: '0'
           ref:  ${{ inputs.reference }}
           clean: false
           
