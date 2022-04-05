@@ -98,8 +98,8 @@ jobs:
                   STORED_CONFIG=$(sed -n '3p' < "${kernel_hash}")
 
                   if [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
-		                  :
-		              else
+                      :
+                  else
                       echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
                   fi
                   done <<< "$FILES"
