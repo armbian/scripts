@@ -199,9 +199,9 @@ jobs:
           fi
 
           CHUNK="${{ matrix.node }}"
-          BOARD=$(echo $CHUNK | cut -d":" -f3)
-          BRANCH=$(echo $CHUNK | cut -d":" -f2)          
-          FAMILY=$(echo $CHUNK | cut -d":" -f1)
+          BOARD=$(echo $CHUNK | cut -d":" -f4)
+          BRANCH=$(echo $CHUNK | cut -d":" -f3)
+          FAMILY=$(echo $CHUNK | cut -d":" -f2)
           export TERM=dumb
           
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf

@@ -53,6 +53,7 @@ jobs:
               while IFS= read -r line; do
                   unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
                   BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
+                  BOARD=$line
                   source "build/config/sources/families/${BOARDFAMILY}.conf"
                   # exceptions handling
                   [[ ${BOARDFAMILY} == *x86 ]] && BOARDFAMILY=x86
@@ -74,26 +75,35 @@ jobs:
                   else
                       ref_name=${KERNELBRANCH##*:}
                   fi
-                  [[ -z $LINUXFAMILY ]] && LINUXFAMILY=$BOARDFAMILY
+                  [[ -z ${LINUXFAMILY} ]] && LINUXFAMILY=$BOARDFAMILY
                   [[ -z ${KERNELPATCHDIR} ]] && KERNELPATCHDIR=$LINUXFAMILY-$BRANCH
                   [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
                   [[ -z ${KERNELSOURCE} ]] && KERNELSOURCE="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable"                  
-                  hash_watch_1=$(LC_COLLATE=C find -L "build/patch/kernel/${KERNELPATCHDIR}"/ -type f \( -iname \*.patch -o -iname \series.* \) -mindepth 1 -maxdepth 1 -printf '%s %P\n' 2> /dev/null | LC_COLLATE=C sort -n)                  
-                  hash_watch_2=$(cat "build/config/kernel/${LINUXCONFIG}.config" 2> /dev/null)
-                  patch_hash=$(echo "${hash_watch_1}${hash_watch_2}" | git hash-object --stdin)                  
+
                   case $ref_type in
-                      branch) hash=$(git ls-remote "${KERNELSOURCE}" refs/heads/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
-                      tag) hash=$(git ls-remote "${KERNELSOURCE}" tags/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
-                      head) hash=$(git ls-remote "${KERNELSOURCE}" HEAD 2> /dev/null | awk '{print $1}') ;;
-                      commit) hash=$ref_name ;;
+                      branch) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" refs/heads/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
+                      tag) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" tags/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
+                      head) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" HEAD 2> /dev/null | awk '{print $1}') ;;
+                      commit) CALC_HASH=$ref_name ;;
                   esac
+                  SRC=$(pwd)"/build"
+                  CALC_PATCHES=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}"))
+                  CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
+
                   # ignore diff checking in case of network errrors
                   kernel_hash="scripts/hash"$([[ ${BETA} == yes ]] && echo "-beta")"/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
-                  if [[ "$hash" != "$(head -1 "${kernel_hash}" 2>/dev/null)" || "$patch_hash" != "$(tail -1 "${kernel_hash}" 2>/dev/null)" ]]; then
-                      echo "${BOARDFAMILY}:${BRANCH}:${line}"
+
+                  STORED_HASH=$(sed -n '1p' < "${kernel_hash}")
+                  STORED_PATCHES=$(sed -n '2p' < "${kernel_hash}")
+                  STORED_CONFIG=$(sed -n '3p' < "${kernel_hash}")
+
+                  if [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
+		                  :
+		              else
+                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
                   fi
                   done <<< "$FILES"
-          done | sort | uniq | sort -u -t: -k1,2 )
+          done | sort | uniq | sort -u -t: -k1,3 )
           echo "${MATRIX}" |sed '/^$/d' > changes
 
       - name: Upload changes
