@@ -24,8 +24,7 @@ jobs:
        with:
          repository: armbian/build
          path: build
-#         ref: "master"
-         ref: "AR-1145"
+         ref: "master"
          clean: false
 
      - name: Checkout support scripts
