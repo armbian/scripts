@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-latest,aarch64]
-        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
+        target: ["debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy"]
 
     name: ${{ matrix.runner }} ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
@@ -20,9 +20,8 @@ jobs:
     steps:
 
      - name: Checkout repository
-       uses: actions/checkout@v2
+       uses: actions/checkout@v3
        with:
-         fetch-depth: 0
          repository: armbian/build
          path: build
          ref: "master"
@@ -31,7 +30,6 @@ jobs:
      - name: Checkout support scripts
        uses: actions/checkout@v2
        with:
-         fetch-depth: 0
          repository: armbian/scripts
          path: scripts
          clean: false
@@ -59,7 +57,21 @@ jobs:
          DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
-         COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
+
+         case $RELEASE in
+              bullseye)
+              PACKAGES="g++-10-arm-linux-gnueabihf libssl1.1"
+              ;;
+              sid)
+              PACKAGES="g++-12-arm-linux-gnueabihf libssl1.1"
+              ;;
+              focal)
+              PACKAGES="g++-8-arm-linux-gnueabihf libssl1.1"
+              ;;
+              jammy)
+              PACKAGES="g++-12-arm-linux-gnueabihf libssl3"
+              ;;
+         esac
 
          cd build
          
@@ -76,7 +88,7 @@ jobs:
          NO_HOST_RELEASE_CHECK="yes"
          
          # change template
-         sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${COMPILER}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+         sudo sed -i "s/^CUSTOM_PACKAGES=.*/CUSTOM_PACKAGES=\"$PACKAGES\"/" userpatches/config-docker.conf 
          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${DISTRO}:${RELEASE}/" userpatches/config-docker.conf
          sed -i "s/-it --rm/-i --rm/" config/templates/config-docker.conf
          touch .ignore_changes
