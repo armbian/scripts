@@ -150,7 +150,7 @@ jobs:
           sudo rm -rf cache/sources/ || true
           sudo rm -rf output/ || true          
           sudo chown -R $USER:$USER build || true
-          rm $HOME/.ssh/known_hosts
+          # rm $HOME/.ssh/known_hosts
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
