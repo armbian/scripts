@@ -2,11 +2,18 @@ name: Changes
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      reference:
+        required: true
+        type: string
 
 jobs:
 
   Prepare:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     name: Source changes
     if: ${{ github.repository_owner == 'Armbian' }}
 
@@ -18,7 +25,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: nightly
+          ref:  ${{ inputs.reference }}
           clean: false
 
       - name: Checkout support scripts
