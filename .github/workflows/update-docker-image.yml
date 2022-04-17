@@ -84,7 +84,7 @@ jobs:
          BUILD_DESKTOP=no \
          KERNEL_ONLY=no \
          KERNEL_CONFIGURE=no \
-         BOARD="zeropi" \
+         BOARD="orangepi3" \
          NO_HOST_RELEASE_CHECK="yes"
          
          # change template
@@ -93,7 +93,7 @@ jobs:
          sudo sed -i "s/-it/-i/" userpatches/config-docker.conf
          touch .ignore_changes
          ./compile.sh docker \
-         BOARD=virtual-qemu \
+         BOARD=orangepi3 \
          BRANCH=current \
          RELEASE=focal \
          BUILD_MINIMAL=yes \
