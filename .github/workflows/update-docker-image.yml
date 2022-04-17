@@ -90,7 +90,7 @@ jobs:
          # change template
          sudo sed -i "s/^CUSTOM_PACKAGES=.*/CUSTOM_PACKAGES=\"$PACKAGES\"/" userpatches/config-docker.conf 
          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${DISTRO}:${RELEASE}/" userpatches/config-docker.conf
-         sed -i "s/-it/-i/" userpatches/config-docker.conf
+         sudo sed -i "s/-it/-i/" userpatches/config-docker.conf
          touch .ignore_changes
          ./compile.sh docker \
          BOARD=virtual-qemu \
