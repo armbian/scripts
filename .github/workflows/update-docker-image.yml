@@ -102,7 +102,7 @@ jobs:
          KERNEL_CONFIGURE=no \
          COMPRESS_OUTPUTIMAGE=no \
          NO_HOST_RELEASE_CHECK=yes \
-         REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware" 
+         REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware" \
          JUST_INIT=yes
 
      - name: Push Docker image
