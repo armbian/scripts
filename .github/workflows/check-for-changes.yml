@@ -95,8 +95,11 @@ jobs:
                   esac
                   SRC=$(pwd)"/build"
                   CALC_PATCHES=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}"))
+                  [[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
+                  
                   CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
-
+                  [[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
+                  
                   # ignore diff checking in case of network errrors
                   kernel_hash="scripts/hash"$([[ ${BETA} == yes ]] && echo "-beta")"/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
 
