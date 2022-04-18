@@ -106,6 +106,10 @@ jobs:
                   STORED_HASH=$(sed -n '1p' < "${kernel_hash}")
                   STORED_PATCHES=$(sed -n '2p' < "${kernel_hash}")
                   STORED_CONFIG=$(sed -n '3p' < "${kernel_hash}")
+                  
+                  # if stored is null, we don't check                   
+                  [[ "$STORED_PATCHES" == "null" ]] && CALC_PATCHES="null"
+                  [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
 
                   if [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
                       :
