@@ -214,6 +214,7 @@ jobs:
           BETA="yes" \
           KERNEL_ONLY="yes" \
           BRANCH="$BRANCH" \
+          CLEAN_LEVEL="alldebs" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
           KERNEL_CONFIGURE="no" \
           CLEAN_LEVEL="" \
