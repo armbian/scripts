@@ -99,21 +99,21 @@ jobs:
           sudo chown -R $USER:$USER build || true
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/build
           path: build
           ref: ${{ inputs.destref }}
-          clean: false
+          clean: true
 
       - name: Checkout support scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/scripts
           path: scripts
-          clean: false
+          clean: true
         
       - name: Pull Docker image
         run: |
