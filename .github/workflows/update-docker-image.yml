@@ -60,16 +60,16 @@ jobs:
 
          case $RELEASE in
               bullseye)
-              PACKAGES="g++-10-arm-linux-gnueabihf libssl1.1"
+              PACKAGES="g++-10-arm-linux-gnueabihf libssl1.1 qemu"
               ;;
               sid)
               PACKAGES="g++-12-arm-linux-gnueabihf libssl1.1"
               ;;
               focal)
-              PACKAGES="g++-8-arm-linux-gnueabihf libssl1.1"
+              PACKAGES="g++-8-arm-linux-gnueabihf libssl1.1 qemu"
               ;;
               jammy)
-              PACKAGES="g++-12-arm-linux-gnueabihf libssl3"
+              PACKAGES="g++-12-arm-linux-gnueabihf libssl3 qemu"
               ;;
          esac
 
