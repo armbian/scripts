@@ -1,4 +1,4 @@
-name: Beta Desktop
+name: Build desktops
 
 on:
   workflow_dispatch:
@@ -48,13 +48,21 @@ jobs:
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           sudo chown -R $USER:$USER build || true
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 100
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
+          fetch-depth: '100'
+          clean: false
+
+      - name: Checkout support scripts
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: '100'
+          repository: armbian/scripts
+          path: scripts
           clean: false
 
       - name: Remove previous artefacts if any
@@ -89,10 +97,9 @@ jobs:
           
   Desktop:
   
-      name: "Build package"
-      needs: Prepare
-      if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
+      needs: [ Prepare ]
       runs-on: ${{ inputs.runner }}
+      if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
       timeout-minutes: 480
       strategy:
         fail-fast: false
@@ -103,6 +110,7 @@ jobs:
 
       - name: Clean temporally folders
         run: |
+
           sudo rm -rf build/.tmp 2>/dev/null || true
           sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
           sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
@@ -110,31 +118,87 @@ jobs:
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           sudo chown -R $USER:$USER build || true
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 100
           repository: armbian/build
           path: build
+          fetch-depth: '100'
           ref:  ${{ inputs.reference }}
-          clean: true
+          clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 100
+          fetch-depth: '100'
           repository: armbian/scripts
           path: scripts
-          clean: true
+          clean: false
+
+      - name: Install SSH key for storage
+        if: ${{ inputs.uploading == 'true' }}
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+
+      - name: Fix permissions
+        run: |
+
+          # make sure no temporally dirs are mounted from previous runs
+          while :
+          do
+              sudo pkill compile.sh || true
+              sudo pkill arm-binfmt-P || true
+              sudo pkill aarch64-binfmt-P || true
+              sudo pkill pixz || true
+              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
+              sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
+              sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
+              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
+              echo "Mounted temp directories. Trying to unmount."
+              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
+              sudo rm -f build/cache/hash/*
+              sudo rm -f build/cache/hash-beta/*
+              sleep 10
+          done
+          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
+          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
+
+      - name: Mount upload folders
+        if: ${{ inputs.uploading == 'true' }}
+        run: |
+
+          # use this only on our runners
+          if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
+          # mount deploy target
+          sudo apt-get -y -qq install sshfs
+          sudo mkdir -p /root/.ssh/
+          sudo cp ~/.ssh/known_hosts /root/.ssh/
+          sudo mkdir -p build/output/debs || true
+          sudo mkdir -p build/output/debs-beta || true
+          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          fi
+
+      - name: Sync
+        run: |
+
+          sudo mkdir -p build/userpatches build/cache/hash build/cache/hash-beta
+          sudo rm -f build/userpatches/targets.conf
+          sudo cp scripts/configs/* build/userpatches/
+          sudo rm -r build/cache/hash/* build/cache/hash-beta/* 2> /dev/null || true
+
 
       - name: Pull Docker image
         run: |
 
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
           sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
+          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
-      - name: Build package
+      - name: Build
         run: |
 
           mkdir -p build/userpatches
@@ -178,18 +242,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Install SSH key for storage
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.KEY_TORRENTS }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
-          if_key_exists: replace
+      - name: Unmount folders
 
-      - name: Deploy to server
         run: |
-        
-          if [[ "$(sudo fuser /var/lib/dpkg/lock 2>/dev/null; echo $?)" != 0 && "$(sudo fuser /var/lib/dpkg/lock-frontend 2>/dev/null; echo $?)" != 0 ]]; then
-          sudo apt-get -y -qq install lftp
-          fi
-          
-          lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --include-glob=armbian-${{ env.RELEASE }}-desktop-${{ env.DE }}_*.deb  --no-perms $(pwd)/build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
+
+            sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
+            sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
+            sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true

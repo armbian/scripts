@@ -28,9 +28,10 @@ on:
 jobs:
 
   Prepare:
-    runs-on: ${{ inputs.runner }}
+
     name: Build
     if: ${{ github.repository_owner == 'Armbian' }}
+    runs-on: ${{ inputs.runner }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
@@ -103,14 +104,14 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          fetch-depth: '0'
+          fetch-depth: '100'
           ref:  ${{ inputs.reference }}
           clean: false
           
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: '0'
+          fetch-depth: '100'
           repository: armbian/scripts
           path: scripts
           clean: false
@@ -124,7 +125,6 @@ jobs:
           if_key_exists: replace
 
       - name: Fix permissions
-        
         run: |
 
           # make sure no temporally dirs are mounted from previous runs
@@ -164,7 +164,6 @@ jobs:
           fi
 
       - name: Sync
-        
         run: |          
 
           sudo mkdir -p build/userpatches build/cache/hash build/cache/hash-beta 
@@ -173,7 +172,6 @@ jobs:
           sudo rm -r build/cache/hash/* build/cache/hash-beta/* 2> /dev/null || true
 
       - name: Pull Docker image
-        
         run: |
         
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
@@ -182,7 +180,6 @@ jobs:
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
       - name: Build
-        
         run: |
 
           cd build
@@ -248,9 +245,9 @@ jobs:
           retention-days: 30
 
       - name: Unmount folders
-        
+
         run: |
-         
+
             sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
             sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
             sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
