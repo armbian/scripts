@@ -207,6 +207,7 @@ jobs:
           ARMBIAN_MIRROR="https://github.com/armbian/mirror/releases/download/" \
           REPOSITORY_INSTALL="u-boot,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware" \
           BOARD="$BOARD" \
+          CLEAN_LEVEL="make,oldcache" \
           PRIVATE_CCACHE="yes" \
           BETA="yes" \
           KERNEL_ONLY="yes" \
