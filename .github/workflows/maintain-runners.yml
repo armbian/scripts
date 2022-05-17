@@ -24,7 +24,11 @@ jobs:
     steps:
 
       - name: Remove previous artefacts if any
-        run: |        
+        run: |
+        
+          sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
+          sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
+          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           sudo rm -rf changes 2>/dev/null || true
           sudo rm -rf build/.tmp 2>/dev/null || true
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
