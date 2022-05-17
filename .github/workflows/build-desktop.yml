@@ -9,6 +9,9 @@ on:
       runner:
         required: true
         type: string
+      reference:
+        required: false
+        type: string
     secrets:
       GPG_KEY1:
         required: true
@@ -48,10 +51,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 100
           repository: armbian/build
           path: build
-          ref: nightly
+          ref:  ${{ inputs.reference }}
           clean: false
 
       - name: Remove previous artefacts if any
@@ -110,16 +113,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 100
           repository: armbian/build
           path: build
-          ref: nightly
+          ref:  ${{ inputs.reference }}
           clean: true
 
       - name: Checkout support scripts
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 100
           repository: armbian/scripts
           path: scripts
           clean: true
