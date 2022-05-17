@@ -219,6 +219,7 @@ jobs:
           RELEASE="focal" \
           BSP_BUILD="yes" \
           BUILD_ALL="yes" \
+          CLEAN_LEVEL="make,oldcache" \
           BUILD_MINIMAL="no" \
           BUILD_DESKTOP="no" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
