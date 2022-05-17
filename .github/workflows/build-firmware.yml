@@ -132,6 +132,7 @@ jobs:
           BOARD=${{ matrix.board }} \
           BRANCH=current \
           RELEASE=${{ matrix.release }} \
+          CLEAN_LEVEL="make,oldcache" \
           BUILD_MINIMAL=no \
           KERNEL_ONLY=yes \
           KERNEL_CONFIGURE=no \
