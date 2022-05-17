@@ -79,14 +79,16 @@ jobs:
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
        
   U-boot:
-    needs: Prepare
+
+    needs: [ Prepare ]
+    runs-on: ${{ inputs.runner }}
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
+    timeout-minutes: 480
     strategy:
       fail-fast: false
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: ${{ inputs.runner }}
     steps:
 
       - name: Clean temporally folders
@@ -98,36 +100,30 @@ jobs:
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           sudo chown -R $USER:$USER build || true
 
-      - name: Checkout repository
+      - name: Checkout Armbian build script
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: ${{ inputs.destref }}
-          clean: true
+          fetch-depth: '100'
+          ref:  ${{ inputs.destref }}
+          clean: false
 
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: '100'
           repository: armbian/scripts
           path: scripts
-          clean: true
-        
-      - name: Pull Docker image
-        run: |
+          clean: false
 
-          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
-          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
-
-      - name: Sync
-        run: |
-
-          mkdir -p build/userpatches
-          sudo cp scripts/configs/* build/userpatches/
+      - name: Install SSH key for storage
+        if: ${{ inputs.uploading == 'true' }}
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
 
       - name: Fix permissions
         run: |
@@ -135,32 +131,52 @@ jobs:
           # make sure no temporally dirs are mounted from previous runs
           while :
           do
-              sudo docker volume rm $(sudo docker volume ls -q) || true
               sudo pkill compile.sh || true
               sudo pkill arm-binfmt-P || true
               sudo pkill aarch64-binfmt-P || true
               sudo pkill pixz || true
-              if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-                  sudo mountpoint -q build/cache/rootfs &&  sudo fusermount -u build/cache/rootfs || true
-                  sudo mountpoint -q build/cache/toolchain &&  sudo fusermount -u build/cache/toolchain || true
-              fi
               sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
+              sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
+              sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
               [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
               echo "Mounted temp directories. Trying to unmount."
               df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
+              sudo rm -f build/cache/hash/*
+              sudo rm -f build/cache/hash-beta/*
               sleep 10
           done
-          [[ -d build/output/debug ]] && sudo rm -rf build/output/debug/* || true
           [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
-         
-      - name: Unmount folders in case they were mount before
-        
+
+      - name: Mount upload folders
+        if: ${{ inputs.uploading == 'true' }}
         run: |
-         
-            sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-            sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-            sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+
+          # use this only on our runners
+          if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
+          # mount deploy target
+          sudo apt-get -y -qq install sshfs
+          sudo mkdir -p /root/.ssh/
+          sudo cp ~/.ssh/known_hosts /root/.ssh/
+          sudo mkdir -p build/output/debs || true
+          sudo mkdir -p build/output/debs-beta || true
+          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          fi
+
+      - name: Sync
+        run: |
+
+          mkdir -p build/userpatches
+          sudo cp scripts/configs/* build/userpatches/
+
+      - name: Pull Docker image
+        run: |
+
+          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
+          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
+          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
       - name: Build
         run: |
@@ -231,12 +247,10 @@ jobs:
             build/output/debs/*u-boot*
           if-no-files-found: ignore
 
-      - name: Deploy to server
-        if: ${{ success() }}
+      - name: Unmount folders
+
         run: |
 
-          while fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do sleep 1; done;
-          sudo apt-get -y -qq install lftp
-          sudo chown -R $USER:$USER build/output/debs-beta/ build/output/debs/
-          lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
-          lftp -u upload, -e "set net:timeout 10;set net:max-retries 16;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/debs/ debs/ ;bye" sftp://users.armbian.com
+            sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
+            sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
+            sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
