@@ -233,6 +233,7 @@ jobs:
 
           if [[ $? -eq 0 ]]; then
             echo "UPLOAD=true" >> $GITHUB_ENV
+            sudo find output/debs-beta/${RELEASE}/. -type f -name 'armbian-bsp*' -print0 | sudo xargs -0 -I {} rm {}
           fi
       
       - name: Upload build artifacts
