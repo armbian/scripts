@@ -218,6 +218,7 @@ jobs:
           RELEASE="${RELEASE}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
           BUILD_DESKTOP="yes" \
+          CLEAN_LEVEL="make,oldcache" \
           DESKTOP_ENVIRONMENT="${DE}" \
           KERNEL_ONLY="yes" \
           KERNEL_CONFIGURE="no" \
