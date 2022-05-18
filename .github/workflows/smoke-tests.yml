@@ -103,7 +103,7 @@ jobs:
           - ip: "10.0.30.144" 
             name: "Banana Pi M2U"
             power-socket: 4
-          - ip: "10.0.30.150" 
+          - ip: "10.0.30.101" 
             name: "Orange Pi R1"
             power-socket: ""
           - ip: "10.0.30.182" 
