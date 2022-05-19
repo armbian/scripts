@@ -200,6 +200,8 @@ jobs:
             echo "#!""/bin/bash" | sudo tee userpatches/customize-image.sh
             echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
             echo "sed -i 's/https/http/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
+            echo "sed -i 's/IMAGE_TYPE=.*/IMAGE_TYPE=stable/' /etc/armbian-image-release" | sudo tee -a userpatches/customize-image.sh
+            echo "sed -i 's/IMAGE_TYPE=.*/IMAGE_TYPE=stable/' /etc/armbian-release" | sudo tee -a userpatches/customize-image.sh
             if [[ "$var" == *rc ]]; then
               MAKE_FOLDERS=rc
             fi
