@@ -83,7 +83,10 @@ jobs:
           fi
 
           # if we want to split more
-          MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat build/config/"${FILENAME}" | grep -v \"^$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }}  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
+          TEMP=$(mktemp -d || exit 1)
+          LIST="cat build/config/"${FILENAME}" | grep -v \"^$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }}  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
+          eval $LIST > $TEMP/data.txt
+          MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat $TEMP/data.txt"
           [ -s changes ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
