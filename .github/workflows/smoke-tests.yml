@@ -80,7 +80,7 @@ jobs:
             name: "Rock64 v3"
             power-socket: ""
           - ip: "10.0.30.121" 
-            name: "ž C4"
+            name: "Odroid C4"
             power-socket: 2
           - ip: "10.0.30.105" 
             name: "Nanopi R2S"
