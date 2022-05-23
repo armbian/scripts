@@ -55,6 +55,9 @@ jobs:
           - ip: "10.0.30.113" 
             name: "Orange Pi 3"
             power-socket: 16
+          - ip: "10.0.30.116" 
+            name: "Odroid M1"
+            power-socket: ""
           - ip: "10.0.30.198" 
             name: "Odroid XU4"
             power-socket: 66
@@ -74,7 +77,7 @@ jobs:
             name: "Rock64 v3"
             power-socket: ""
           - ip: "10.0.30.121" 
-            name: "Odroid C4"
+            name: "ž C4"
             power-socket: 2
           - ip: "10.0.30.105" 
             name: "Nanopi R2S"
