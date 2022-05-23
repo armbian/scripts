@@ -56,7 +56,10 @@ jobs:
             name: "Orange Pi 3"
             power-socket: 16
           - ip: "10.0.30.116" 
-            name: "Odroid M1"
+            name: "Odroid M1 4G"
+            power-socket: ""
+          - ip: "10.0.30.123" 
+            name: "Odroid M1 8G"
             power-socket: ""
           - ip: "10.0.30.198" 
             name: "Odroid XU4"
