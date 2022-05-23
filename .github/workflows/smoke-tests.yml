@@ -133,7 +133,7 @@ jobs:
           - ip: "10.0.30.139" 
             name: "Odroid N2"
             power-socket: 198
-          - ip: "10.0.30.219" 
+          - ip: "10.0.30.142" 
             name: "Rockpi E"
             power-socket: ""
           - ip: "10.0.40.253" 
