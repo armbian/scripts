@@ -45,7 +45,7 @@ jobs:
           - ip: "10.0.30.163"
             name: "Khadas VIM2"
             power-socket: ""
-          - ip: "10.0.30.162"
+          - ip: "10.0.30.128"
             name: "Khadas VIM3"
             power-socket: ""
           - ip: "10.0.30.133" 
