@@ -139,7 +139,7 @@ jobs:
           - ip: "10.0.30.142" 
             name: "Rockpi E"
             power-socket: ""
-          - ip: "10.0.40.253" 
+          - ip: "10.0.40.136" 
             name: "Rockpi S"
             power-socket: ""
           - ip: "10.0.30.122" 
