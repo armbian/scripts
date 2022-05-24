@@ -120,7 +120,7 @@ jobs:
           - ip: "10.0.30.101" 
             name: "Orange Pi R1"
             power-socket: ""
-          - ip: "10.0.30.182" 
+          - ip: "10.0.30.111" 
             name: "Orange Pi 4"
             power-socket: "17"
           - ip: "10.0.30.167" 
