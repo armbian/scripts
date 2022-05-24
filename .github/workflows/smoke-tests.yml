@@ -39,7 +39,7 @@ jobs:
           - ip: "10.0.30.129"
             name: "Khadas EDGE"
             power-socket: ""
-          - ip: "10.0.30.160"
+          - ip: "10.0.30.125"
             name: "Khadas VIM1"
             power-socket: ""
           - ip: "10.0.30.163"
