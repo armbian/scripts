@@ -182,12 +182,12 @@ jobs:
           export TERM=dumb
           cd build
 
-          if [[ "${{ inputs.destref }}" != "master" ]]; then
+          if [[ "${{ inputs.destref }}" == "nightly" ]]; then
               BETA="yes"
           else
               BETA="no"
               OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
-              sudo git checkout -f ${{ inputs.destref }}              
+              sudo git checkout -f ${{ inputs.destref }}
               sudo cp ../scripts/VERSION .
               sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
           fi
