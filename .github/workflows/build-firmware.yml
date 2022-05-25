@@ -124,7 +124,7 @@ jobs:
         run: |
 
           mkdir -p build/userpatches
-          cp scripts/configs/* build/userpatches/
+          sudo cp scripts/configs/* build/userpatches/
           cd build
           export TERM=dumb
           sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
