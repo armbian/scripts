@@ -125,15 +125,7 @@ jobs:
           sudo cp scripts/configs/* build/userpatches/
           sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
           sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-          
-      - name: Pull Docker image
-        run: |
 
-          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
-          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
-          
       - name: Fix permissions
         run: |
           # make sure no temporally dirs are mounted from previous runs
@@ -157,7 +149,15 @@ jobs:
           
           [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
           [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
-         
+
+      - name: Pull Docker image
+        run: |
+
+          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
+          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
+          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+
       - name: Import GPG key
 
         uses: crazy-max/ghaction-import-gpg@v3
