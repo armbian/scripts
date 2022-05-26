@@ -229,6 +229,13 @@ jobs:
           REPOSITORY_INSTALL="armbian-firmware,kernel,armbian-firmware,armbian-config,armbian-zsh" \
           EXPERT="yes"
 
+          # if we are building rc images, we want to have this in nightly repo
+          # to do - proper solution is needed when we will push directly to stable          
+          if [[ "${{ inputs.destref }}" != "nightly" ]]; then
+          sudo mv output/debs/linux-u-boot-${BRANCH}-${BOARD}* output/debs-beta/ || true
+          sudo mv output/debs/armbian-bsp-cli-${BOARD}* output/debs-beta/ || true
+          fi
+
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
         with:
