@@ -16,10 +16,11 @@ on:
         - bananapipro
         - clearfogbase
         - clearfogpro
+        - clockworkpi-a06
         - cubox-i
+        - espressobin
         - firefly-rk3399
         - helios4
-        - helios64
         - jethubj100
         - jethubj80
         - jetson-nano
@@ -53,6 +54,7 @@ on:
         - orangepi-r1plus
         - orangepi-r1plus-lts
         - orangepi3
+        - orangepi3-lts
         - orangepi4
         - orangepilite
         - orangepilite2
@@ -69,14 +71,20 @@ on:
         - orangepizeroplus
         - orangepizeroplus2-h3
         - pine64
+        - pine64so
         - pinebook-a64
         - pinebook-pro
         - pineh64-b
         - quartz64a
         - radxa-zero
+        - radxa-zero2
         - renegade
         - rk322x-box
         - rock-3a
+        - rock64
+        - rockpi-4a
+        - rockpi-4b
+        - rockpi-4c
         - rockpro64
         - rpi4b
         - station-m1
@@ -85,6 +93,8 @@ on:
         - station-p2
         - tinkerboard
         - tinkerboard-2
+        - tritium-h3
+        - tritium-h5
         - uefi-arm64
         - uefi-x86
         - virtual-qemu
