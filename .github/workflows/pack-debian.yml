@@ -107,7 +107,7 @@ jobs:
             LOCATION=$(echo $p | cut -d":" -f2 | cut -d"/" -f2-)
             if [[ -n $LOCATION && -n $FILE ]]; then
                 mkdir -p "output/${PKG_NAME}/$LOCATION"
-                cp source/$FILE "output/${PKG_NAME}/$LOCATION"
+                cp -R source/$FILE "output/${PKG_NAME}/$LOCATION"
             fi
             done < source/debian.conf
           fi
