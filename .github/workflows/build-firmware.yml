@@ -20,7 +20,7 @@ on:
 jobs:  
 
   gradle:
-    if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
+    if: ${{ github.repository_owner == 'Armbian' }}
     strategy:
       fail-fast: false
       matrix:
@@ -40,13 +40,18 @@ jobs:
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           sudo chown -R $USER:$USER build || true
 
+      - run: |
+          REFERENCE=${{ inputs.reference }}
+          # Use user input or fall back to "Octocat"
+          echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
+
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
         with:
           repository: armbian/build
           path: build
           fetch-depth: '100'
-          ref:  ${{ inputs.reference }}
+          ref:  ${{ env.REFERENCE }}
           clean: false
 
       - name: Checkout support scripts
