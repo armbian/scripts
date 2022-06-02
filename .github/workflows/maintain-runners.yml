@@ -17,7 +17,7 @@ jobs:
   Prepare:
 
     name: Prepare
-    runs-on: small
+    runs-on: Linux
     if: ${{ github.repository_owner == 'armbian' }}
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
