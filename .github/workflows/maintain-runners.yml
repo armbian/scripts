@@ -156,6 +156,9 @@ jobs:
           sudo rm -rf output/ || true          
           sudo chown -R $USER:$USER build || true
           # rm $HOME/.ssh/known_hosts
+          
+          # mount all back
+          sudo mount -a
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
