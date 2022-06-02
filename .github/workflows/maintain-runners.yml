@@ -126,10 +126,11 @@ jobs:
 
           if [[ -f build/VERSION ]]; then
           
+            sudo docker system prune -af  || true
             sudo docker volume rm $(sudo docker volume ls -q) 2>/dev/null || true
-            sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
-            sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true          
-            sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
+            # sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
+            # sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true          
+            # sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
 
           fi
           
