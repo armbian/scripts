@@ -280,6 +280,14 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
+      - name: Upload firmware to release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: latest
+          files: build/output/images/*/*/
+
 #      - name: Deploy to server
 #        run: |
 #          ls -l build/output/images/*/*/
