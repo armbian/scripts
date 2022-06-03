@@ -101,7 +101,7 @@ jobs:
     runs-on: ${{ inputs.runner }}
     steps:
 
-      - uses: igorpecovnik/freespace@master  
+      - uses: igorpecovnik/freespace@main  
 
       - name: Checkout repository
         uses: actions/checkout@v2
