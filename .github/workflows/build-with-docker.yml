@@ -263,6 +263,16 @@ jobs:
           sudo chmod 644 output/images/$BOARD/*/*.xz  2> /dev/null || true
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/$MAKE_FOLDERS/*.img.xz
 
+      - name: "GH latest release"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Latest Armbian images"
+          files: |
+            build/output/images/
+
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
         with:
