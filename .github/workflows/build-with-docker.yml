@@ -101,7 +101,7 @@ jobs:
     runs-on: ${{ inputs.runner }}
     steps:
 
-      - uses: armbian/scripts/.github/workflows/freespace.yml@master  
+      - uses: igorpecovnik/freespace@master  
 
       - name: Checkout repository
         uses: actions/checkout@v2
