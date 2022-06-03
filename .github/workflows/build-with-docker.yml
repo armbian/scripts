@@ -280,11 +280,11 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
-      - name: Deploy to server
-        run: |
-          ls -l build/output/images/*/*/
-          sudo apt-get -y -qq install lftp          
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
+#      - name: Deploy to server
+#        run: |
+#          ls -l build/output/images/*/*/
+#          sudo apt-get -y -qq install lftp          
+#          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
 
       - name: Upload artefacts
         if: inputs.uploading == 'true' && env.UPLOAD == 'true'
