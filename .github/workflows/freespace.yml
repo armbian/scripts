@@ -1,0 +1,14 @@
+name: "Free space"
+author: ""
+description: ""
+branding:
+  icon: "terminal"
+  color: "gray-dark"
+runs:
+  using: "composite"
+  steps:
+    - name: Enable problem-matcher
+      shell: bash
+      run: |
+        sudo df
+        sudo mount
