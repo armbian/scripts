@@ -91,6 +91,8 @@ jobs:
 
     steps:
 
+      - uses: igorpecovnik/freespace@main
+
       - name: Clean temporally folders
         run: |
           sudo rm -rf build/.tmp 2>/dev/null || true
