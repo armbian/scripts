@@ -39,6 +39,8 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
+      - uses: igorpecovnik/freespace@main
+
       - name: Clean temporally folders
         run: |
           sudo rm -rf build/.tmp 2>/dev/null || true
@@ -107,6 +109,8 @@ jobs:
           node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
       steps:
+
+      - uses: igorpecovnik/freespace@main
 
       - name: Clean temporally folders
         run: |
