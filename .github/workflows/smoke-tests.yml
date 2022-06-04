@@ -156,7 +156,7 @@ jobs:
           - ip: "10.0.30.254" 
             name: "Orange Pi Zero"  
             power-socket: 6
-          - ip: "10.0.30.170" 
+          - ip: "10.0.30.146" 
             name: "Udoo Quad"  
             power-socket: 3
           - ip: "10.0.30.131"
