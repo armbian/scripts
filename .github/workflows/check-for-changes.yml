@@ -89,7 +89,8 @@ jobs:
                
                echo $BOARD
               done <<< "$FILES"
-          done | sort | uniq | sort -u -t: -k1,3
+          done | sort | uniq 
+          #| sort -u -t: -k1,3
 
           
       - name: Upload changes
