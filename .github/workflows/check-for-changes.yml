@@ -125,8 +125,8 @@ jobs:
                       echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
                   fi
                   done <<< "$FILES"
-          done | sort | uniq | sort -u -t: -k1,3 )
-          echo "${MATRIX}" |sed '/^$/d' > changes
+          done | sort | uniq | sort -u -t: -k1,3
+          #echo "${MATRIX}" |sed '/^$/d' > changes
           
       - name: Upload changes
         uses: actions/upload-artifact@v2
