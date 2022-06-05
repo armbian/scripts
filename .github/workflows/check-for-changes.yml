@@ -60,9 +60,36 @@ jobs:
                source build/config/boards/$line.conf 2> /dev/null || true
                source build/config/boards/$line.wip 2> /dev/null || true
                source "build/config/sources/families/${BOARDFAMILY}.conf"
+               source "build/config/sources/${ARCH}.conf"
+               
+               # exceptions handling
+               [[ ${BOARDFAMILY} == *x86 ]] && BOARDFAMILY=x86
+               [[ ${BOARDFAMILY} == *arm64 ]] && BOARDFAMILY=arm64
+               [[ ${BOARDFAMILY} == sun*i ]] && BOARDFAMILY=sunxi
+               [[ ${BOARDFAMILY} == sun8i-v3s ]] && BOARDFAMILY=sunxi
+               [[ ${BOARDFAMILY} == sun*iw* && ${BRANCH} != legacy ]] && BOARDFAMILY=sunxi64
+               [[ ${BOARDFAMILY} == meson8b ]] && BOARDFAMILY=meson
+               [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]] && BOARDFAMILY=meson64
+               [[ ${BOARDFAMILY} == rk35xx && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
+               [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
+               [[ ${BOARDFAMILY} == jetson-nano && ${BRANCH} != legacy ]] && BOARDFAMILY=media
+               [[ ${BOARDFAMILY} == media && ${BRANCH} == legacy ]] && BOARDFAMILY=station-p2
+               [[ ${BOARDFAMILY} == bcm2711 && ${BRANCH} == legacy ]] && continue
+
+                  ref_type=${KERNELBRANCH%%:*}
+                  if [[ $ref_type == head ]]; then
+                      ref_name=HEAD
+                  else
+                      ref_name=${KERNELBRANCH##*:}
+                  fi
+                  [[ -z ${LINUXFAMILY} ]] && LINUXFAMILY=$BOARDFAMILY
+                  [[ -z ${KERNELPATCHDIR} ]] && KERNELPATCHDIR=$LINUXFAMILY-$BRANCH
+                  [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
+                  [[ -z ${KERNELSOURCE} ]] && KERNELSOURCE="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable"
+               
                echo $BOARD
               done <<< "$FILES"
-          done
+          done | sort | uniq | sort -u -t: -k1,3
 
           
       - name: Upload changes
