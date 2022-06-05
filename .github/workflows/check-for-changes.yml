@@ -54,7 +54,13 @@ jobs:
           for BRANCH in legacy current edge; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
-              echo $line
+               unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
+               BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
+               BOARD=$line
+               source build/config/boards/$line.conf 2> /dev/null || true
+               source build/config/boards/$line.wip 2> /dev/null || true
+               source "build/config/sources/families/${BOARDFAMILY}.conf"
+               echo $BOARD
               done <<< "$FILES"
           done
 
