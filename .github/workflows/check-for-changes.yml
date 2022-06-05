@@ -57,10 +57,9 @@ jobs:
                unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
                BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
                BOARD=$line
-               source build/config/boards/$line.conf 2> /dev/null || true
-               source build/config/boards/$line.wip 2> /dev/null || true
+               #source build/config/boards/$line.conf 2> /dev/null || true
+               #source build/config/boards/$line.wip 2> /dev/null || true
                source "build/config/sources/families/${BOARDFAMILY}.conf"
-               source "build/config/sources/${ARCH}.conf"
                
                # exceptions handling
                [[ ${BOARDFAMILY} == *x86 ]] && BOARDFAMILY=x86
@@ -87,7 +86,7 @@ jobs:
                   [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
                   [[ -z ${KERNELSOURCE} ]] && KERNELSOURCE="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable"
                
-               echo $BOARD
+                 echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
               done <<< "$FILES"
           done | sort | uniq 
           #| sort -u -t: -k1,3
