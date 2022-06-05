@@ -56,7 +56,7 @@ jobs:
           return 0
           }
 
-          for BRANCH in legacy current edge; do
+           MATRIX=$(for BRANCH in legacy current edge; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
 
@@ -125,8 +125,8 @@ jobs:
                       echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} $CALC_PATCHES $CALC_CONFIG"
                   fi
                   done <<< "$FILES"
-          done | sort | uniq | sort -u -t: -k1,3
-          #echo "${MATRIX}" |sed '/^$/d' > changes
+          done | sort | uniq | sort -u -t: -k1,3 )
+          echo "${MATRIX}" |sed '/^$/d' > changes
           
       - name: Upload changes
         uses: actions/upload-artifact@v2
