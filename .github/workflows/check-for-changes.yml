@@ -122,7 +122,7 @@ jobs:
                   if [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
                       :
                   else
-                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
+                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} $CALC_PATCHES $CALC_CONFIG"
                   fi
                   done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,3
