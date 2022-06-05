@@ -101,7 +101,7 @@ jobs:
                   CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
                   [[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
                
-                  echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} $CALC_PATCHES $CALC_CONFIG"
+                  echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} ${KERNELPATCHDIR} ${LINUXCONFIG}.config $CALC_PATCHES $CALC_CONFIG"
               done <<< "$FILES"
           done 
           #| sort | uniq | sort -u -t: -k1,3
