@@ -22,7 +22,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 10
+          fetch-depth: 0
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
@@ -31,7 +31,7 @@ jobs:
       - name: Checkout support scripts
         uses: actions/checkout@v2
         with:
-          fetch-depth: 10
+          fetch-depth: 0
           repository: armbian/scripts
           path: scripts
           ref: master
