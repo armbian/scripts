@@ -63,7 +63,7 @@ jobs:
           # read unique only
           while IFS= read -r line; do
               if [[ -f $line ]]; then
-                  source "$line"
+                  source "$line" || true
               fi
           done <<< $DIFFERENT
           
