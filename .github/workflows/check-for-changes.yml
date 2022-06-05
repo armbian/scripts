@@ -57,8 +57,8 @@ jobs:
                unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
                BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
                BOARD=$line
-               #source build/config/boards/$line.conf 2> /dev/null || true
-               #source build/config/boards/$line.wip 2> /dev/null || true
+               source build/config/boards/$line.conf 2> /dev/null || true
+               source build/config/boards/$line.wip 2> /dev/null || true
                source "build/config/sources/families/${BOARDFAMILY}.conf"
                
                # exceptions handling
