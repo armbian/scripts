@@ -45,6 +45,11 @@ jobs:
       - name: Determine changed kernels
         run: |
 
+          # Declare this folder as safe
+          if [[ -z $(cat ${HOME}/.gitconfig | grep "directory = \*") ]]; then
+                  git config --global --add safe.directory "*"
+          fi
+
           # fake function
           enable_extension ()
           {
@@ -96,17 +101,13 @@ jobs:
                
                   SRC="$(pwd)/build"
                   
-                  echo "SRC=$SRC"
-                  echo "KERNELPATCHDIR=${KERNELPATCHDIR}"
+                  CALC_PATCHES=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}"))
+                  [[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
                   
-                  #CALC_PATCHES=$(
-                  #git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}")
-                  #)
-                  #[[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
+                  CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
+                  [[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
                   
-                  #CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
-                  #[[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
-                  #echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} ${KERNELPATCHDIR} ${LINUXCONFIG}.config $CALC_PATCHES $CALC_CONFIG"
+                  echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} ${KERNELPATCHDIR} ${LINUXCONFIG}.config $CALC_PATCHES $CALC_CONFIG"
               done <<< "$FILES"
           done 
           #| sort | uniq | sort -u -t: -k1,3
