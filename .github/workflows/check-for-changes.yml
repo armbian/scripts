@@ -54,12 +54,13 @@ jobs:
           for BRANCH in legacy current edge; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
+
                unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
                BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
                BOARD=$line
                source build/config/boards/$line.conf 2> /dev/null || true
                source build/config/boards/$line.wip 2> /dev/null || true
-               source "build/config/sources/families/${BOARDFAMILY}.conf"
+               source build/config/sources/families/${BOARDFAMILY}.conf 2> /dev/null || true
                
                # exceptions handling
                [[ ${BOARDFAMILY} == *x86 ]] && BOARDFAMILY=x86
@@ -94,15 +95,18 @@ jobs:
                   esac
                
                   SRC="$(pwd)/build"
-                  #CALC_PATCHES=$(
-                  git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}")
-                  #)
-                  [[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
                   
-                  CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
-                  [[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
-               
-                  echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} ${KERNELPATCHDIR} ${LINUXCONFIG}.config $CALC_PATCHES $CALC_CONFIG"
+                  echo "SRC=$SRC"
+                  echo "KERNELPATCHDIR=${KERNELPATCHDIR}"
+                  
+                  #CALC_PATCHES=$(
+                  #git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}")
+                  #)
+                  #[[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
+                  
+                  #CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
+                  #[[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
+                  #echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} ${KERNELPATCHDIR} ${LINUXCONFIG}.config $CALC_PATCHES $CALC_CONFIG"
               done <<< "$FILES"
           done 
           #| sort | uniq | sort -u -t: -k1,3
