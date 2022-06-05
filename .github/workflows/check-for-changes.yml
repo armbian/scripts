@@ -56,7 +56,7 @@ jobs:
               while IFS= read -r line; do
                   unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
                   BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
-                  source "build/config/sources/families/${BOARDFAMILY}.conf"
+                  #source "build/config/sources/families/${BOARDFAMILY}.conf"
                   done <<< "$FILES"
           done
           
