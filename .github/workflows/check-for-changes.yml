@@ -54,71 +54,8 @@ jobs:
           for BRANCH in legacy current edge; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
-                  unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
-                  BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
-                  BOARD=$line
-
-                  source build/config/boards/$line.conf 2> /dev/null || true
-                  source build/config/boards/$line.wip 2> /dev/null || true
-
-                  source "build/config/sources/families/${BOARDFAMILY}.conf"
-                  # exceptions handling
-                  [[ ${BOARDFAMILY} == *x86 ]] && BOARDFAMILY=x86
-                  [[ ${BOARDFAMILY} == *arm64 ]] && BOARDFAMILY=arm64
-                  [[ ${BOARDFAMILY} == sun*i ]] && BOARDFAMILY=sunxi
-                  [[ ${BOARDFAMILY} == sun8i-v3s ]] && BOARDFAMILY=sunxi
-                  [[ ${BOARDFAMILY} == sun*iw* && ${BRANCH} != legacy ]] && BOARDFAMILY=sunxi64
-                  [[ ${BOARDFAMILY} == meson8b ]] && BOARDFAMILY=meson
-                  [[ ${BOARDFAMILY} == meson-* || ${BOARDFAMILY} == jethub ]] && BOARDFAMILY=meson64
-                  [[ ${BOARDFAMILY} == rk35xx && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
-                  [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
-                  [[ ${BOARDFAMILY} == jetson-nano && ${BRANCH} != legacy ]] && BOARDFAMILY=media
-                  [[ ${BOARDFAMILY} == media && ${BRANCH} == legacy ]] && BOARDFAMILY=station-p2
-                  [[ ${BOARDFAMILY} == bcm2711 && ${BRANCH} == legacy ]] && continue
-                  source "build/config/sources/${ARCH}.conf"
-                  ref_type=${KERNELBRANCH%%:*}
-                  if [[ $ref_type == head ]]; then
-                      ref_name=HEAD
-                  else
-                      ref_name=${KERNELBRANCH##*:}
-                  fi
-                  [[ -z ${LINUXFAMILY} ]] && LINUXFAMILY=$BOARDFAMILY
-                  [[ -z ${KERNELPATCHDIR} ]] && KERNELPATCHDIR=$LINUXFAMILY-$BRANCH
-                  [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
-                  [[ -z ${KERNELSOURCE} ]] && KERNELSOURCE="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable"
-
-                  case $ref_type in
-                      branch) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" refs/heads/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
-                      tag) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" tags/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
-                      head) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" HEAD 2> /dev/null | awk '{print $1}') ;;
-                      commit) CALC_HASH=$ref_name ;;
-                  esac
-                  SRC=$(pwd)"/build"
-                  CALC_PATCHES=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}"))
-                  [[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
-
-                  CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
-                  [[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
-
-                  # ignore diff checking in case of network errrors
-                  kernel_hash="scripts/hash"$([[ ${BETA} == yes ]] && echo "-beta")"/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
-
-                  if [[ -f $kernel_hash ]] ; then
-                  STORED_HASH=$(sed -n '1p' < "${kernel_hash}")
-                  STORED_PATCHES=$(sed -n '2p' < "${kernel_hash}")
-                  STORED_CONFIG=$(sed -n '3p' < "${kernel_hash}")
-                  fi
-
-                  # if stored is null, we don't check
-                  [[ "$STORED_PATCHES" == "null" ]] && CALC_PATCHES="null"
-                  [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
-
-                  if [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
-                      :
-                  else
-                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${CALC_PATCHES} ${KERNELPATCHDIR}"
-                  fi
-                  done <<< "$FILES"
+              echo $line
+              done <<< "$FILES"
           done
 
           
