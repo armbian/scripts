@@ -93,9 +93,10 @@ jobs:
                       commit) CALC_HASH=$ref_name ;;
                   esac
                
-                  SRC=$(pwd)"/build"
-                  echo "SRC = $SRC LOL= ${SRC}/patch/kernel/${KERNELPATCHDIR}"
-                  CALC_PATCHES=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}"))
+                  SRC="$(pwd)/build"
+                  #CALC_PATCHES=$(
+                  git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}")
+                  #)
                   [[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
                   
                   CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
