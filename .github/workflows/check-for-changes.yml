@@ -45,6 +45,8 @@ jobs:
       - name: Determine changed kernels
         run: |
 
+          sudo apt -yy install coreutils
+
           # fake function
           enable_extension ()
           {
