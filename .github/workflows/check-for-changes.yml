@@ -20,13 +20,13 @@ jobs:
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
-          clean: false
+          clean: true
 
       - name: Checkout support scripts
         uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
           repository: armbian/scripts
           path: scripts
           ref: master
-          clean: false
+          clean: true
 
       - name: Remove previous artefacts if any
         run: |
@@ -55,7 +55,8 @@ jobs:
           BOOTCONFIG=true
           BETA=yes
 
-          MATRIX=$(for BRANCH in legacy current edge; do
+          #MATRIX=$(
+          for BRANCH in legacy current edge; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
                   unset LINUXFAMILY KERNELPATCHDIR LINUXCONFIG KERNELSOURCE KERNEL_VERSION_LEVEL
@@ -119,8 +120,9 @@ jobs:
                       echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
                   fi
                   done <<< "$FILES"
-          done | sort | uniq | sort -u -t: -k1,3 )
-          echo "${MATRIX}" |sed '/^$/d' > changes
+          done 
+          #| sort | uniq | sort -u -t: -k1,3 )
+          #echo "${MATRIX}" |sed '/^$/d' > changes
 
       - name: Upload changes
         uses: actions/upload-artifact@v2
