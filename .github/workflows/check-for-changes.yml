@@ -86,42 +86,17 @@ jobs:
                   [[ -z ${LINUXCONFIG} ]] && LINUXCONFIG=linux-$LINUXFAMILY-$BRANCH
                   [[ -z ${KERNELSOURCE} ]] && KERNELSOURCE="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable"
                
-               case $ref_type in
+                  case $ref_type in
                       branch) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" refs/heads/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
                       tag) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" tags/"${ref_name}" 2> /dev/null | awk '{print $1}') ;;
                       head) CALC_HASH=$(git ls-remote "${KERNELSOURCE}" HEAD 2> /dev/null | awk '{print $1}') ;;
                       commit) CALC_HASH=$ref_name ;;
                   esac
-                  SRC=$(pwd)"/build"
-                  CALC_PATCHES=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/patch/kernel/${KERNELPATCHDIR}"))
-                  [[ -z "$CALC_PATCHES" ]] && CALC_PATCHES="null"
-                  
-                  CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
-                  [[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
-                  
-                  # ignore diff checking in case of network errrors
-                  kernel_hash="scripts/hash"$([[ ${BETA} == yes ]] && echo "-beta")"/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
-                  
-                  if [[ -f $kernel_hash ]] ; then
-                  STORED_HASH=$(sed -n '1p' < "${kernel_hash}")
-                  STORED_PATCHES=$(sed -n '2p' < "${kernel_hash}")
-                  STORED_CONFIG=$(sed -n '3p' < "${kernel_hash}")
-                  fi
-                  
-                  # if stored is null, we don't check                   
-                  [[ "$STORED_PATCHES" == "null" ]] && CALC_PATCHES="null"
-                  [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
                
-               
-               
-               
-               
-               
-               
-                 echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} $CALC_PATCHES $CALC_CONFIG"
+                  echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} $CALC_PATCHES $CALC_CONFIG"
               done <<< "$FILES"
-          done | sort | uniq 
-          #| sort -u -t: -k1,3
+          done 
+          #| sort | uniq | sort -u -t: -k1,3
 
           
       - name: Upload changes
