@@ -107,11 +107,26 @@ jobs:
                   CALC_CONFIG=$(git -C $SRC log --format="%H" -1 -- $(realpath --relative-base="$SRC" "${SRC}/config/kernel/${LINUXCONFIG}.config"))
                   [[ -z "$CALC_CONFIG" ]] && CALC_CONFIG="null"
                   
-                  echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line} ${KERNELPATCHDIR} ${LINUXCONFIG}.config $CALC_PATCHES $CALC_CONFIG"
-              done <<< "$FILES"
-          done 
-          #| sort | uniq | sort -u -t: -k1,3
-
+                  # ignore diff checking in case of network errrors
+                  kernel_hash="scripts/hash-beta/linux-image-${BRANCH}-${LINUXFAMILY}.githash"
+                  
+                  if [[ -f $kernel_hash ]] ; then
+                  STORED_HASH=$(sed -n '1p' < "${kernel_hash}")
+                  STORED_PATCHES=$(sed -n '2p' < "${kernel_hash}")
+                  STORED_CONFIG=$(sed -n '3p' < "${kernel_hash}")
+                  fi
+                  
+                  # if stored is null, we don't check                   
+                  [[ "$STORED_PATCHES" == "null" ]] && CALC_PATCHES="null"
+                  [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
+                  if [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
+                      :
+                  else
+                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
+                  fi
+                  done <<< "$FILES"
+          done | sort | uniq | sort -u -t: -k1,3 )
+          echo "${MATRIX}" |sed '/^$/d' > changes
           
       - name: Upload changes
         uses: actions/upload-artifact@v2
