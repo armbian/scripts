@@ -19,10 +19,10 @@ jobs:
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
 
-     - name: Install dependencies and fix permissions
-       run: |
-         sudo apt install -y docker.io
-         sudo chmod 666 /var/run/docker.sock
+#     - name: Install dependencies and fix permissions
+#       run: |
+#         sudo apt install -y docker.io
+#         sudo chmod 666 /var/run/docker.sock
 
      - name: Checkout repository
        uses: actions/checkout@v3
