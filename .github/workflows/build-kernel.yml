@@ -53,13 +53,13 @@ jobs:
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
-          fetch-depth: '100'
+          fetch-depth: 0
           clean: false
 
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: '100'
+          fetch-depth: 0
           repository: armbian/scripts
           path: scripts
           clean: false
@@ -108,14 +108,14 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          fetch-depth: '100'
+          fetch-depth: 0
           ref:  ${{ inputs.reference }}
           clean: false
           
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: '100'
+          fetch-depth: 0
           repository: armbian/scripts
           path: scripts
           clean: false
