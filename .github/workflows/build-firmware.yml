@@ -18,9 +18,29 @@ on:
         required: true
 
 jobs:  
+  
+  read:
+    name: Readinng changes
+    runs-on: ${{ inputs.runner }}
+    steps:
+
+      - name: Remove previous artefacts if any
+        run: |
+          sudo rm -rf changes 2>/dev/null || true
+          
+      - name: Download changes
+        uses: actions/download-artifact@v2
+        with:
+          name: changes
+          
+      - name: Write it to the environment
+        run: |
+           echo "CHANGES=true" >> $GITHUB_ENV
+           [ -s changes ] || echo "CHANGES=false" >> $GITHUB_ENV || true
 
   gradle:
-    if: ${{ github.repository_owner == 'Armbian' }}
+  
+    if: ${{ github.repository_owner == 'Armbian' && env.CHANGES == 'true' }}
     strategy:
       fail-fast: false
       matrix:
