@@ -40,7 +40,7 @@ jobs:
 
   gradle:
   
-    if: ${{ github.repository_owner == 'Armbian' && env.CHANGES == 'true' }}
+    if: ${{ github.repository_owner == 'Armbian' }} && ${{ env.CHANGES == 'true' }}
     strategy:
       fail-fast: false
       matrix:
