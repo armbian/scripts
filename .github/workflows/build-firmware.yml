@@ -20,15 +20,15 @@ on:
 jobs:  
   
   gradle:
-    if: ${{ github.repository_owner == 'Armbian' && !github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.repository_owner == 'Armbian' }}
     strategy:
       fail-fast: false
       matrix:
         board: [bananapi]
         release: [focal]
     
-    name: Variant
-    runs-on: ${{ inputs.runner }}
+    name: Variant    
+    runs-on: ${{ inputs.runner }}    
     steps:
 
       - name: Clean temporally folders
