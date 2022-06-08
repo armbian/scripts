@@ -20,7 +20,7 @@ on:
 jobs:  
   
   gradle:
-    if: ${{ github.repository_owner == 'Armbian' }}
+    if: ${{ github.repository_owner == 'Armbian' && !github.event_name == 'workflow_dispatch' }}
     strategy:
       fail-fast: false
       matrix:
