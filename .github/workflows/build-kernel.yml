@@ -241,7 +241,7 @@ jobs:
           path: build/${{ env.FILE_HASH }}
 
       - name: Upload build artifacts
-        if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' && !github.event_name == 'pull_request' }}
+        if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' && github.event_name == 'pull_request' }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.FILE_NAME }}
