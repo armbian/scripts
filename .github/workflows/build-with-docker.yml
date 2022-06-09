@@ -104,7 +104,7 @@ jobs:
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: ${{ needs.Prepare.outputs.runner }}
+    runs-on: ubuntu-latest
     steps:
 
       - uses: igorpecovnik/freespace@main  
@@ -113,6 +113,7 @@ jobs:
         run: |
           SOURCEREPO=${{ inputs.sourcerepo }}
           echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
+          echo ${{ needs.Prepare.outputs.runner }}
 
       - name: Checkout repository
         uses: actions/checkout@v2
