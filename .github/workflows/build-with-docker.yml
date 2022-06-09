@@ -282,14 +282,23 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
-      - name: Upload firmware to release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: ncipollo/release-action@v1
         with:
-          tag_name: latest
-          body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
-          files: build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*
+          artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
+          tag: "latest"
+          omitBody: true
+          omitName: true
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Upload firmware to release
+#        uses: softprops/action-gh-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: latest
+#          body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
+#          files: build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*
 
 #      - name: Deploy to server
 #        run: |
