@@ -50,6 +50,7 @@ jobs:
     runs-on: small
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
+      runner: ${{steps.list_dirs.outputs.runner}}
     steps:
 
       - name: Set ENV vars
@@ -104,7 +105,7 @@ jobs:
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: ${{ env.REPO }}
+    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     steps:
 
       - uses: igorpecovnik/freespace@main  
