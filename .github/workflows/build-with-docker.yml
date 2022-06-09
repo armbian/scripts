@@ -300,6 +300,7 @@ jobs:
           if_key_exists: replace
 
       - uses: ncipollo/release-action@v1
+        if: ${{ github.repository_owner == 'Armbian' && !inputs.sourcerepo == 'stable' && !inputs.sourcerepo == 'rc' }}
         with:
           artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
           tag: "latest"
@@ -317,11 +318,12 @@ jobs:
 #          body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
 #          files: build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*
 
-#      - name: Deploy to server
-#        run: |
-#          ls -l build/output/images/*/*/
-#          sudo apt-get -y -qq install lftp          
-#          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
+      - name: Deploy to server
+        if: ${{ github.repository_owner == 'Armbian' && inputs.sourcerepo == 'stable' && inputs.sourcerepo == 'rc' }}
+        run: |
+          ls -l build/output/images/*/*/
+          sudo apt-get -y -qq install lftp          
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
 
       - name: Upload artefacts
         if: inputs.uploading == 'true' && env.UPLOAD == 'true'
