@@ -52,13 +52,18 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
+      - name: Set ENV vars
+        run: |
+          SOURCEREPO=${{ inputs.sourcerepo }}}
+          echo "REPO=${SOURCEREPO:-'nightly'}" >> $GITHUB_ENV
+
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: ${{ inputs.sourcerepo }}
+          ref: ${{ env.REPO }}
           clean: false
 
       - name: Remove previous artefacts if any
