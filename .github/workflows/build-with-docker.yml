@@ -113,8 +113,8 @@ jobs:
         run: |
           SOURCEREPO=${{ inputs.sourcerepo }}
           echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
-          echo ${{ Prepare.list_dirs.outputs.runner }}
-
+          echo ${{fromJson(needs.Prepare.outputs.runner)}}
+          
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
