@@ -112,7 +112,7 @@ jobs:
     runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     steps:
 
-      - name: Set ENV vars
+      - name: Set environment variables
         run: |
 
           SOURCEREPO=${{ inputs.sourcerepo }}
@@ -136,7 +136,8 @@ jobs:
           path: scripts
           clean: false
 
-      - uses: igorpecovnik/freespace@main
+      - name: "Runner cleanup"
+        uses: igorpecovnik/freespace@main
 
       - name: Sync
         run: |
