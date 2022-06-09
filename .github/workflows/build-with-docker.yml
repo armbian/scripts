@@ -104,7 +104,7 @@ jobs:
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
+    runs-on: ${{ env.REPO }}
     steps:
 
       - uses: igorpecovnik/freespace@main  
