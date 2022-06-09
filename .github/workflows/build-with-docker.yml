@@ -108,13 +108,18 @@ jobs:
 
       - uses: igorpecovnik/freespace@main  
 
+      - name: Set ENV vars
+        run: |
+          SOURCEREPO=${{ inputs.sourcerepo }}
+          echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
+
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: ${{ inputs.sourcerepo }} 
+          ref: ${{ env.REPO }} 
           clean: false
 
       - name: Checkout support scripts
