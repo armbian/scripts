@@ -112,10 +112,9 @@ jobs:
     runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     steps:
 
-      - uses: igorpecovnik/freespace@main  
-
       - name: Set ENV vars
         run: |
+
           SOURCEREPO=${{ inputs.sourcerepo }}
           echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
           echo ${{needs.Prepare.outputs.runner}}
@@ -137,37 +136,13 @@ jobs:
           path: scripts
           clean: false
 
+      - uses: igorpecovnik/freespace@main
+
       - name: Sync
         run: |
 
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
-          sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-          sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-
-      - name: Fix permissions
-        run: |
-          # make sure no temporally dirs are mounted from previous runs
-          while :
-          do
-              sudo docker volume rm $(sudo docker volume ls -q) 2> /dev/null || true
-              sudo pkill compile.sh || true
-              sudo pkill arm-binfmt-P || true
-              sudo pkill aarch64-binfmt-P || true
-              sudo pkill pixz || true
-              if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "188.227.12.36" ]]; then
-                  sudo mountpoint -q build/cache/rootfs &&  sudo fusermount -u build/cache/rootfs || true
-                  sudo mountpoint -q build/cache/toolchain &&  sudo fusermount -u build/cache/toolchain || true
-              fi
-              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
-              echo "Mounted temp directories. Trying to unmount."
-              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
-              sleep 10
-          done
-          
-          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
-          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Pull Docker image
         run: |
@@ -190,7 +165,6 @@ jobs:
       - name: Assemble
         run: |
 
-          export TERM=dumb
           cd build
 
           # use local resources if possible
@@ -282,16 +256,6 @@ jobs:
           sudo chmod 644 output/images/$BOARD/*/*.xz  2> /dev/null || true
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/$MAKE_FOLDERS/*.img.xz
 
-#      - name: "GH latest release"
-#        uses: "marvinpinto/action-automatic-releases@latest"
-#        with:
-#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#          automatic_release_tag: "latest"
-#          prerelease: false
-#          title: "Latest Armbian images"
-#          files: |
-#            build/output/images/
-
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
         with:
@@ -308,15 +272,6 @@ jobs:
           omitName: true
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
-
-#      - name: Upload firmware to release
-#        uses: softprops/action-gh-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: latest
-#          body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
-#          files: build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*
 
       - name: Deploy to server
         if: ${{ github.repository_owner == 'Armbian' && inputs.sourcerepo == 'stable' && inputs.sourcerepo == 'rc' }}
