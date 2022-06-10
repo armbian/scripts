@@ -251,7 +251,7 @@ jobs:
           if_key_exists: replace
 
       - uses: ncipollo/release-action@v1
-        if: ${{ github.repository_owner == 'Armbian' && !inputs.sourcerepo == 'stable' && !inputs.sourcerepo == 'rc' }}
+        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.choice != 'stable'  && github.event.inputs.choice != 'rc' }}
         with:
           artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
           tag: "latest"
@@ -261,7 +261,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to server
-        if: ${{ github.repository_owner == 'Armbian' && inputs.sourcerepo == 'stable' && inputs.sourcerepo == 'rc' }}
+        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.choice == 'stable'  && github.event.inputs.choice == 'rc' }}        
         run: |
           ls -l build/output/images/*/*/
           sudo apt-get -y -qq install lftp          
