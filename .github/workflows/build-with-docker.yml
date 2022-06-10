@@ -53,6 +53,9 @@ jobs:
       runner: ${{steps.list_dirs.outputs.runner}}
     steps:
 
+      - name: Runner cleanup
+        uses: igorpecovnik/freespace@main
+
       - name: Set ENV vars
         run: |
           SOURCEREPO=${{ inputs.sourcerepo }}
