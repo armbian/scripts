@@ -21,7 +21,7 @@ jobs:
 
      - name: Install dependencies and fix permissions
        run: |
-         sudo apt install -y docker.io
+         #sudo apt install -y docker.io
          sudo chmod 666 /var/run/docker.sock
 
      - name: Checkout repository
