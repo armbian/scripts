@@ -50,7 +50,7 @@ jobs:
     runs-on: small
     outputs:
       release: ${{steps.list_dirs.outputs.release}}
-      variant: ${{steps.list_dirs.outputs.variants}}
+      variant: ${{steps.list_dirs.outputs.variant}}
     steps:
 
       - name: Runner cleanup
