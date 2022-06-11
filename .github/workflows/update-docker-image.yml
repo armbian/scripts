@@ -11,7 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-latest,aarch64]
+      
+        runner: ["ubuntu-latest","aarch64"]
         target: ["debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy"]
 
     name: ${{ matrix.runner }} ${{ matrix.target }}
@@ -26,7 +27,6 @@ jobs:
        with:
          repository: armbian/build
          path: build
-         ref: "master"
          clean: false
 
      - name: Checkout support scripts
