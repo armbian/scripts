@@ -76,7 +76,8 @@ jobs:
           MATRIX="seq -w 01 10"
           #echo ::set-output name=release::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           #echo ::set-output name=variant::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
-          echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true          
+          echo ::set-output name=variant::$(echo '[""]' | jq) || true
+          echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true
 
   image:
   
