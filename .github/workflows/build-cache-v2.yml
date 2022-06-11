@@ -68,7 +68,7 @@ jobs:
         id: list_dirs
         run: |
 
-          echo ::set-output name=release::$(for x in $(grep -rw config/distributions/*/ -e 'supported' | cut -d"/" -f3); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           echo ::set-output name=variant::$(for x in $(echo "cli_1 cli_2"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
   image:
