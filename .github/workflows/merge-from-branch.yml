@@ -41,6 +41,7 @@ jobs:
         with:
           repository: armbian/build
           path: build
+          ref: master
           fetch-depth: 0
           clean: true
 
