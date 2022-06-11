@@ -18,7 +18,7 @@ on:
         required: true
 
 jobs:  
-
+  
   gradle:
     if: ${{ github.repository_owner == 'Armbian' }}
     strategy:
@@ -27,8 +27,8 @@ jobs:
         board: [bananapi]
         release: [focal]
     
-    name: Variant
-    runs-on: ${{ inputs.runner }}
+    name: Variant    
+    runs-on: ${{ inputs.runner }}    
     steps:
 
       - name: Clean temporally folders

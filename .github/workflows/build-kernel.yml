@@ -36,6 +36,8 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
+      - uses: igorpecovnik/freespace@main
+
       - name: Clean temporally folders
         run: |
           sudo rm -rf build/.tmp 2>/dev/null || true
@@ -51,13 +53,13 @@ jobs:
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
-          fetch-depth: '100'
+          fetch-depth: 0
           clean: false
 
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: '100'
+          fetch-depth: 0
           repository: armbian/scripts
           path: scripts
           clean: false
@@ -89,7 +91,9 @@ jobs:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
     steps:
-   
+
+      - uses: igorpecovnik/freespace@main
+
       - name: Clean temporally folders
         run: |
           sudo rm -rf build/.tmp 2>/dev/null || true
@@ -104,14 +108,14 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          fetch-depth: '100'
+          fetch-depth: 0
           ref:  ${{ inputs.reference }}
           clean: false
           
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: '100'
+          fetch-depth: 0
           repository: armbian/scripts
           path: scripts
           clean: false
@@ -237,7 +241,7 @@ jobs:
           path: build/${{ env.FILE_HASH }}
 
       - name: Upload build artifacts
-        if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' }}
+        if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' && github.event_name == 'pull_request' }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.FILE_NAME }}

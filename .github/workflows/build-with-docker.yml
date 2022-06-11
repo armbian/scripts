@@ -50,7 +50,16 @@ jobs:
     runs-on: small
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
+      runner: ${{steps.list_dirs.outputs.runner}}
     steps:
+
+      - name: Runner cleanup
+        uses: igorpecovnik/freespace@main
+
+      - name: Set ENV vars
+        run: |
+          SOURCEREPO=${{ inputs.sourcerepo }}
+          echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
 
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -58,7 +67,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: ${{ inputs.sourcerepo }}
+          ref: ${{ env.REPO }}
           clean: false
 
       - name: Remove previous artefacts if any
@@ -89,8 +98,14 @@ jobs:
           MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat $TEMP/data.txt"
           [ -s changes ] || unset MATRIX
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          if [[ -z "${{ inputs.runner }}" ]]; then
+          echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true
+          else
+          echo ::set-output name=runner::$(echo '["${{ inputs.runner }}"]' | jq) || true
+          fi
 
   image:
+  
     needs: Prepare
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
@@ -98,16 +113,23 @@ jobs:
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: ${{ inputs.runner }}
+    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     steps:
 
+      - name: Set environment variables
+        run: |
+
+          SOURCEREPO=${{ inputs.sourcerepo }}
+          echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
+          echo ${{needs.Prepare.outputs.runner}}
+          
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: ${{ inputs.sourcerepo }} 
+          ref: ${{ env.REPO }} 
           clean: false
 
       - name: Checkout support scripts
@@ -118,44 +140,21 @@ jobs:
           path: scripts
           clean: false
 
-      - name: Sync
+      - name: Runner cleanup
+        uses: igorpecovnik/freespace@main
+
+      - name: Copy templates
         run: |
 
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
-          sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-          sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-
-      - name: Fix permissions
-        run: |
-          # make sure no temporally dirs are mounted from previous runs
-          while :
-          do
-              sudo docker volume rm $(sudo docker volume ls -q) 2> /dev/null || true
-              sudo pkill compile.sh || true
-              sudo pkill arm-binfmt-P || true
-              sudo pkill aarch64-binfmt-P || true
-              sudo pkill pixz || true
-              if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "188.227.12.36" ]]; then
-                  sudo mountpoint -q build/cache/rootfs &&  sudo fusermount -u build/cache/rootfs || true
-                  sudo mountpoint -q build/cache/toolchain &&  sudo fusermount -u build/cache/toolchain || true
-              fi
-              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
-              echo "Mounted temp directories. Trying to unmount."
-              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
-              sleep 10
-          done
-          
-          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
-          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Pull Docker image
         run: |
 
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
           sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
-          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
+          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
       - name: Import GPG key
@@ -171,24 +170,8 @@ jobs:
       - name: Assemble
         run: |
 
-          export TERM=dumb
           cd build
-
-          # use local resources if possible
-          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-              sudo rm -rf cache/toolchain/*
-              sudo mkdir -p cache/toolchain build/cache/rootfs || true
-              ! sudo mountpoint -q cache/toolchain && sudo mount nas:/tank/armbian/toolchain.armbian.com cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=3 || true
-              ! sudo mountpoint -q cache/rootfs && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=3 || true
-          fi
-          
-          if [[ $(curl -s http://ifconfig.me) == "188.227.12.36" || $(curl -s http://ifconfig.me) == "206.82.251.151" ]]; then
-              sudo rm -rf cache/sources
-              sudo mkdir -p cache/toolchain build/cache/rootfs || true
-              ! sudo mountpoint -q cache/toolchain && sudo mount --bind /mnt/armbian/cache/toolchain/ cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=3 || true
-              ! sudo mountpoint -q cache/rootfs && sudo mount --bind /mnt/armbian/cache/rootfs/ cache/rootfs/ -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=3 || true
-          fi
-          
+         
           var="${{ inputs.variant }}"
           RC="no"
           if [[ "$var" != *beta ]]; then
@@ -270,7 +253,18 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
+      - uses: ncipollo/release-action@v1
+        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.choice != 'stable'  && github.event.inputs.choice != 'rc' }}
+        with:
+          artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
+          tag: "latest"
+          omitBody: true
+          omitName: true
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Deploy to server
+        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.choice == 'stable'  && github.event.inputs.choice == 'rc' }}        
         run: |
           ls -l build/output/images/*/*/
           sudo apt-get -y -qq install lftp          

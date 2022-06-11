@@ -35,24 +35,10 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
-        - name: Fix permissions
-          run: |
-            # make sure no temporally dirs are mounted from previous runs
-            while :
-            do
-                sudo pkill compile.sh || true
-                sudo pkill arm-binfmt-P || true
-                sudo pkill aarch64-binfmt-P || true
-                sudo pkill pixz || true
-                sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-                [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 ]] && sudo rm -rf build/.tmp && break                
-                echo "Mounted temp directories. Trying to unmount."
-                df | grep "/.tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
-                sleep 10
-            done
-            sudo chown -R $USER:$USER build/.git
-        - name: Checkout Armbian build script
+        - name: Runner cleanup
+          uses: igorpecovnik/freespace@main
 
+        - name: Checkout Armbian build script
           uses: actions/checkout@v2
           with:
             fetch-depth: 0
@@ -122,29 +108,14 @@ jobs:
 
     steps:
  
+      - name: Runner cleanup
+        uses: igorpecovnik/freespace@main
+ 
       - name: Download artefacts
         uses: actions/download-artifact@v2
         with:
           name: build-rootfs
-      - name: Fix permissions
-        run: |
-          # make sure no temporally dirs are mounted from previous runs
-          while :
-          do
-              sudo pkill compile.sh || true
-              sudo pkill arm-binfmt-P || true
-              sudo pkill aarch64-binfmt-P || true
-              sudo pkill pixz || true
-              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
-              echo "Mounted temp directories. Trying to unmount."
-              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
-              sleep 10
-          done
-          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
-          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
-          [[ -d build/cache/sources ]] && sudo rm -rf build/cache/sources/* || true
-          
+        
       - name: Checkout Armbian build script
 
         uses: actions/checkout@v2
