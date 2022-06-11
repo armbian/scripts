@@ -70,7 +70,7 @@ jobs:
 
           #echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           #echo ::set-output name=variant::$(for x in $(echo "cli_1 cli_2"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
-          MATRIX="seq -w 01 100"
+          MATRIX="seq -w 01 10"
           echo ::set-output name=release::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           echo ::set-output name=variant::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
