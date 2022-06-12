@@ -74,7 +74,7 @@ jobs:
         run: |
 
           # default values
-          echo ::set-output name=runner::$(echo '[""]' | jq) || true
+          echo ::set-output name=runner::$(echo 'X64') || true
           echo ::set-output name=release::$(echo '[""]' | jq) || true
           echo ::set-output name=variant::$(echo '[""]' | jq) || true
           echo ::set-output name=desktop::$(echo '[""]' | jq) || true
@@ -90,8 +90,7 @@ jobs:
 
           if [[ $VAR == desktop* ]]; then 
           echo ::set-output name=desktop::$(for x in $(find -L build/config/desktop/*/environments/*/config* -name packages 2>/dev/null | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          #else
-          #echo ::set-output name=desktop::$(for x in $(echo "cli"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=variant::$(for x in $(seq -w 01 05); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
           if [[ $VAR == cli* ]]; then 
@@ -112,10 +111,11 @@ jobs:
           #runners=("small" "ubuntu-latest" "big")
           #selectedrunner=$(printf "%s\n" "${runners[@]}" | shuf -n1)
           #echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=runner::$(echo 'X64') || true
-          [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo 'ARM64') || true
-          [[ $VAR == desktop ]] && echo ::set-output name=runner::$(echo 'big') || true
-          [[ $VAR == minimal && $ARC == x86 ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
+          
+          # Let's choose runners wisely          
+          [[ $ARC == arm* ]]                                         && echo ::set-output name=runner::$(echo 'ARM64')         || true
+          [[ $VAR == desktop ]]                                      && echo ::set-output name=runner::$(echo 'small')         || true
+          [[ ( $VAR == minimal || $VAR == server ) && $ARC == x86 ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
 
   image:
   
@@ -124,13 +124,11 @@ jobs:
       fail-fast: false
       matrix:
       
-#        runner:  ${{fromJson(needs.Prepare.outputs.runner)}}
         release: ${{fromJson(needs.Prepare.outputs.release)}}
         variant: ${{fromJson(needs.Prepare.outputs.variant)}}
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
-#    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     runs-on: ["${{ needs.Prepare.outputs.runner }}"]
     steps:
 
