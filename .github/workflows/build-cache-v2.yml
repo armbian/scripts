@@ -105,7 +105,10 @@ jobs:
           #echo ::set-output name=release::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           #echo ::set-output name=variant::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           #[[ $BOARD == cli* ]] && echo ::set-output name=variant::$(echo '["minimal","server"]' | jq) || true
-          echo ::set-output name=runner::$(echo '["small","ubuntu-latest"]' | jq) || true
+          runner=("small" "ubuntu-latest")
+          selectedrunner=$(printf "%s\n" "${runner[@]}" | shuf -n1)
+          echo ::set-output name=variant::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          #echo ::set-output name=runner::$(echo '["small","ubuntu-latest"]' | jq) || true
 
   image:
   
