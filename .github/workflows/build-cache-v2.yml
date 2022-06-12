@@ -70,14 +70,11 @@ jobs:
         id: list_dirs
         run: |
 
-          echo ${{ github.action }}
-          echo ${{ github.action_path }}
-          echo ${{ github.base_ref }}
-          echo ${{ github.workflow }}
-
           CHUNK=${{ inputs.variant }}
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $LINE | cut -d"_" -f1)
+          
+          echo $BOARD
 
           echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           [[ $BOARD == desktop* ]] && echo ::set-output name=desktop::$(for x in $(find -L build/config/desktop/*/environments/*/config* -name packages 2>/dev/null | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
