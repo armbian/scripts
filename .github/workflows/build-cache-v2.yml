@@ -117,7 +117,7 @@ jobs:
         variant: ${{fromJson(needs.Prepare.outputs.variant)}}
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
 
-    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
+    runs-on: "${{fromJson(needs.Prepare.outputs.runner)}}"
     steps:
 
       - name: Checkout repository
