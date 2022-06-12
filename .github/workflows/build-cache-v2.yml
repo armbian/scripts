@@ -171,8 +171,7 @@ jobs:
           sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
-      - name: Install SSH key for storage
-        if: ${{ inputs.uploading == 'true' }}
+      - name: Install SSH key for storage        
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_TORRENTS }}
@@ -188,7 +187,6 @@ jobs:
           sudo cp ~/.ssh/* /root/.ssh/          
           sudo mkdir -p build/cache/rootfs || true
           sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other          
-          fi
 
       - name: Read variables
         run: |
