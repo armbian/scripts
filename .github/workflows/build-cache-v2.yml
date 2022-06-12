@@ -73,6 +73,7 @@ jobs:
           # default values
           echo ::set-output name=release::$(echo '[""]' | jq) || true
           echo ::set-output name=variant::$(echo '[""]' | jq) || true
+          echo ::set-output name=desktop::$(echo '[""]' | jq) || true
           echo ::set-output name=runner::$(echo '[""]' | jq) || true
 
           CHUNK=${{ inputs.variant }}
@@ -85,8 +86,8 @@ jobs:
 
           if [[ $VAR == desktop* ]]; then 
           echo ::set-output name=desktop::$(for x in $(find -L build/config/desktop/*/environments/*/config* -name packages 2>/dev/null | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          else
-          echo ::set-output name=desktop::$(for x in $(echo "cli"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          #else
+          #echo ::set-output name=desktop::$(for x in $(echo "cli"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
           if [[ $VAR == cli* ]]; then 
