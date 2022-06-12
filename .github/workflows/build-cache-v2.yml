@@ -70,7 +70,9 @@ jobs:
         id: list_dirs
         run: |
 
-          echo ${{ github.job }}
+          echo ${{ github.action }}
+          echo ${{ github.action_path }}
+          echo ${{ github.base_ref }}
           echo ${{ github.workflow }}
 
           CHUNK=${{ inputs.variant }}
