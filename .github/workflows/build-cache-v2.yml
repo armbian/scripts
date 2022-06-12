@@ -98,7 +98,7 @@ jobs:
 
           if [[ $VAR == desktop* ]]; then 
           echo ::set-output name=desktop::$(for x in $(grep -rw build/config/desktop/*/environments/*/support -e 'supported'  | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=variant::$(for x in $(seq -w 01 03); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=appgroup::$(for x in $(seq -w 01 03); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
           #if [[ $VAR == cli* ]]; then 
