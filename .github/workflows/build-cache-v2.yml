@@ -47,7 +47,7 @@ jobs:
   Prepare:
 
     name: targets
-    
+    runs-on: self-hosted
     outputs:
     
       runner:   ${{steps.list_dirs.outputs.runner}}
