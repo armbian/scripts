@@ -161,15 +161,30 @@ jobs:
       - name: Copy templates
         run: |
 
-          echo ${{ matrix.release }}
-          echo ${{ matrix.variant }}
+          RELEASE=${{ matrix.release }}
+
           echo ${{ matrix.desktop }}
           echo ${{ needs.Prepare.outputs.board }}
           
+          case "${{ matrix.variant }}" in
+          1)
+              DESKTOP_APPGROUPS_SELECTED="3dsupport"
+          ;;
           
-          [[ "${{ matrix.variant }}" == 1 ]] && DESKTOP_APPGROUPS_SELECTED=""
-          [[ "${{ matrix.variant }}" == 2 ]] && DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
-          [[ "${{ matrix.variant }}" == 3 ]] && DESKTOP_APPGROUPS_SELECTED="3dsupport browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
+          2)
+              DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
+          ;;
+          3)
+          
+              DESKTOP_APPGROUPS_SELECTED="3dsupport browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
+          ;;
+          
+          *)
+              DESKTOP_APPGROUPS_SELECTED=""
+          ;;
+          esac
+          
+          
                   
 
           
