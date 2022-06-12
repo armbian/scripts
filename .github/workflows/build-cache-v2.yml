@@ -192,11 +192,6 @@ jobs:
       - name: Generate rootfs
         run: |
 
-          RELEASE=${{ matrix.release }}
-          BRANCH="current"
-          DESKTOP_ENVIRONMENT="${{ matrix.desktop }}"
-          BOARD="${{ needs.Prepare.outputs.board }}"
-          
           case "${{ matrix.variant }}" in
           1)
               DESKTOP_APPGROUPS_SELECTED="3dsupport"
@@ -218,13 +213,13 @@ jobs:
           cd build
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
-          [[ -n ${DESKTOP_ENVIRONMENT} ]] && BUILD_DESKTOP="yes"
+          [[ -n "${{ matrix.desktop }}" ]] && BUILD_DESKTOP="yes"
           
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           ./compile.sh docker \
           BETA="no" \
           ROOT_FS_CREATE_ONLY="force" \
-          RELEASE="${RELEASE}" \
+          RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
           IGNORE_UPDATES="yes" \
@@ -232,12 +227,12 @@ jobs:
           DESKTOP_ENVIRONMENT_CONFIG_NAME="$DESKTOP_ENVIRONMENT_CONFIG_NAME" \
           BUILD_DESKTOP="$BUILD_DESKTOP" \
           BUILD_MINIMAL="$BUILD_MINIMAL" \
-          DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
+          DESKTOP_ENVIRONMENT="${{ matrix.desktop }}" \
           KERNEL_CONFIGURE="no" \
-          BOARD="$BOARD" \
+          BOARD="${{ needs.Prepare.outputs.board }}" \
           OFFLINE_WORK="yes" \
           LOG_SUBPATH="debug/$BOARD" \
-          BRANCH="$BRANCH" \
+          BRANCH="current" \
           MAKE_FOLDERS="$MAKE_FOLDERS" \
           FORCED_MONTH_OFFSET="${FORCED_MONTH_OFFSET}" \
           IMAGE_PRESENT="no" \
