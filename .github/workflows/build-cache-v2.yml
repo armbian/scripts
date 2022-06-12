@@ -201,7 +201,8 @@ jobs:
       - name: Generate rootfs
         run: |
 
-          case "${{ matrix.appgroup }}" in
+          DESKTOP_APPGROUPS=${{ matrix.appgroup }}
+          case "$DESKTOP_APPGROUPS" in
           "01")
               DESKTOP_APPGROUPS_SELECTED="3dsupport"
           ;;
