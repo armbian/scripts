@@ -120,6 +120,9 @@ jobs:
     runs-on: "${{fromJson(needs.Prepare.outputs.runner)}}"
     steps:
 
+      - name: Runner cleanup
+        uses: igorpecovnik/freespace@main
+
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -132,19 +135,23 @@ jobs:
           repository: armbian/scripts
           path: scripts
 
-      - name: Runner cleanup
-        uses: igorpecovnik/freespace@main
-
       - name: Copy templates
         run: |
 
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
 
-      - name: Pull Docker image
+      - name: Copy templates
         run: |
 
-          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
-          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+          echo ${{ matrix.release }}
+          echo ${{ matrix.variant }}
+          echo ${{ matrix.desktop }}
+
+#      - name: Pull Docker image
+#        run: |
+#
+#          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
+#          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
+#          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
+#          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
