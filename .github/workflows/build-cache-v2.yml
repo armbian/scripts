@@ -233,7 +233,7 @@ jobs:
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           GPG_PASS=${GPG_PASS} sudo -E bash ./compile.sh \
           BETA="no" \
-          ROOT_FS_CREATE_ONLY="force" \
+          ROOT_FS_CREATE_ONLY="yes" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
