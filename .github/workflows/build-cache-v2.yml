@@ -47,7 +47,7 @@ jobs:
   Prepare:
 
     name: targets
-    runs-on: ubuntu-latest
+    runs-on: []
     outputs:
     
       runner:   ${{steps.list_dirs.outputs.runner}}
