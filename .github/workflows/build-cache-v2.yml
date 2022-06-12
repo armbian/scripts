@@ -113,9 +113,9 @@ jobs:
           #selectedrunner=$(printf "%s\n" "${runners[@]}" | shuf -n1)
           #echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo ::set-output name=runner::$(echo 'X64') || true
-          if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo 'ARM64') || true
-          if [[ $VAR == desktop ]] && echo ::set-output name=runner::$(echo 'big') || true
-          if [[ $VAR == minimal && $ARC == x86 ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
+          [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo 'ARM64') || true
+          [[ $VAR == desktop ]] && echo ::set-output name=runner::$(echo 'big') || true
+          [[ $VAR == minimal && $ARC == x86 ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
 
   image:
   
