@@ -94,18 +94,18 @@ jobs:
           
           echo "$VAR $ARC"
 
-          echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|bullseye/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
 
           if [[ $VAR == desktop* ]]; then 
           echo ::set-output name=desktop::$(for x in $(grep -rw build/config/desktop/*/environments/*/support -e 'supported'  | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo ::set-output name=variant::$(for x in $(seq -w 01 03); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
-          if [[ $VAR == cli* ]]; then 
-          echo ::set-output name=variant::$(for x in $(echo "cli_1 cli_2"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          #if [[ $VAR == cli* ]]; then 
+          echo ::set-output name=variant::$(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           #else
           #echo ::set-output name=variant::$(for x in $(echo "na"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          fi
+          #fi
           
           #[[ $VAR == cli* ]] && echo ::set-output name=desktop::$(echo '[]' | jq) || true
           #$if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64","ubuntu-latest"]' | jq) || true
