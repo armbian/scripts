@@ -227,7 +227,7 @@ jobs:
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
 
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
-          GPG_PASS="${GPG_PASS}" ./compile.sh docker \
+          GPG_PASS="${{ secrets.GPG_PASSPHRASE1 }}" ./compile.sh docker \
           BETA="no" \
           ROOT_FS_CREATE_ONLY="yes" \
           RELEASE="${{ matrix.release }}" \
