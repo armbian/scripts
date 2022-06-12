@@ -62,6 +62,12 @@ jobs:
       - name: Runner cleanup
         uses: igorpecovnik/freespace@main
 
+      - name: Prepare matrix
+        id: list_dirs
+        run: |
+        
+          df
+           
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -166,6 +172,17 @@ jobs:
           sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
+      - name: Mount upload folders
+        run: |
+
+          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+          sudo apt-get -y -qq install sshfs
+          sudo mkdir -p /root/.ssh/
+          sudo cp ~/.ssh/known_hosts /root/.ssh/          
+          sudo mkdir -p build/cache/rootfs || true
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other          
+          fi
+
       - name: Read variables
         run: |
 
@@ -191,7 +208,7 @@ jobs:
               DESKTOP_APPGROUPS_SELECTED=""
           ;;
           esac
-          
+         
           cd build
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
@@ -227,3 +244,9 @@ jobs:
           REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
+
+      - name: Unmount folders
+
+        run: |
+        
+          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
