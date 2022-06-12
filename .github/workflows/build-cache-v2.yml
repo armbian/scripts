@@ -112,7 +112,7 @@ jobs:
           #runners=("small" "ubuntu-latest" "big")
           #selectedrunner=$(printf "%s\n" "${runners[@]}" | shuf -n1)
           #echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
+          echo ::set-output name=runner::$(echo '[X64,ubuntu-latest]' | jq) || true
           #$if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64"]' | jq) || true
 
   image:
