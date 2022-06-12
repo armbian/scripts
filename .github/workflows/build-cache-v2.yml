@@ -129,7 +129,7 @@ jobs:
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
 #    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ needs.Prepare.outputs.runners }}
     steps:
 
       - name: Runner cleanup
