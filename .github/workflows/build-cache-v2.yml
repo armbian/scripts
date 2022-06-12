@@ -109,10 +109,10 @@ jobs:
           #echo ::set-output name=release::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           #echo ::set-output name=variant::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           #[[ $BOARD == cli* ]] && echo ::set-output name=variant::$(echo '["minimal","server"]' | jq) || true
-          runners=("small" "ubuntu-latest" "big")
-          selectedrunner=$(printf "%s\n" "${runners[@]}" | shuf -n1)
-          echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          #echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
+          #runners=("small" "ubuntu-latest" "big")
+          #selectedrunner=$(printf "%s\n" "${runners[@]}" | shuf -n1)
+          #echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
           #$if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64"]' | jq) || true
 
   image:
@@ -129,7 +129,7 @@ jobs:
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
 #    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
-    runs-on: ${{ needs.Prepare.outputs.runners }}
+    runs-on: ${{ needs.Prepare.outputs.runner }}
     steps:
 
       - name: Runner cleanup
