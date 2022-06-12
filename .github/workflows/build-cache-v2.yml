@@ -84,7 +84,11 @@ jobs:
 
           echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true          
           echo ::set-output name=desktop::$(for x in $(find -L build/config/desktop/*/environments/*/config* -name packages 2>/dev/null | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          if [[ $VAR == cli* ]]; then 
           echo ::set-output name=variant::$(for x in $(echo "cli_1 cli_2"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          else
+          echo ::set-output name=variant::$(for x in $(echo ""); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          fi
           
           #[[ $VAR == cli* ]] && echo ::set-output name=desktop::$(echo '[]' | jq) || true
           #if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64","ubuntu-latest"]' | jq) || true
