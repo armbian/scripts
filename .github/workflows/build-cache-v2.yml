@@ -191,6 +191,7 @@ jobs:
         run: |
 
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+          sudo rm -f build/cache/rootfs/*
           sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/          
