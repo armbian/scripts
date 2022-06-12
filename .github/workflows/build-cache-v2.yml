@@ -49,10 +49,13 @@ jobs:
     name: targets
     runs-on: ubuntu-latest
     outputs:
-      release: ${{steps.list_dirs.outputs.release}}
-      variant: ${{steps.list_dirs.outputs.variant}}
-      desktop: ${{steps.list_dirs.outputs.desktop}}
-      runner:  ${{steps.list_dirs.outputs.runner}}
+    
+      runner:   ${{steps.list_dirs.outputs.runner}}
+      release:  ${{steps.list_dirs.outputs.release}}
+      variant:  ${{steps.list_dirs.outputs.variant}}
+      desktop:  ${{steps.list_dirs.outputs.desktop}}
+      appgroup: ${{steps.list_dirs.outputs.appgroup}}
+      
     steps:
 
       - name: Runner cleanup
@@ -71,11 +74,12 @@ jobs:
         run: |
 
           # default values
+          echo ::set-output name=runner::$(echo '[""]' | jq) || true
           echo ::set-output name=release::$(echo '[""]' | jq) || true
           echo ::set-output name=variant::$(echo '[""]' | jq) || true
           echo ::set-output name=desktop::$(echo '[""]' | jq) || true
-          echo ::set-output name=runner::$(echo '[""]' | jq) || true
-
+          echo ::set-output name=appgroup::$(echo '[""]' | jq) || true
+      
           CHUNK=${{ inputs.variant }}
           VAR=$(echo $CHUNK | cut -d":" -f1)
           ARC=$(echo $CHUNK | cut -d":" -f2)
@@ -122,7 +126,7 @@ jobs:
         release: ${{fromJson(needs.Prepare.outputs.release)}}
         variant: ${{fromJson(needs.Prepare.outputs.variant)}}
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
-        
+        appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
 #    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     runs-on: ${{ matrix.runner }}
