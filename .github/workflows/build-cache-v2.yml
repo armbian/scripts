@@ -164,7 +164,7 @@ jobs:
           echo ${{ matrix.release }}
           echo ${{ matrix.variant }}
           echo ${{ matrix.desktop }}
-          ${{ needs.Prepare.outputs.board }}
+          echo ${{ needs.Prepare.outputs.board }}
           
           
           [[ "${{ matrix.variant }}" == 1 ]] && DESKTOP_APPGROUPS_SELECTED=""
