@@ -158,13 +158,21 @@ jobs:
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
 
-      - name: Copy templates
+      - name: Pull Docker image
+        run: |
+
+          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
+          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
+          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+
+      - name: Read variables
         run: |
 
           RELEASE=${{ matrix.release }}
-
-          echo ${{ matrix.desktop }}
-          echo ${{ needs.Prepare.outputs.board }}
+          BRANCH="current"
+          DESKTOP_ENVIRONMENT="${{ matrix.desktop }}"
+          BOARD="${{ needs.Prepare.outputs.board }}"
           
           case "${{ matrix.variant }}" in
           1)
@@ -184,15 +192,38 @@ jobs:
           ;;
           esac
           
+          cd build
+          BUILD_DESKTOP="no"
+          BUILD_MINIMAL="no"
+          [[ -n ${DESKTOP_ENVIRONMENT} ]] && BUILD_DESKTOP="yes"
           
-                  
-
-          
-
-#      - name: Pull Docker image
-#        run: |
-#
-#          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-#          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
-#          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
-#          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+          sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
+          ./compile.sh docker \
+          BETA="${BETA}" \
+          ROOT_FS_CREATE_ONLY="force" \
+          RELEASE="${RELEASE}" \
+          KERNEL_ONLY="no" \
+          SKIP_EXTERNAL_TOOLCHAINS="$SKIP_EXTERNAL_TOOLCHAINS" \
+          IGNORE_UPDATES="yes" \
+          SYNC_CLOCK="no" \
+          DESKTOP_ENVIRONMENT_CONFIG_NAME="$DESKTOP_ENVIRONMENT_CONFIG_NAME" \
+          BUILD_DESKTOP="$BUILD_DESKTOP" \
+          BUILD_MINIMAL="$BUILD_MINIMAL" \
+          DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
+          KERNEL_CONFIGURE="no" \
+          BOARD="$BOARD" \
+          OFFLINE_WORK="yes" \
+          LOG_SUBPATH="debug/$BOARD" \
+          BRANCH="$BRANCH" \
+          MAKE_FOLDERS="$MAKE_FOLDERS" \
+          FORCED_MONTH_OFFSET="${FORCED_MONTH_OFFSET}" \
+          IMAGE_PRESENT="no" \
+          BUILD_ALL="yes" \
+          USE_TORRENT="no" \
+          CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu" \
+          USE_MAINLINE_GOOGLE_MIRROR="yes" \
+          ARMBIAN_CACHE_TOOLCHAIN_PATH="${ARMBIAN_CACHE_TOOLCHAIN_PATH}" \
+          ARMBIAN_CACHE_ROOTFS_PATH="${ARMBIAN_CACHE_ROOTFS_PATH}" \
+          REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-config,armbian-firmware" \
+          DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
+          EXPERT="yes"
