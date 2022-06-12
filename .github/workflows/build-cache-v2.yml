@@ -84,7 +84,7 @@ jobs:
           echo ::set-output name=release::$(echo '[""]' | jq) || true
           
           echo ::set-output name=variant::$(echo '[""]' | jq) || true
-          echo ::set-output name=desktop::$(echo '[""]' | jq) || true
+          echo ::set-output name=desktop::$(echo '["none"]' | jq) || true
           echo ::set-output name=appgroup::$(echo '[""]' | jq) || true
       
           CHUNK=${{ inputs.variant }}
