@@ -112,7 +112,7 @@ jobs:
           #runners=("small" "ubuntu-latest" "big")
           #selectedrunner=$(printf "%s\n" "${runners[@]}" | shuf -n1)
           #echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=runner::$(echo '[X64,ubuntu-latest]' | jq) || true
+          echo ::set-output name=runner::$(echo 'X64,ubuntu-latest') || true
           #$if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64"]' | jq) || true
 
   image:
@@ -129,7 +129,7 @@ jobs:
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
     runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
-#    runs-on: ${{ needs.Prepare.outputs.runner }}
+    runs-on: [self-hosted, "${{ needs.Prepare.outputs.runner }}"]
     steps:
 
       - name: Runner cleanup
