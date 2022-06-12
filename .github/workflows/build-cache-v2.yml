@@ -73,7 +73,6 @@ jobs:
           # default values
           echo ::set-output name=release::$(echo '[]' | jq) || true
           echo ::set-output name=variant::$(echo '[]' | jq) || true
-          
           echo ::set-output name=runner::$(echo '[]' | jq) || true
 
           CHUNK=${{ inputs.variant }}
