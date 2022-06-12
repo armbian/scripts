@@ -84,7 +84,7 @@ jobs:
           echo ::set-output name=release::$(echo '[""]' | jq) || true
           
           echo ::set-output name=variant::$(echo '[""]' | jq) || true
-          echo ::set-output name=desktop::$(echo '["none"]' | jq) || true
+          echo ::set-output name=desktop::$(echo '[""]' | jq) || true
           echo ::set-output name=appgroup::$(echo '[""]' | jq) || true
       
           CHUNK=${{ inputs.variant }}
@@ -187,6 +187,7 @@ jobs:
       - name: Install SSH key for storage        
         uses: shimataro/ssh-key-action@v2
         with:
+        
           key: ${{ secrets.SSH_KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
@@ -222,7 +223,7 @@ jobs:
               DESKTOP_APPGROUPS_SELECTED=""
           ;;
           esac
-         
+
           cd build
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
