@@ -97,8 +97,8 @@ jobs:
           fi
           
           #[[ $VAR == cli* ]] && echo ::set-output name=desktop::$(echo '[]' | jq) || true
-          if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64","ubuntu-latest"]' | jq) || true
-          if [[ $ARC == x86 ]] && echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
+          if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64"]' | jq) || true
+          if [[ $ARC == x86 ]] && echo ::set-output name=runner::$(echo '["X64"]' | jq) || true
           
           
           #MATRIX="seq -w 01 10"
