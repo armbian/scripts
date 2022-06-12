@@ -121,7 +121,7 @@ jobs:
           #echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           
           # Let's choose runners wisely          
-          [[ $ARC == arm* ]]                                         && echo ::set-output name=runner::$(echo 'ARM64')         || true
+          [[ $VAR != desktop && $ARC == *arm* ]]                                         && echo ::set-output name=runner::$(echo 'ARM64')         || true
           [[ $VAR == desktop ]]                                      && echo ::set-output name=runner::$(echo 'small')         || true
           [[ ( $VAR == min || $VAR == srv ) && $ARC == x86 ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
 
