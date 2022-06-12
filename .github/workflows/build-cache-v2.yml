@@ -117,10 +117,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+      
+        runner:  ${{fromJson(needs.Prepare.outputs.runner)}}
         release: ${{fromJson(needs.Prepare.outputs.release)}}
         variant: ${{fromJson(needs.Prepare.outputs.variant)}}
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
-        runner:  ${{fromJson(needs.Prepare.outputs.runner)}}
+        
 
 #    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     runs-on: ${{ matrix.runner }}
