@@ -76,6 +76,7 @@ jobs:
           # default values
           echo ::set-output name=runner::$(echo 'X64') || true
           echo ::set-output name=release::$(echo '[""]' | jq) || true
+          
           echo ::set-output name=variant::$(echo '[""]' | jq) || true
           echo ::set-output name=desktop::$(echo '[""]' | jq) || true
           echo ::set-output name=appgroup::$(echo '[""]' | jq) || true
@@ -83,6 +84,7 @@ jobs:
           CHUNK=${{ inputs.variant }}
           VAR=$(echo $CHUNK | cut -d":" -f1)
           ARC=$(echo $CHUNK | cut -d":" -f2)
+          echo ::set-output name=board::$(echo $ARC) || true
           
           echo "$VAR $ARC"
 
@@ -90,7 +92,7 @@ jobs:
 
           if [[ $VAR == desktop* ]]; then 
           echo ::set-output name=desktop::$(for x in $(find -L build/config/desktop/*/environments/*/config* -name packages 2>/dev/null | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=variant::$(for x in $(seq -w 01 05); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=variant::$(for x in $(seq -w 01 03); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
           if [[ $VAR == cli* ]]; then 
@@ -161,6 +163,15 @@ jobs:
           echo ${{ matrix.release }}
           echo ${{ matrix.variant }}
           echo ${{ matrix.desktop }}
+          ${{ needs.Prepare.outputs.board }}
+          
+          
+          [[ "${{ matrix.variant }}" == 1 ]] && DESKTOP_APPGROUPS_SELECTED=""
+          [[ "${{ matrix.variant }}" == 2 ]] && DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
+          [[ "${{ matrix.variant }}" == 3 ]] && DESKTOP_APPGROUPS_SELECTED="3dsupport browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
+                  
+
+          
 
 #      - name: Pull Docker image
 #        run: |
