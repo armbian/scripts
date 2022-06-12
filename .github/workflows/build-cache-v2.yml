@@ -202,14 +202,14 @@ jobs:
         run: |
 
           case "${{ matrix.appgroup }}" in
-          1)
+          "01")
               DESKTOP_APPGROUPS_SELECTED="3dsupport"
           ;;
           
-          2)
+          "02")
               DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
           ;;
-          3)
+          "03")
           
               DESKTOP_APPGROUPS_SELECTED="3dsupport browsers chat desktop_tools editors email internet languages multimedia office programming remote_desktop"
           ;;
