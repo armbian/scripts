@@ -70,6 +70,12 @@ jobs:
         id: list_dirs
         run: |
 
+          # default values
+          echo ::set-output name=release::$(echo '[]' | jq) || true
+          echo ::set-output name=variant::$(echo '[]' | jq) || true
+          echo ::set-output name=desktop::$(echo '[]' | jq) || true
+          echo ::set-output name=runner::$(echo '[]' | jq) || true
+
           CHUNK=${{ inputs.variant }}
           VAR=$(echo $CHUNK | cut -d":" -f1)
           ARC=$(echo $CHUNK | cut -d":" -f2)
