@@ -102,7 +102,7 @@ jobs:
           fi
           
           #if [[ $VAR == cli* ]]; then 
-          echo ::set-output name=variant::$(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=variant::$(for x in $(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           #else
           #echo ::set-output name=variant::$(for x in $(echo "na"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           #fi
