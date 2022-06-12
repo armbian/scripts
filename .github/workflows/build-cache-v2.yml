@@ -70,6 +70,8 @@ jobs:
         id: list_dirs
         run: |
 
+          echo ${{ github.event_name }}
+
           CHUNK=${{ inputs.variant }}
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $LINE | cut -d"_" -f1)
