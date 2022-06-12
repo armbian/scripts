@@ -177,7 +177,7 @@ jobs:
         with:
           gpg-private-key: ${{ secrets.GPG_KEY1 }}
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
-          workdir: scripts
+          workdir: build
           git-user-signingkey: true
 
       - name: Build rootfs cache
@@ -231,7 +231,7 @@ jobs:
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
           
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
-          GPG_PASS=${GPG_PASS} ./compile.sh \
+          GPG_PASS="${GPG_PASS}" ./compile.sh \
           BETA="no" \
           ROOT_FS_CREATE_ONLY="yes" \
           RELEASE="${{ matrix.release }}" \
