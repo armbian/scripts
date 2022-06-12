@@ -87,7 +87,7 @@ jobs:
           if [[ $VAR == desktop* ]]; then 
           echo ::set-output name=desktop::$(for x in $(find -L build/config/desktop/*/environments/*/config* -name packages 2>/dev/null | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           else
-          echo ::set-output name=desktop::$(for x in $(echo "desktop"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=desktop::$(for x in $(echo "cli"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
           if [[ $VAR == cli* ]]; then 
@@ -97,8 +97,8 @@ jobs:
           fi
           
           #[[ $VAR == cli* ]] && echo ::set-output name=desktop::$(echo '[]' | jq) || true
-          #if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64","ubuntu-latest"]' | jq) || true
-          #if [[ $ARC == x86 ]] && echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
+          if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64","ubuntu-latest"]' | jq) || true
+          if [[ $ARC == x86 ]] && echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
           
           
           #MATRIX="seq -w 01 10"
