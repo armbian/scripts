@@ -87,8 +87,8 @@ jobs:
           echo ::set-output name=variant::$(for x in $(echo "cli_1 cli_2"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           
           [[ $VAR == cli* ]] && echo ::set-output name=desktop::$(echo '[]' | jq) || true
-          if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '[ARM64,X64,ubuntu-latest]' | jq) || true
-          if [[ $ARC == x86 ]] && echo ::set-output name=runner::$(echo '[X64,ubuntu-latest]' | jq) || true
+          if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64","ubuntu-latest"]' | jq) || true
+          if [[ $ARC == x86 ]] && echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
           
           
           #MATRIX="seq -w 01 10"
