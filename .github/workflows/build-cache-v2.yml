@@ -229,9 +229,9 @@ jobs:
           [[ "${{ matrix.desktop }}" == "none" ]] && DESKTOP_ENVIRONMENT=""
           [[ -n "$DESKTOP_ENVIRONMENT" ]] && BUILD_DESKTOP="yes"
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
-          
+
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
-          GPG_PASS="${GPG_PASS}" ./compile.sh \
+          GPG_PASS="${GPG_PASS}" ./compile.sh docker \
           BETA="no" \
           ROOT_FS_CREATE_ONLY="yes" \
           RELEASE="${{ matrix.release }}" \
@@ -262,7 +262,6 @@ jobs:
           EXPERT="yes"
 
       - name: Unmount folders
-
         run: |
-        
+
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
