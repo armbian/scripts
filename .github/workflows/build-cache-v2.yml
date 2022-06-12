@@ -70,7 +70,8 @@ jobs:
         id: list_dirs
         run: |
 
-          echo ${{ github.event_name }}
+          echo ${{ github.job }}
+          echo ${{ github.workflow }}
 
           CHUNK=${{ inputs.variant }}
           LINE=$(echo $CHUNK | cut -d":" -f1)
