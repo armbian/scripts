@@ -189,7 +189,7 @@ jobs:
           sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
           sudo df
 
-      - name: Read variables
+      - name: Generate rootfs
         run: |
 
           RELEASE=${{ matrix.release }}
@@ -214,9 +214,6 @@ jobs:
               DESKTOP_APPGROUPS_SELECTED=""
           ;;
           esac
-
-      - name: Generate rootfs
-        run: |
          
           cd build
           BUILD_DESKTOP="no"
