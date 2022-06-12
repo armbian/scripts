@@ -195,7 +195,7 @@ jobs:
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/          
           sudo mkdir -p build/cache/rootfs || true
-          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other
           sudo df
 
       - name: Generate rootfs
