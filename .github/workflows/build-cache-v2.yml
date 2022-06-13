@@ -210,6 +210,7 @@ jobs:
           cd build
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
+          DESKTOP_ENVIRONMENT="${{ matrix.desktop }}"
           [[ "${{ matrix.desktop }}" == "none" ]] && DESKTOP_ENVIRONMENT=""
           [[ -n "$DESKTOP_ENVIRONMENT" ]] && BUILD_DESKTOP="yes"
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
