@@ -244,7 +244,8 @@ jobs:
           ARMBIAN_CACHE_ROOTFS_PATH="${ARMBIAN_CACHE_ROOTFS_PATH}" \
           REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
-          EXPERT="yes"
+          EXPERT="yes" \
+          JUST_INIT="yes" # TEMP TEMP TEMP
 
       - name: Unmount folders
         run: |
