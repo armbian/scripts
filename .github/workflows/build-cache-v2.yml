@@ -80,14 +80,13 @@ jobs:
         run: |
 
           # default values
-          echo ::set-output name=runner::$(echo 'X64') || true
+          
           echo ::set-output name=release::$(echo '[""]' | jq) || true
           
           echo ::set-output name=variant::$(echo '[""]' | jq) || true
-          echo ::set-output name=desktop::$(echo '[""]' | jq) || true
-          echo ::set-output name=appgroup::$(echo '[""]' | jq) || true
+          
       
-          CHUNK=${{ inputs.variant }}
+          CHUNK=${{ inputs.variant }} # desktop uefi-x86
           VAR=$(echo $CHUNK | cut -d":" -f1)
           ARC=$(echo $CHUNK | cut -d":" -f2)
           echo ::set-output name=board::$(echo $ARC) || true
@@ -96,33 +95,20 @@ jobs:
 
           echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|bullseye/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
 
-          if [[ $VAR == desktop* ]]; then 
+          echo ::set-output name=desktop::$(echo 'none' | jq) || true
+          echo ::set-output name=appgroup::$(echo 'none' | jq) || true
+          if [[ $VAR == desktop* ]]; then
           echo ::set-output name=desktop::$(for x in $(grep -rw build/config/desktop/*/environments/*/support -e 'supported'  | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo ::set-output name=appgroup::$(for x in $(seq -w 01 03); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
-          #if [[ $VAR == cli* ]]; then 
-          echo ::set-output name=variant::$(for x in $(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          #else
-          #echo ::set-output name=variant::$(for x in $(echo "na"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          #fi
+          # passing minimal, server or desktop
+          echo ::set-output name=variant::$(for x in $(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true          
           
-          #[[ $VAR == cli* ]] && echo ::set-output name=desktop::$(echo '[]' | jq) || true
-          #$if [[ $ARC == arm* ]] && echo ::set-output name=runner::$(echo '["ARM64" , "X64","ubuntu-latest"]' | jq) || true
-          #if [[ $ARC == x86 ]] && echo ::set-output name=runner::$(echo '["X64","ubuntu-latest"]' | jq) || true
-          
-          
-          #MATRIX="seq -w 01 10"
-          #echo ::set-output name=release::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
-          #echo ::set-output name=variant::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
-          #[[ $BOARD == cli* ]] && echo ::set-output name=variant::$(echo '["minimal","server"]' | jq) || true
-          #runners=("small" "ubuntu-latest" "big")
-          #selectedrunner=$(printf "%s\n" "${runners[@]}" | shuf -n1)
-          #echo ::set-output name=runner::$(for x in $(echo $selectedrunner); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          
-          # Let's choose runners wisely          
-          [[ $VAR != desktop && $ARC == *arm* ]]                                         && echo ::set-output name=runner::$(echo 'ARM64')         || true
-          [[ $VAR == desktop ]]                                      && echo ::set-output name=runner::$(echo 'small')         || true
+          # Let's choose runners wisely
+          echo ::set-output name=runner::$(echo 'X64') || true # default
+          [[ $VAR != desktop && $ARC == *arm* ]] && echo ::set-output name=runner::$(echo 'ARM64') || true
+          [[ $VAR == desktop ]]  && echo ::set-output name=runner::$(echo 'small') || true
           [[ $ARC == uefi-x86 ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
 
   image:
