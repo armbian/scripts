@@ -234,13 +234,13 @@ jobs:
           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
           BUILD_DESKTOP="$BUILD_DESKTOP" \
           BUILD_MINIMAL="$BUILD_MINIMAL" \
-          DESKTOP_ENVIRONMENT="${{ matrix.desktop }}" \
+          DESKTOP_ENVIRONMENT="$DESKTOP_ENVIRONMENT" \
           KERNEL_CONFIGURE="no" \
           BOARD="${{ needs.Prepare.outputs.board }}" \
           OFFLINE_WORK="yes" \
-          LOG_SUBPATH="debug/$BOARD" \
+          LOG_SUBPATH="debug/${{ needs.Prepare.outputs.board }}" \
           BRANCH="current" \
-          MAKE_FOLDERS="$MAKE_FOLDERS" \
+          MAKE_FOLDERS="yes" \
           FORCED_MONTH_OFFSET="${FORCED_MONTH_OFFSET}" \
           IMAGE_PRESENT="no" \
           BUILD_ALL="yes" \
