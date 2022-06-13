@@ -225,7 +225,7 @@ jobs:
           ./compile.sh docker \
           GPG_PASS="${{ secrets.GPG_PASSPHRASE1 }}" \
           BETA="no" \
-          ROOT_FS_CREATE_ONLY="force" \
+          ROOT_FS_CREATE_ONLY="yes" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
