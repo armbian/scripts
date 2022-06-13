@@ -246,7 +246,8 @@ jobs:
           REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes" \
-          JUST_INIT="yes" # TEMP TEMP TEMP
+          NO_APT_CACHER="no"
+
 
       - name: Unmount folders
         run: |
