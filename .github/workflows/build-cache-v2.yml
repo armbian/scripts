@@ -165,7 +165,7 @@ jobs:
           workdir: build
           git-user-signingkey: true
 
-      - name: Install SSH key for storage        
+      - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
         with:
         
@@ -226,7 +226,7 @@ jobs:
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           ./compile.sh docker \
           BETA="no" \
-          ROOT_FS_CREATE_ONLY="yes" \
+          ROOT_FS_CREATE_ONLY="force" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
