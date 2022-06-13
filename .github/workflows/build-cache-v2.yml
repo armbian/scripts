@@ -79,13 +79,6 @@ jobs:
         id: list_dirs
         run: |
 
-          # default values
-          
-          echo ::set-output name=release::$(echo '[""]' | jq) || true
-          
-          echo ::set-output name=variant::$(echo '[""]' | jq) || true
-          
-      
           CHUNK=${{ inputs.variant }} # desktop uefi-x86
           VAR=$(echo $CHUNK | cut -d":" -f1)
           ARC=$(echo $CHUNK | cut -d":" -f2)
@@ -95,8 +88,12 @@ jobs:
 
           echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|bullseye/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
 
-          echo ::set-output name=desktop::$(echo 'none' ) || true
-          echo ::set-output name=appgroup::$(echo 'none' ) || true
+          #echo ::set-output name=desktop::$(echo 'none' ) || true
+          #echo ::set-output name=appgroup::$(echo 'none' ) || true
+          
+          echo ::set-output name=desktop::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=appgroup::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          
           if [[ $VAR == desktop* ]]; then
           echo ::set-output name=desktop::$(for x in $(grep -rw build/config/desktop/*/environments/*/support -e 'supported'  | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo ::set-output name=appgroup::$(for x in $(seq -w 01 03); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
@@ -188,6 +185,12 @@ jobs:
       - name: Generate rootfs
         run: |
 
+          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
+             CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"
+             else
+             CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
+          fi
+
           DESKTOP_APPGROUPS=${{ matrix.appgroup }}
           case "$DESKTOP_APPGROUPS" in
           "01")
@@ -238,10 +241,8 @@ jobs:
           IMAGE_PRESENT="no" \
           BUILD_ALL="yes" \
           USE_TORRENT="no" \
-          CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu" \
+          CUSTOM_UBUNTU_MIRROR="${CUSTOM_UBUNTU_MIRROR}" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
-          ARMBIAN_CACHE_TOOLCHAIN_PATH="${ARMBIAN_CACHE_TOOLCHAIN_PATH}" \
-          ARMBIAN_CACHE_ROOTFS_PATH="${ARMBIAN_CACHE_ROOTFS_PATH}" \
           REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes" \
