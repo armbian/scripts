@@ -221,7 +221,7 @@ jobs:
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           GPG_PASS="${{ secrets.GPG_PASSPHRASE1 }}" ./compile.sh docker \
           BETA="no" \
-          ROOT_FS_CREATE_ONLY="yes" \
+          ROOT_FS_CREATE_ONLY="force" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
@@ -243,7 +243,7 @@ jobs:
           USE_TORRENT="no" \
           CUSTOM_UBUNTU_MIRROR="${CUSTOM_UBUNTU_MIRROR}" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
-          REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-config,armbian-firmware" \
+          REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-desktop,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes" \
           NO_APT_CACHER="no"
