@@ -213,6 +213,8 @@ jobs:
           ;;
           esac
 
+          echo $HOME
+
           cd build
           BUILD_DESKTOP="no"
           BUILD_MINIMAL="no"
