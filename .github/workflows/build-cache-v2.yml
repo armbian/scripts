@@ -86,7 +86,7 @@ jobs:
           
           echo "$VAR $ARC"
 
-          echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|bullseye/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
 
           #echo ::set-output name=desktop::$(echo 'none' ) || true
           #echo ::set-output name=appgroup::$(echo 'none' ) || true
@@ -96,6 +96,9 @@ jobs:
           
           if [[ $VAR == desktop* ]]; then
           echo ::set-output name=desktop::$(for x in $(grep -rw build/config/desktop/*/environments/*/support -e 'supported'  | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+              if [[ $ARC == tinkerboard ]]
+              echo ::set-output name=desktop::$(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+              fi
           echo ::set-output name=appgroup::$(for x in $(seq -w 01 03); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           fi
           
