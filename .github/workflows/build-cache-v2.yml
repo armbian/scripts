@@ -233,17 +233,6 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
-      - name: Upload
-        uses: ncipollo/release-action@v1
-        if: ${{ github.repository_owner == 'Armbian' }}
-        with:
-          artifacts: "build/cache/rootfs/*"
-          tag: "_rootfs"
-          omitBody: true
-          omitName: true
-          allowUpdates: true
-          token: ${{ secrets.CR_PAT }}
-
       - name: Signing
         run: |
 
@@ -257,12 +246,26 @@ jobs:
          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback $FILE
          buildtorrent -q -s -m "$WEBSEEDS" --announce="$ANNOUNCE" --announcelist="$TRACKERS" $FILE -c "Armbian rootfs cache" $FILE.torrent >/dev/null
 
+      - name: Upload
+        uses: ncipollo/release-action@v1
+        if: ${{ github.repository_owner == 'Armbian' }}
+        with:
+          repo: "mirror"
+          artifacts: "build/cache/rootfs/*"
+          tag: "_rootfs"
+          omitBody: true
+          omitName: true
+          allowUpdates: true
+          token: ${{ secrets.CR_PAT }}
+
       - name: Sync
+        if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
           rsync -av --progress build/cache/rootfs/* build/cache/rootfs.upload
 
       - name: Unmount folders
+        if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
