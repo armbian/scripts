@@ -243,7 +243,7 @@ jobs:
          WEBSEEDS="--webseeds=https://github.com/armbian/mirror/releases/download/_rootfs/"
          cd build/cache/rootfs
          FILE=$(ls -1 *.lz4 | head -1)
-         echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback $FILE
+         echo ${{ secrets.GPG_PASSPHRASE1 }} | sudo --preserve-env gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback $FILE
          buildtorrent -q -s -m "$WEBSEEDS" --announce="$ANNOUNCE" --announcelist="$TRACKERS" $FILE -c "Armbian rootfs cache" $FILE.torrent >/dev/null
 
       - name: Upload
