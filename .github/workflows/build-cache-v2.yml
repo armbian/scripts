@@ -104,6 +104,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: armbian/build
+          fetch-depth: 1
           path: build
           clean: false
 
@@ -111,7 +112,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: armbian/scripts
+          fetch-depth: 1
           path: scripts
+          clean: false
+
+      - name: Checkout tracker lists
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          repository: ngosang/trackerslist
+          path: trackerslist
           clean: false
 
       - name: Copy templates
@@ -152,8 +162,8 @@ jobs:
           sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/          
-          sudo mkdir -p build/cache/rootfs || true
-          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other
+          sudo mkdir -p build/cache/rootfs.upload || true
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other
           sudo df
 
       - name: Generate rootfs
@@ -197,7 +207,7 @@ jobs:
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           ./compile.sh docker \
           BETA="no" \
-          ROOT_FS_CREATE_ONLY="force" \
+          ROOT_FS_CREATE_ONLY="yes" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
@@ -223,7 +233,36 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
+      - name: Upload
+        uses: ncipollo/release-action@v1
+        if: ${{ github.repository_owner == 'Armbian' }}
+        with:
+          artifacts: "build/cache/rootfs/*"
+          tag: "_rootfs"
+          omitBody: true
+          omitName: true
+          allowUpdates: true
+          token: ${{ secrets.CR_PAT }}
+
+      - name: Signing
+        run: |
+
+         sudo apt-get -y -qq install parallel buildtorrent
+
+         ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | head -1)ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
+         TRACKERS=$(cat trackerslist/trackers_all.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
+         WEBSEEDS="--webseeds https://github.com/armbian/mirror/releases/download/_rootfs/"
+         FILE=$(ls -1 *.lz4 | head -1)         
+         cd build/cache/rootfs
+         echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback $FILE
+         buildtorrent -q -s -m "$WEBSEEDS" --announce="$ANNOUNCE" --announcelist="$TRACKERS" $FILE -c "Armbian rootfs cache" $FILE.torrent >/dev/null
+
+      - name: Sync
+        run: |
+
+          rsync -av --progress build/cache/rootfs/* build/cache/rootfs.upload
+
       - name: Unmount folders
         run: |
 
-          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
+          sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
