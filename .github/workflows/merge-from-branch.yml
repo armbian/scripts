@@ -26,6 +26,8 @@ jobs:
 
     steps:
 
+      - uses: igorpecovnik/freespace@main
+
       - name: Clean temporally folders
         run: |
 
