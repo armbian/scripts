@@ -241,7 +241,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
-          rsync -av --progress build/cache/rootfs/* build/cache/rootfs.upload
+          sudo rsync -av --progress build/cache/rootfs/* build/cache/rootfs.upload
 
       - name: Unmount folders
         if: ${{ github.repository_owner == 'Armbian' }}
