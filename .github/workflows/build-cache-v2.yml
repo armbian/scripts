@@ -221,10 +221,7 @@ jobs:
           KERNEL_CONFIGURE="no" \
           BOARD="${{ needs.Prepare.outputs.board }}" \
           OFFLINE_WORK="yes" \
-          LOG_SUBPATH="debug/${{ needs.Prepare.outputs.board }}" \
           BRANCH="current" \
-          MAKE_FOLDERS="yes" \
-          FORCED_MONTH_OFFSET="${FORCED_MONTH_OFFSET}" \   
           USE_TORRENT="yes" \
           CUSTOM_UBUNTU_MIRROR="${CUSTOM_UBUNTU_MIRROR}" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
