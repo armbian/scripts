@@ -224,7 +224,7 @@ jobs:
           LOG_SUBPATH="debug/${{ needs.Prepare.outputs.board }}" \
           BRANCH="current" \
           MAKE_FOLDERS="yes" \
-          FORCED_MONTH_OFFSET="${FORCED_MONTH_OFFSET}" \
+          FORCED_MONTH_OFFSET="${FORCED_MONTH_OFFSET}" \   
           IMAGE_PRESENT="no" \
           BUILD_ALL="yes" \
           USE_TORRENT="yes" \
@@ -250,7 +250,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
-          sudo rsync -av --progress build/cache/rootfs/* build/cache/rootfs.upload
+          sudo rsync -ahv --no-o --no-g --no-perms --progress build/cache/rootfs/* build/cache/rootfs.upload
 
       - name: Unmount folders
         if: ${{ github.repository_owner == 'Armbian' }}
