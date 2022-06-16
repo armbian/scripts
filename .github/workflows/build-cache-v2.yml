@@ -151,6 +151,7 @@ jobs:
       - name: Mount upload folders
         run: |
 
+          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
           sudo apt-get -y -qq install sshfs
           sudo mkdir -p build/cache/rootfs.upload || true
