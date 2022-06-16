@@ -230,6 +230,8 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
+          df
+
       - name: Upload
         uses: ncipollo/release-action@v1
         if: ${{ github.repository_owner == 'Armbian' }}
