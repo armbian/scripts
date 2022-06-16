@@ -82,7 +82,8 @@ jobs:
           echo ::set-output name=runner::$(echo 'ubuntu-latest') || true # default
           #[[ $VAR != desktop && $ARC == *arm* ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
           #[[ $VAR == desktop ]]  && echo ::set-output name=runner::$(echo 'small') || true
-          [[ $ARC == uefi-arm64 ]] && echo ::set-output name=runner::$(echo 'small') || true
+          runner=("small" "small" "ubuntu-latest")
+          [[ $VAR == desktop && $ARC == uefi-arm64 ]] && echo ::set-output name=runner::$(printf "%s\n" "${runner[@]}" | shuf -n1) || true
 
   image:
   
@@ -208,7 +209,7 @@ jobs:
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           ./compile.sh docker \
           BETA="no" \
-          ROOT_FS_CREATE_ONLY="force" \
+          ROOT_FS_CREATE_ONLY="yes" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
