@@ -82,7 +82,7 @@ jobs:
           echo ::set-output name=runner::$(echo 'ubuntu-latest') || true # default
           #[[ $VAR != desktop && $ARC == *arm* ]] && echo ::set-output name=runner::$(echo 'ubuntu-latest') || true
           #[[ $VAR == desktop ]]  && echo ::set-output name=runner::$(echo 'small') || true
-          [[ $ARC == uefi-x86 ]] && echo ::set-output name=runner::$(echo 'small') || true
+          [[ $ARC == uefi-arm64 ]] && echo ::set-output name=runner::$(echo 'small') || true
 
   image:
   
