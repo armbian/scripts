@@ -225,8 +225,6 @@ jobs:
           BRANCH="current" \
           MAKE_FOLDERS="yes" \
           FORCED_MONTH_OFFSET="${FORCED_MONTH_OFFSET}" \   
-          IMAGE_PRESENT="no" \
-          BUILD_ALL="yes" \
           USE_TORRENT="yes" \
           CUSTOM_UBUNTU_MIRROR="${CUSTOM_UBUNTU_MIRROR}" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
