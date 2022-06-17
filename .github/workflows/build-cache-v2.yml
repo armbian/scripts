@@ -231,7 +231,9 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
-          df
+          df          
+          cd ..
+          ls -l build/cache/rootfs || true
 
       - name: Upload
         uses: ncipollo/release-action@v1
