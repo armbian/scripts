@@ -81,7 +81,7 @@ jobs:
                [[ ${BOARDFAMILY} == media && ${BRANCH} == legacy ]] && BOARDFAMILY=station-p2
                [[ ${BOARDFAMILY} == bcm2711 && ${BRANCH} == legacy ]] && continue
                
-               [[ -n "${KERNELSWITCHOBJ}" ]] && KERNELBRANCH=${KERNELSWITCHOBJ/=/:}
+               #[[ -n "${KERNELSWITCHOBJ}" ]] && KERNELBRANCH=${KERNELSWITCHOBJ/=/:}
                
                   ref_type=${KERNELBRANCH%%:*}
                   if [[ $ref_type == head ]]; then
