@@ -159,6 +159,7 @@ jobs:
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload || true
+          sudo mkdir -p build/cache/rootfs || true
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
               ls -l build/cache/rootfs/
               echo "Clean folder"
