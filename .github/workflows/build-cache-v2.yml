@@ -89,10 +89,10 @@ jobs:
   
     needs: Prepare
     strategy:
+      max-parallel: 4
       fail-fast: false
       matrix:
-
-        max-parallel: 4
+       
         release: ${{fromJson(needs.Prepare.outputs.release)}}
         variant: ${{fromJson(needs.Prepare.outputs.variant)}}
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
