@@ -160,6 +160,9 @@ jobs:
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload || true
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
+              ls -l build/cache/rootfs/
+              echo "Clean folder"
+              sudo rm -rf build/cache/rootfs/*
               echo "Mounting NFS share"
               sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
           else
@@ -167,7 +170,7 @@ jobs:
               sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
           fi
           # remove true when all runners are on jammy
-          sudo df
+          sudo df          
 
       - name: Generate rootfs
         run: |
