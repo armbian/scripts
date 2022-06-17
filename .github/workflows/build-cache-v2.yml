@@ -245,6 +245,7 @@ jobs:
         with:
           repo: "mirror"
           artifacts: "build/cache/rootfs/*"
+          artifactErrorsFailBuild: true
           tag: "_rootfs"
           omitBody: true
           omitName: true
