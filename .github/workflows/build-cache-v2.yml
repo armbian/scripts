@@ -163,7 +163,7 @@ jobs:
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
               ls -l build/cache/rootfs/
               echo "Clean folder"
-              sudo rm -rf build/cache/rootfs/*
+              sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
               echo "Mounting NFS share"
               sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
           else
