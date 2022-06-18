@@ -45,7 +45,6 @@ jobs:
           path: build
           ref: master
           fetch-depth: 0
-          clean: true
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5
