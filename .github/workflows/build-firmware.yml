@@ -149,7 +149,7 @@ jobs:
           USE_MAINLINE_GOOGLE_MIRROR="yes"
 
       - name: Upload artefacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: firmware-zsh-armbian-config
           path: build/output/debs-beta/*.deb

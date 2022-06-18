@@ -234,7 +234,7 @@ jobs:
 
       - name: Upload hash      
         if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: hash
           if-no-files-found: ignore
@@ -242,7 +242,7 @@ jobs:
 
       - name: Upload build artifacts
         if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' && github.event_name == 'pull_request' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.FILE_NAME }}
           path: build/output/debs-beta/linux-*${{ env.FILE_NAME }}*

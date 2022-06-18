@@ -249,7 +249,7 @@ jobs:
 
       - name: upload artefacts
         if: ${{ inputs.uploading == true }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: u-boot-${{ env.BOARD }}-${{ env.BRANCH }}
           path: |

@@ -117,13 +117,13 @@ jobs:
           tar cvfz ../${PKG_NAME}.tar.gz . 
 
       - name: Upload deb as artifact ${{ matrix.node }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: deb
           path: output/*.deb
 
       - name: Upload tarball as artifact ${{ matrix.node }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: tar
           path: output/*.tar.gz
