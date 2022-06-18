@@ -37,7 +37,7 @@ on:
         required: true
       SCRIPTS_ACCESS_TOKEN:
         required: true
-      SSH_KEY_TORRENTS: 
+      SSH_KEY_TORRENTS:
         required: true
       KNOWN_HOSTS_UPLOAD:
         required: true
@@ -106,7 +106,7 @@ jobs:
           fi
 
   image:
-  
+
     needs: Prepare
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
@@ -123,14 +123,14 @@ jobs:
           SOURCEREPO=${{ inputs.sourcerepo }}
           echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
           echo ${{needs.Prepare.outputs.runner}}
-          
+
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           repository: armbian/build
           path: build
-          ref: ${{ env.REPO }} 
+          ref: ${{ env.REPO }}
           clean: false
 
       - name: Checkout support scripts
@@ -154,7 +154,7 @@ jobs:
         run: |
 
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
+          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
           sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
@@ -162,17 +162,17 @@ jobs:
 
         uses: crazy-max/ghaction-import-gpg@v5
         with:
-          gpg-private-key: ${{ secrets.GPG_KEY1 }}
+          gpg_private_key: ${{ secrets.GPG_KEY1 }}
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
           workdir: scripts
           git-user-signingkey: true
           git-commit-gpgsign: true
-        
+
       - name: Assemble
         run: |
 
           cd build
-         
+
           var="${{ inputs.variant }}"
           RC="no"
           if [[ "$var" != *beta ]]; then
@@ -214,7 +214,7 @@ jobs:
           [[ ${BUILD_TARGET} == "minimal" ]] && BUILD_MINIMAL="yes"
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes
 
-          sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
+          sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf
           ./compile.sh docker \
           BETA="${BETA}" \
           RELEASE="${RELEASE}" \
@@ -240,7 +240,7 @@ jobs:
           REPOSITORY_INSTALL="$REPOSITORY_INSTALL" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
-          
+
           sudo chown -R $USER.$USER output/images/$BOARD 2> /dev/null || true
           sudo chmod 644 output/images/$BOARD/*/*.xz  2> /dev/null || true
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes output/images/$BOARD/$MAKE_FOLDERS/*.img.xz
@@ -263,10 +263,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to server
-        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.choice == 'stable'  && github.event.inputs.choice == 'rc' }}        
+        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.choice == 'stable'  && github.event.inputs.choice == 'rc' }}
         run: |
           ls -l build/output/images/*/*/
-          sudo apt-get -y -qq install lftp          
+          sudo apt-get -y -qq install lftp
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
 
       - name: Upload artefacts

@@ -153,7 +153,7 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
-        with:          
+        with:
           path: repository
           ref: repository
 
@@ -167,17 +167,17 @@ jobs:
       - name: Configure git identity
         working-directory: repository
         run: |
-        
+
           echo "Testing signing" | gpg --sign --armor
-          
+
           gpg -K
           echo "#"
           git config user.name github-actions
           git config user.email github-actions@github.com
 
       - name: Deploy packages
-        run: |        
-       
+        run: |
+
           PACKAGES_DIR="$(pwd)"/output
           REPO_DIR="$(pwd)"/repository
 
