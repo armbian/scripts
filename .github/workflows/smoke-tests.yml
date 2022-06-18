@@ -75,7 +75,7 @@ jobs:
           - ip: "10.0.30.198" 
             name: "Odroid XU4"
             power-socket: 66
-          - ip: "10.0.30.117" 
+          - ip: "10.0.30.183" 
             name: "Rockpi 4B"
             power-socket: ""
           - ip: "10.0.30.119" 
