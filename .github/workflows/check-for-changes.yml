@@ -132,7 +132,7 @@ jobs:
           echo "${MATRIX}" |sed '/^$/d' > changes
           
       - name: Upload changes
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: changes
           name: changes
