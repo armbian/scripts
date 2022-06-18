@@ -46,6 +46,7 @@ jobs:
 
   Prepare:
 
+    if: ${{ github.repository_owner == 'Armbian' }}
     name: targets
     runs-on: small
     outputs:
@@ -83,10 +84,10 @@ jobs:
       - name: Prepare matrix
         id: list_dirs
         run: |
+
           var="${{ inputs.variant }}"
           if [[ "$var" != *beta ]]; then
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
-            #FILENAME="targets.conf | grep \"yes\|adv\""
           else
             FILENAME="targets-${var%:*}-beta.conf"
           fi
@@ -175,11 +176,9 @@ jobs:
           var="${{ inputs.variant }}"
           RC="no"
           if [[ "$var" != *beta ]]; then
-            #FILENAME="targets.conf | grep \"yes\|adv\""
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             MAKE_FOLDERS=archive
             OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
-            #sudo git checkout master              
             sudo cp ../scripts/VERSION .
             sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
             # we use nightly repository, but change back to stable right before closing image

@@ -45,7 +45,7 @@ jobs:
           sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-          sudo chown -R $USER:$USER build || true
+          sudo chown -R $USER:$USER build/.tmp || true
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
