@@ -36,7 +36,7 @@ jobs:
           sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-          sudo chown -R $USER:$USER build || true
+          sudo chown -R $USER:$USER build/.git || true
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
@@ -48,7 +48,7 @@ jobs:
           clean: true
 
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v3
+        uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg-private-key: ${{ secrets.GPG_KEY2 }}
           passphrase: ${{ secrets.GPG_PASSPHRASE2 }}
@@ -59,6 +59,7 @@ jobs:
       - name: Merge master into nightly
 
         run: |
+
           cd build
           git config --global user.email "info@armbian.com"
           git config --global user.name "Armbianworker"

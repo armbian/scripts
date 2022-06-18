@@ -117,13 +117,13 @@ jobs:
           tar cvfz ../${PKG_NAME}.tar.gz . 
 
       - name: Upload deb as artifact ${{ matrix.node }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: deb
           path: output/*.deb
 
       - name: Upload tarball as artifact ${{ matrix.node }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: tar
           path: output/*.tar.gz
@@ -139,13 +139,13 @@ jobs:
           echo 'man-db man-db/auto-update boolean false' | sudo debconf-set-selections
           sudo apt-get -q -y install reprepro
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         name: Download deb artifacts
         with:
           name: deb
           path: output
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         name: Download tarball artifacts
         with:
           name: tar
@@ -159,7 +159,7 @@ jobs:
 
       - name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v4.3.0
+        uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}

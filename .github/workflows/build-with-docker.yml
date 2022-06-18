@@ -46,6 +46,7 @@ jobs:
 
   Prepare:
 
+    if: ${{ github.repository_owner == 'Armbian' }}
     name: targets
     runs-on: small
     outputs:
@@ -76,17 +77,17 @@ jobs:
           sudo rm -rf changes 2>/dev/null || true
 
       - name: Download changes
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: changes
 
       - name: Prepare matrix
         id: list_dirs
         run: |
+
           var="${{ inputs.variant }}"
           if [[ "$var" != *beta ]]; then
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
-            #FILENAME="targets.conf | grep \"yes\|adv\""
           else
             FILENAME="targets-${var%:*}-beta.conf"
           fi
@@ -159,7 +160,7 @@ jobs:
 
       - name: Import GPG key
 
-        uses: crazy-max/ghaction-import-gpg@v3
+        uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg-private-key: ${{ secrets.GPG_KEY1 }}
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
@@ -175,11 +176,9 @@ jobs:
           var="${{ inputs.variant }}"
           RC="no"
           if [[ "$var" != *beta ]]; then
-            #FILENAME="targets.conf | grep \"yes\|adv\""
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             MAKE_FOLDERS=archive
             OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
-            #sudo git checkout master              
             sudo cp ../scripts/VERSION .
             sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
             # we use nightly repository, but change back to stable right before closing image

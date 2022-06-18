@@ -19,10 +19,11 @@ jobs:
 
     steps:
 
+      # we are comparing hash on subdirs so we need full clone
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0 
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
@@ -131,7 +132,7 @@ jobs:
           echo "${MATRIX}" |sed '/^$/d' > changes
           
       - name: Upload changes
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: changes
           name: changes

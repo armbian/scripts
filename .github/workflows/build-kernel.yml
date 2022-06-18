@@ -45,7 +45,7 @@ jobs:
           sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-          sudo chown -R $USER:$USER build || true
+          sudo chown -R $USER:$USER build/.tmp || true
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
@@ -70,7 +70,7 @@ jobs:
           sudo rm -rf changes 2>/dev/null || true
 
       - name: Download changes
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: changes
 
@@ -234,7 +234,7 @@ jobs:
 
       - name: Upload hash      
         if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: hash
           if-no-files-found: ignore
@@ -242,7 +242,7 @@ jobs:
 
       - name: Upload build artifacts
         if: ${{ env.UPLOAD == 'true' && inputs.uploading == 'true' && env.FILE_HASH != '' && github.event_name == 'pull_request' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.FILE_NAME }}
           path: build/output/debs-beta/linux-*${{ env.FILE_NAME }}*
