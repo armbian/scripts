@@ -37,7 +37,7 @@ jobs:
           fi
           sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
           sudo mountpoint -q build/output/tmp && sudo fusermount -u build/output/tmp || true
-          sudo chown -R $USER:$USER build/.
+          sudo chown -R $USER:$USER build/.git
 
       - name: Download changes
         if: ${{ inputs.checking }}
@@ -154,7 +154,7 @@ jobs:
           sudo rm *.txt 2>/dev/null || true
           sudo rm -rf cache/sources/ || true
           sudo rm -rf output/ || true          
-          sudo chown -R $USER:$USER build || true
+          sudo chown -R $USER:$USER build/.git || true
           # rm $HOME/.ssh/known_hosts
           
           # mount all back

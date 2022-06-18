@@ -2,7 +2,6 @@ name: Update Repository
 
 on:
   workflow_dispatch:
-
   workflow_call:
     inputs:
       KEY_ID:
@@ -42,7 +41,7 @@ jobs:
           [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
 
       - name: Install SSH key for repository
-        if: ${{ env.SKIP != 'yes' }}
+        if: ${{ github.repository_owner == 'Armbian' && env.SKIP != 'yes' }}
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_REPOSITORY }}
@@ -51,5 +50,5 @@ jobs:
           if_key_exists: replace
 
       - name: Update repository
-        if: ${{ env.SKIP != 'yes' }}
+        if: ${{ github.repository_owner == 'Armbian' && env.SKIP != 'yes' }}
         run: ssh -T -i ~/.ssh/${{ inputs.KEY_ID }} ${{ secrets.USER_REPOSITORY }}@${{ secrets.HOST_REPOSITORY }}
