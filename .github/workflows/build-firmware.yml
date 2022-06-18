@@ -31,6 +31,8 @@ jobs:
     runs-on: ${{ inputs.runner }}    
     steps:
 
+      - uses: igorpecovnik/freespace@main
+
       - name: Clean temporally folders
         run: |
           sudo rm -rf build/.tmp 2>/dev/null || true
@@ -62,39 +64,32 @@ jobs:
           path: scripts
           clean: false
 
-      - name: Install SSH key for storage
+      - name: Remove previous artefacts if any
+        run: |
+
+          sudo rm -rf changes 2>/dev/null || true
+
+      - name: Download changes
+        uses: actions/download-artifact@v3
+        with:
+          name: changes
+
+      - name: Read changes
         if: ${{ inputs.uploading == 'true' }}
+        run: |
+
+          [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
+
+      - name: Install SSH key for storage
+        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
-      - name: Fix permissions
-        run: |
-
-          # make sure no temporally dirs are mounted from previous runs
-          while :
-          do
-              sudo pkill compile.sh || true
-              sudo pkill arm-binfmt-P || true
-              sudo pkill aarch64-binfmt-P || true
-              sudo pkill pixz || true
-              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-              sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-              sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
-              echo "Mounted temp directories. Trying to unmount."
-              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
-              sudo rm -f build/cache/hash/*
-              sudo rm -f build/cache/hash-beta/*
-              sleep 10
-          done
-          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
-          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
-
       - name: Mount upload folders
-        if: ${{ inputs.uploading == 'true' }}
+        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
         run: |
 
           # use this only on our runners
@@ -110,6 +105,7 @@ jobs:
           fi
 
       - name: Sync
+        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
         run: |
 
           sudo mkdir -p build/userpatches build/cache/hash build/cache/hash-beta
@@ -118,6 +114,7 @@ jobs:
           sudo rm -r build/cache/hash/* build/cache/hash-beta/* 2> /dev/null || true
 
       - name: Pull Docker image
+        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
         run: |
 
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
@@ -126,6 +123,7 @@ jobs:
           sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
 
       - name: Build test image
+        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
         run: |
 
           mkdir -p build/userpatches
@@ -149,6 +147,7 @@ jobs:
           USE_MAINLINE_GOOGLE_MIRROR="yes"
 
       - name: Upload artefacts
+        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
         uses: actions/upload-artifact@v3
         with:
           name: firmware-zsh-armbian-config
@@ -157,7 +156,7 @@ jobs:
           retention-days: 7
 
       - name: Unmount folders
-
+        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
         run: |
 
             sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
