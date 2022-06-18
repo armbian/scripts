@@ -10,6 +10,7 @@ on:
 
 jobs:
   clean-logs:
+    if: ${{ github.repository_owner == 'Armbian' }}
     runs-on: ubuntu-latest
     steps:
       - uses: igorjs/gh-actions-clean-workflow@v1
