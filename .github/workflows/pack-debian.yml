@@ -139,13 +139,13 @@ jobs:
           echo 'man-db man-db/auto-update boolean false' | sudo debconf-set-selections
           sudo apt-get -q -y install reprepro
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         name: Download deb artifacts
         with:
           name: deb
           path: output
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         name: Download tarball artifacts
         with:
           name: tar
