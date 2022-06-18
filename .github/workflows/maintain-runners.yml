@@ -52,7 +52,7 @@ jobs:
           name: changes
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/build
@@ -161,7 +161,7 @@ jobs:
           sudo mount -a
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/build

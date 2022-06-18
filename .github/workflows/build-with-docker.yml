@@ -62,7 +62,7 @@ jobs:
           echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/build
@@ -124,7 +124,7 @@ jobs:
           echo ${{needs.Prepare.outputs.runner}}
           
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/build
@@ -133,7 +133,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: armbian/scripts

@@ -70,7 +70,7 @@ jobs:
 
       - name: Checkout repository
         if: ${{ env.SKIP != 'yes' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 100
           repository: armbian/build
@@ -80,7 +80,7 @@ jobs:
 
       - name: Checkout support scripts
         if: ${{ env.SKIP != 'yes' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 100
           repository: armbian/scripts
