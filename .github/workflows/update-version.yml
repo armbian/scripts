@@ -67,7 +67,7 @@ jobs:
 
       - name: Import GPG key
         if: ${{ github.repository_owner == 'Armbian' && env.SKIP != 'yes' }}
-        uses: crazy-max/ghaction-import-gpg@v3
+        uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg-private-key: ${{ secrets.GPG_KEY2 }}
           passphrase: ${{ secrets.GPG_PASSPHRASE2 }}
