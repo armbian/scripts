@@ -44,6 +44,7 @@ jobs:
           repository: armbian/build
           path: build
           ref: master
+          clean: false
           fetch-depth: 0
 
       - name: Import GPG key
