@@ -17,6 +17,10 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get -y -qq install parallel
+          
+      - name: Integrity test in parallel
+        run: |
+          sudo apt-get -y -qq install parallel
           sudo mkdir -p dl
           sudo mount nas:/tank/armbian/dl.armbian.com/ dl
           FILES=$(find dl -type f -name "*.xz")
