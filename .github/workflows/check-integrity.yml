@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get -y -qq install parallel
-          sudo mkdir dl
+          sudo mkdir -p dl
           sudo mount nas:/tank/armbian/dl.armbian.com/ dl
           FILES=$(find dl -type f -name "*.xz")
           for FILE in ${FILES[@]}
@@ -24,3 +24,4 @@ jobs:
           done | sudo --preserve-env parallel --jobs 18 '
               xz -t {}
           '
+          sudo umount dl
