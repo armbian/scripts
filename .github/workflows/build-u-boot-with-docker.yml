@@ -44,6 +44,12 @@ jobs:
 
       - uses: igorpecovnik/freespace@main
 
+      - name: "Read"
+        run: |
+        
+          INPUT_REFERENCE=${{ inputs.destref }}      
+          INPUT_REFERENCE=${INPUT_REFERENCE:-"nightly"}     
+
       - name: Clean temporally folders
         run: |
           sudo rm -rf build/.tmp 2>/dev/null || true
@@ -58,7 +64,7 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          ref: ${{ inputs.destref }}
+          ref: ${{ env.INPUT_REFERENCE }}
           fetch-depth: '100'
           clean: false
 
@@ -104,13 +110,19 @@ jobs:
           sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
           sudo chown -R $USER:$USER build/.git || true
 
+      - name: "Read"
+        run: |
+        
+          INPUT_REFERENCE=${{ inputs.destref }}      
+          INPUT_REFERENCE=${INPUT_REFERENCE:-"nightly"}   
+
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
         with:
           repository: armbian/build
           path: build
           fetch-depth: '100'
-          ref:  ${{ inputs.destref }}
+          ref:  ${{ env.INPUT_REFERENCE }}
           clean: false
 
       - name: Checkout support scripts
