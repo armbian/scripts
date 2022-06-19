@@ -5,9 +5,13 @@ on:
 
 jobs:
 
-  check:
+  Update:
+
+    name: Check images integrity
     runs-on: [fast, igor]
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
-      - run: |
+
+      - name: Install dependencies
+        run: |
           sudo apt-get -y -qq install parallel
