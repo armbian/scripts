@@ -117,7 +117,7 @@ jobs:
           - ip: "10.0.30.141" 
             name: "ZeroPi"
             power-socket: 1
-          - ip: "10.0.30.144" 
+          - ip: "10.0.30.199" 
             name: "Banana Pi M2U"
             power-socket: 4
           - ip: "10.0.30.101" 
