@@ -19,6 +19,8 @@ jobs:
 
     steps:
 
+      - uses: igorpecovnik/freespace@main
+
       # we are comparing hash on subdirs so we need full clone
       - name: Checkout repository
         uses: actions/checkout@v3
