@@ -15,3 +15,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get -y -qq install parallel
+          df
+          mkdir dl
+          mount nas:/tank/armbian/dl.armbian.com/ dl
+          df
