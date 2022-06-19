@@ -1,0 +1,13 @@
+name: Check images integrity
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  check:
+    runs-on: [fast, igor]
+    if: ${{ github.repository_owner == 'Armbian' }}
+    steps:
+      - run: |
+          sudo apt-get -y -qq install parallel
