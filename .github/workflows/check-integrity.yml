@@ -17,12 +17,15 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get -y -qq install parallel
-          
-      - name: Integrity test in parallel
+
+      - name: Mount test folders
         run: |
           sudo apt-get -y -qq install parallel
           sudo mkdir -p dl
           sudo mount nas:/tank/armbian/dl.armbian.com/ dl
+
+      - name: Integrity test in parallel
+        run: |
           FILES=$(find dl -type f -name "*.xz")
           for FILE in ${FILES[@]}
           do
