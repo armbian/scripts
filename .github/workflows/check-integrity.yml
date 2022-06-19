@@ -15,8 +15,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get -y -qq install parallel
-          df
-          pwd
-          mkdir dl
-          mount nas:/tank/armbian/dl.armbian.com/ dl
-          df
+          sudo mkdir dl
+          sudo mount nas:/tank/armbian/dl.armbian.com/ dl
+          FILES=$(find dl -type f -name "*.xz")
+          for FILE in ${FILES[@]}
+          do
+           echo "$FILE"
+          done | sudo --preserve-env parallel --jobs 18 '
+              xz -t {}
+          '
