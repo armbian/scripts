@@ -38,7 +38,7 @@ jobs:
             power-socket: 6
           - ip: "10.0.30.151" 
             name: "Espressobin"
-            power-socket: ""
+            power-socket: "203"
 #          - ip: "10.0.50.153"
 #            name: "Khadas EDGE"
 #            power-socket: ""
@@ -80,10 +80,10 @@ jobs:
             power-socket: ""
           - ip: "10.0.30.119" 
             name: "Tinkerboard"
-            power-socket: 14
+            power-socket: ""
           - ip: "10.0.30.203"
             name: "Orange Pi One+"
-            power-socket: 14
+            power-socket: ""
           - ip: "10.0.30.120" 
             name: "RockPro 64"
             power-socket: ""
@@ -104,13 +104,13 @@ jobs:
 #            power-socket: "14"
 #          - ip: "10.0.30.221"
 #            name: "NanoPC T4"
-#            power-socket: ""
+#            power-socket: "199"
           - ip: "10.0.30.130"
             name: "Le Potato"
             power-socket: ""
           - ip: "10.0.30.134" 
             name: "Cubox i2eX/i4"            
-            power-socket: 64
+            power-socket: 17
           - ip: "10.0.30.140" 
             name: "NanoPi Neo 2 Black"
             power-socket: 65
@@ -119,16 +119,16 @@ jobs:
             power-socket: 1
           - ip: "10.0.30.199" 
             name: "Banana Pi M2U"
-            power-socket: 4
+            power-socket: ""
           - ip: "10.0.30.101" 
             name: "Orange Pi R1"
             power-socket: ""
           - ip: "10.0.30.111" 
             name: "Orange Pi 4"
-            power-socket: "17"
+            power-socket: "64"
           - ip: "10.0.30.167" 
             name: "Cubietruck"
-            power-socket: 3
+            power-socket: ""
           - ip: "10.0.30.206" 
             name: "Cubieboard"
             power-socket: ""
@@ -158,7 +158,7 @@ jobs:
             power-socket: ""
           - ip: "10.0.30.254" 
             name: "Orange Pi Zero"  
-            power-socket: 6
+            power-socket: ""
           - ip: "10.0.30.146" 
             name: "Udoo Quad"  
             power-socket: 3
