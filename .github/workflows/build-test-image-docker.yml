@@ -68,14 +68,19 @@ jobs:
 #          echo "SKIP=yes" >> $GITHUB_ENV
 #          fi
 
+      - run: |
+
+          REFERENCE=${{ inputs.reference }}          
+          echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
+
       - name: Checkout repository
         if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 100
           repository: armbian/build
-          path: build
-          ref: ${{ inputs.reference }}
+          path: build          
+          ref:  ${{ env.REFERENCE }}
           clean: true
 
       - name: Checkout support scripts

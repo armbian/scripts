@@ -38,27 +38,17 @@ jobs:
 
       - uses: igorpecovnik/freespace@main
 
-      - name: "Read"
-        run: |
-        
-          INPUT_REFERENCE=${{ inputs.reference }}      
-          INPUT_REFERENCE=${INPUT_REFERENCE:-"nightly"}     
+      - run: |
 
-      - name: Clean temporally folders
-        run: |
-          sudo rm -rf build/.tmp 2>/dev/null || true
-          sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-          sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
-          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-          sudo chown -R $USER:$USER build/.tmp || true
+          REFERENCE=${{ inputs.reference }}          
+          echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
         with:
           repository: armbian/build
           path: build
-          ref:  ${{ env.INPUT_REFERENCE }}
+          ref:  ${{ env.REFERENCE }}
           fetch-depth: 0
           clean: false
 
@@ -100,14 +90,10 @@ jobs:
 
       - uses: igorpecovnik/freespace@main
 
-      - name: Clean temporally folders
-        run: |
-          sudo rm -rf build/.tmp 2>/dev/null || true
-          sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-          sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-          sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
-          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-          sudo chown -R $USER:$USER build || true
+      - run: |
+
+          REFERENCE=${{ inputs.reference }}          
+          echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
 
       - name: "Read"
         run: |
@@ -121,7 +107,7 @@ jobs:
           repository: armbian/build
           path: build
           fetch-depth: 0
-          ref:  ${{ env.INPUT_REFERENCE }}
+          ref:  ${{ env.REFERENCE }}
           clean: false
           
       - name: Checkout support scripts
@@ -139,29 +125,6 @@ jobs:
           key: ${{ secrets.KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
-
-      - name: Fix permissions
-        run: |
-
-          # make sure no temporally dirs are mounted from previous runs
-          while :
-          do
-              sudo pkill compile.sh || true
-              sudo pkill arm-binfmt-P || true
-              sudo pkill aarch64-binfmt-P || true
-              sudo pkill pixz || true
-              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-              sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-              sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
-              echo "Mounted temp directories. Trying to unmount."
-              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
-              sudo rm -f build/cache/hash/*
-              sudo rm -f build/cache/hash-beta/*
-              sleep 10
-          done
-          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
-          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
 
       - name: Mount upload folders
         if: ${{ inputs.uploading == 'true' }}
