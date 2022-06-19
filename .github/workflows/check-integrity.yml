@@ -12,6 +12,8 @@ jobs:
     if: ${{ github.repository_owner == 'Armbian' }}
     steps:
 
+      - uses: igorpecovnik/freespace@main
+
       - name: Install dependencies
         run: |
           sudo apt-get -y -qq install parallel
