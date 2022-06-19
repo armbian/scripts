@@ -16,6 +16,7 @@ jobs:
         run: |
           sudo apt-get -y -qq install parallel
           df
+          pwd
           mkdir dl
           mount nas:/tank/armbian/dl.armbian.com/ dl
           df
