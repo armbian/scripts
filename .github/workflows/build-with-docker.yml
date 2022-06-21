@@ -86,10 +86,10 @@ jobs:
         run: |
 
           var="${{ inputs.variant }}"
-          if [[ "$var" != *beta ]]; then
-            FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
+          if [[ "$var" == *stable || "$var" == *rc ]]; then
+              FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
           else
-            FILENAME="targets-${var%:*}-beta.conf"
+              FILENAME="targets-${var%:*}-beta.conf"
           fi
 
           # if we want to split more
@@ -190,7 +190,7 @@ jobs:
 
           var="${{ inputs.variant }}"
           RC="no"
-          if [[ "$var" != *beta ]]; then
+          if [[ "$var" == *stable || "$var" == *rc ]]; then
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             MAKE_FOLDERS=archive
             OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
