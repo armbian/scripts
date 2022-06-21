@@ -6,6 +6,9 @@ on:
       sourcerepo:
        required: true
        type: string
+      packagesrepo:
+       required: false
+       type: string
       variant:
        required: true
        type: string
@@ -61,6 +64,8 @@ jobs:
         run: |
           SOURCEREPO=${{ inputs.sourcerepo }}
           echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
+          PACKAGESREPO=${{ inputs.packagesrepo }}
+          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -122,6 +127,8 @@ jobs:
 
           SOURCEREPO=${{ inputs.sourcerepo }}
           echo "REPO=${SOURCEREPO:-nightly}" >> $GITHUB_ENV
+          PACKAGESREPO=${{ inputs.packagesrepo }}
+          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
           echo ${{needs.Prepare.outputs.runner}}
 
       - name: Checkout repository
@@ -209,7 +216,7 @@ jobs:
             FILENAME="targets-${var%:*}-beta.conf"
             MAKE_FOLDERS=nightly
           fi
-          BETA="yes"
+          BETA="$BETA"
           SKIP_EXTERNAL_TOOLCHAINS="yes"
           REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           echo "DEPLOYFOLDER=$MAKE_FOLDERS" >> $GITHUB_ENV
