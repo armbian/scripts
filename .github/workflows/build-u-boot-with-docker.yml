@@ -195,7 +195,7 @@ jobs:
           ARMBIAN_MIRROR="https://github.com/armbian/mirror/releases/download/" \
           BOARD="$BOARD" \
           PRIVATE_CCACHE="yes" \
-          BETA="{{ env.BETA }}" \
+          BETA="${{ env.BETA }}" \
           USE_TORRENT="yes" \
           KERNEL_ONLY="no" \
           KERNEL_KEEP_CONFIG="no" \
