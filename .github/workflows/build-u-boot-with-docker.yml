@@ -161,12 +161,12 @@ jobs:
           export TERM=dumb
           cd build
 
-          if [[ "${{ inputs.destref }}" == "nightly" ]]; then
+          if [[ "${{ env.REFERENCE }}" == "nightly" ]]; then
               BETA="yes"
           else
               BETA="no"
               OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
-              sudo git checkout -f ${{ inputs.destref }}
+              sudo git checkout -f ${{ env.REFERENCE }}
               sudo cp ../scripts/VERSION .
               sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
           fi
@@ -210,7 +210,7 @@ jobs:
 
           # if we are building rc images, we want to have this in nightly repo
           # to do - proper solution is needed when we will push directly to stable          
-          if [[ "${{ inputs.destref }}" != "nightly" ]]; then
+          if [[ "${{ env.REFERENCE }}" != "nightly" ]]; then
           sudo mv output/debs/linux-u-boot-${BRANCH}-${BOARD}* output/debs-beta/ || true
           sudo mv output/debs/armbian-bsp-cli-${BOARD}* output/debs-beta/ || true
           fi
