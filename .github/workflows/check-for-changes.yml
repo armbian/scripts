@@ -52,7 +52,7 @@ jobs:
         run: |
 
           PACKAGESREPO=${{ inputs.packagesrepo }}
-          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
+          BETA=${PACKAGESREPO:-yes}
 
           # Declare this folder as safe
           if [[ -z $(cat ${HOME}/.gitconfig 2>/dev/null | grep "directory = \*") ]]; then
@@ -67,7 +67,7 @@ jobs:
 
            VALUES="legacy current edge"
 
-           [[ "${{ env.BETA }}" == no ]] && VALUES="current"
+           [[ "$BETA" == no ]] && VALUES="legacy current"
            MATRIX=$(for BRANCH in $VALUES; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
