@@ -216,7 +216,7 @@ jobs:
             FILENAME="targets-${var%:*}-beta.conf"
             MAKE_FOLDERS=nightly
           fi
-          BETA="$BETA"
+          
           SKIP_EXTERNAL_TOOLCHAINS="yes"
           REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           echo "DEPLOYFOLDER=$MAKE_FOLDERS" >> $GITHUB_ENV
@@ -238,7 +238,7 @@ jobs:
 
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf
           ./compile.sh docker \
-          BETA="${BETA}" \
+          BETA="{{ env.BETA }}" \
           RELEASE="${RELEASE}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="$SKIP_EXTERNAL_TOOLCHAINS" \

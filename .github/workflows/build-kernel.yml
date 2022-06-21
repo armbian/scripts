@@ -10,6 +10,9 @@ on:
         type: string
       reference:
         type: string
+      packagesrepo:
+        required: false
+        type: string
     secrets:
       GPG_KEY1:
         required: true
@@ -42,6 +45,8 @@ jobs:
 
           REFERENCE=${{ inputs.reference }}          
           echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
+          PACKAGESREPO=${{ inputs.packagesrepo }}
+          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
@@ -94,6 +99,8 @@ jobs:
 
           REFERENCE=${{ inputs.reference }}          
           echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
+          PACKAGESREPO=${{ inputs.packagesrepo }}
+          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: "Read"
         run: |
@@ -188,7 +195,7 @@ jobs:
           BOARD="$BOARD" \
           CLEAN_LEVEL="make,oldcache" \
           PRIVATE_CCACHE="yes" \
-          BETA="yes" \
+          BETA="{{ env.BETA }}" \
           KERNEL_ONLY="yes" \
           BRANCH="$BRANCH" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \

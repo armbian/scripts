@@ -11,6 +11,9 @@ on:
         type: string
       uploading:
         type: string
+      packagesrepo:
+       required: false
+       type: string
     secrets:
       KEY_TORRENTS:
         required: true
@@ -37,6 +40,8 @@ jobs:
 
           REFERENCE=${{ inputs.reference }}          
           echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
+          PACKAGESREPO=${{ inputs.packagesrepo }}
+          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
@@ -123,7 +128,7 @@ jobs:
           export TERM=dumb
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf          
           ./compile.sh docker \
-          BETA=yes \
+          BETA="{{ env.BETA }}" \
           EXPERT=yes \
           BOARD=${{ matrix.board }} \
           BRANCH=current \
