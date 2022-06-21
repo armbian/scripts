@@ -67,7 +67,7 @@ jobs:
 
            VALUES="legacy current edge"
 
-           [[ "${{ env.PACKAGESREPO }}" == no ]] && VALUES="current"
+           [[ "${{ env.BETA }}" == no ]] && VALUES="current"
            MATRIX=$(for BRANCH in $VALUES; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
@@ -134,7 +134,7 @@ jobs:
                   [[ "$STORED_PATCHES" == "null" ]] && CALC_PATCHES="null"
                   [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
                   # in bugfix rebuild, we rebuild all kernels (current branch only)
-                  if [[ "${{ env.PACKAGESREPO }}" == no ]]; then
+                  if [[ "${{ env.BETA }}" == no ]]; then
                         echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
                   elif [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
                       :
