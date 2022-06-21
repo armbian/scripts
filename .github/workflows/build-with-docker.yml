@@ -201,8 +201,8 @@ jobs:
             FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             MAKE_FOLDERS=archive
             OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
-            sudo cp ../scripts/VERSION .
-            sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
+            #sudo cp ../scripts/VERSION .
+            sudo docker tag $OLD ghcr.io/armbian/build:$(cat ../scripts/VERSION)-$(dpkg --print-architecture)
             # we use nightly repository, but change back to stable right before closing image
             echo "#!""/bin/bash" | sudo tee userpatches/customize-image.sh
             echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
@@ -285,7 +285,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to server
-        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.choice == 'stable'  && github.event.inputs.choice == 'rc' }}
+        if: ${{ github.repository_owner == 'Armbian' && (github.event.inputs.choice == 'stable' || github.event.inputs.choice == 'rc') }}
         run: |
           ls -l build/output/images/*/*/
           sudo apt-get -y -qq install lftp
