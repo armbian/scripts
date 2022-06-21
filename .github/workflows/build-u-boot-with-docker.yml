@@ -167,8 +167,8 @@ jobs:
               BETA="no"
               OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
               sudo git checkout -f ${{ env.REFERENCE }}
-              sudo cp ../scripts/VERSION .
-              sudo docker tag $OLD ghcr.io/armbian/build:$(cat VERSION)-$(dpkg --print-architecture)
+              #sudo cp ../scripts/VERSION .
+              sudo docker tag $OLD ghcr.io/armbian/build:$(cat ../scripts/VERSION)-$(dpkg --print-architecture)
           fi
 
           # use local resources if possible
