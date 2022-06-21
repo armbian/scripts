@@ -16,6 +16,9 @@ on:
         type: string
       destref:
         type: string
+      packagesrepo:
+       required: false
+       type: string
     secrets:
       GPG_KEY1:
         required: true
@@ -48,6 +51,8 @@ jobs:
 
           REFERENCE=${{ inputs.destref }}          
           echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
+          PACKAGESREPO=${{ inputs.packagesrepo }}
+          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
@@ -95,6 +100,8 @@ jobs:
 
           REFERENCE=${{ inputs.destref }}          
           echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
+          PACKAGESREPO=${{ inputs.packagesrepo }}
+          echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: "Read"
         run: |
@@ -161,10 +168,7 @@ jobs:
           export TERM=dumb
           cd build
 
-          if [[ "${{ env.REFERENCE }}" == "nightly" ]]; then
-              BETA="yes"
-          else
-              BETA="no"
+          if [[ "${{ env.REFERENCE }}" != "nightly" ]]; then
               OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
               sudo git checkout -f ${{ env.REFERENCE }}
               #sudo cp ../scripts/VERSION .
@@ -191,7 +195,7 @@ jobs:
           ARMBIAN_MIRROR="https://github.com/armbian/mirror/releases/download/" \
           BOARD="$BOARD" \
           PRIVATE_CCACHE="yes" \
-          BETA="$BETA" \
+          BETA="{{ env.BETA }}" \
           USE_TORRENT="yes" \
           KERNEL_ONLY="no" \
           KERNEL_KEEP_CONFIG="no" \
