@@ -134,7 +134,7 @@ jobs:
                   [[ "$STORED_PATCHES" == "null" ]] && CALC_PATCHES="null"
                   [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
                   # in bugfix rebuild, we rebuild all kernels (current branch only)
-                  if [[ "${{ env.BETA }}" == no ]]; then
+                  if [[ "$BETA" == no ]]; then
                         echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
                   elif [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
                       :
