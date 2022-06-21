@@ -9,6 +9,9 @@ on:
       reference:
         required: true
         type: string
+      bugfix:
+        required: false
+        type: string
 
 jobs:
 
@@ -59,7 +62,10 @@ jobs:
           return 0
           }
 
-           MATRIX=$(for BRANCH in legacy current edge; do
+           VALUES="legacy current edge"
+
+           [[ "${{ inputs.bugfix }}" == true ]] && VALUES="current"
+           MATRIX=$(for BRANCH in $VALUES; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
 
@@ -124,7 +130,10 @@ jobs:
                   # if stored is null, we don't check                   
                   [[ "$STORED_PATCHES" == "null" ]] && CALC_PATCHES="null"
                   [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
-                  if [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
+                  # in bugfix rebuild, we rebuild all kernels (current branch only)
+                  if [[ "${{ inputs.bugfix }}" == true ]]; then
+                        echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
+                  elif [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
                       :
                   else
                       echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
