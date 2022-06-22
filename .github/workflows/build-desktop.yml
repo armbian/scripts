@@ -193,7 +193,7 @@ jobs:
 
           ./compile.sh docker \
           BSP_BUILD="yes" \
-          BETA="{{ env.BETA }}" \
+          BETA="${{ env.BETA }}" \
           RELEASE="${RELEASE}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
           BUILD_DESKTOP="yes" \
