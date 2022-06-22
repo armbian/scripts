@@ -195,7 +195,7 @@ jobs:
           BOARD="$BOARD" \
           CLEAN_LEVEL="make,oldcache" \
           PRIVATE_CCACHE="yes" \
-          BETA="{{ env.BETA }}" \
+          BETA="${{ env.BETA }}" \
           KERNEL_ONLY="yes" \
           BRANCH="$BRANCH" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
