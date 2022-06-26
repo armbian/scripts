@@ -6,6 +6,9 @@ on:
       variant:
        required: true
        type: string
+      monthoffset:
+       required: true
+       type: number
     secrets:
       PAT1:
         required: true
@@ -38,6 +41,7 @@ jobs:
       variant:  ${{steps.list_dirs.outputs.variant}}
       desktop:  ${{steps.list_dirs.outputs.desktop}}
       appgroup: ${{steps.list_dirs.outputs.appgroup}}
+      monthoffset: ${{steps.list_dirs.outputs.monthoffset}}
       
     steps:
 
@@ -61,6 +65,9 @@ jobs:
           ARC=$(echo $CHUNK | cut -d":" -f2)
           echo ::set-output name=board::$(echo $ARC) || true
           
+          MONTHOFFSET=${{ inputs.monthoffset }}                    
+          echo ::set-output name=monthoffset::$(echo ${MONTHOFFSET:-"0"}) || true
+                    
           echo "$VAR $ARC"
 
           #echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|sid/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
@@ -135,6 +142,7 @@ jobs:
 
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
+          echo ${{ needs.Prepare.outputs.monthoffset }}
 
       - name: Pull Docker image
         run: |
@@ -217,6 +225,7 @@ jobs:
           ./compile.sh docker \
           BETA="no" \
           ROOT_FS_CREATE_ONLY="force" \
+          FORCED_MONTH_OFFSET="${{ needs.Prepare.outputs.monthoffset }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
