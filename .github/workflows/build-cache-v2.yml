@@ -8,7 +8,7 @@ on:
        type: string
       monthoffset:
        required: true
-       type: number
+       type: string
     secrets:
       PAT1:
         required: true
