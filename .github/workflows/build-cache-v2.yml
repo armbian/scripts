@@ -256,7 +256,6 @@ jobs:
 
           df          
           cd ..
-          echo "${{ needs.Prepare.outputs.rootfscache_version }}" | sudo tee build/cache/rootfs/rootfscache.version
           ls -l build/cache/rootfs || true
 
       - name: Upload
