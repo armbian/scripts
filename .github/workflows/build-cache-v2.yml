@@ -170,7 +170,7 @@ jobs:
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload || true
           sudo mkdir -p build/cache/rootfs || true
-          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
+          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "188.227.12.36" ]]; then
               ls -l build/cache/rootfs/
               echo "Clean folder"
               sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
