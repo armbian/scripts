@@ -9,6 +9,9 @@ on:
       monthoffset:
        required: true
        type: string
+      rootfscache_version:
+       required: true
+       type: string
     secrets:
       PAT1:
         required: true
@@ -42,6 +45,7 @@ jobs:
       desktop:  ${{steps.list_dirs.outputs.desktop}}
       appgroup: ${{steps.list_dirs.outputs.appgroup}}
       monthoffset: ${{steps.list_dirs.outputs.monthoffset}}
+      rootfscache_version: ${{steps.list_dirs.outputs.rootfscache_version}}
       
     steps:
 
@@ -67,6 +71,8 @@ jobs:
           
           MONTHOFFSET=${{ inputs.monthoffset }}                    
           echo ::set-output name=monthoffset::$(echo ${MONTHOFFSET:-"0"}) || true
+          ROOTFSCACHE_VERSION=${{ inputs.rootfscache_version }}                    
+          echo ::set-output name=rootfscache_version::$(echo ${ROOTFSCACHE_VERSION:-"0"}) || true
                     
           echo "$VAR $ARC"
 
@@ -143,6 +149,7 @@ jobs:
           mkdir -p build/userpatches
           sudo cp scripts/configs/* build/userpatches/
           echo ${{ needs.Prepare.outputs.monthoffset }}
+          echo ${{ needs.Prepare.outputs.rootfscache_version }}
 
       - name: Pull Docker image
         run: |
@@ -226,6 +233,7 @@ jobs:
           BETA="no" \
           ROOT_FS_CREATE_ONLY="force" \
           FORCED_MONTH_OFFSET="${{ needs.Prepare.outputs.monthoffset }}" \
+          ROOTFSCACHE_VERSION="${{ needs.Prepare.outputs.rootfscache_version }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
