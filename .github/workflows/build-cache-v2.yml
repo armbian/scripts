@@ -256,6 +256,7 @@ jobs:
 
           df          
           cd ..
+          echo "${{ needs.Prepare.outputs.rootfscache_version }}" | sudo tee build/cache/rootfs/rootfscache.version
           ls -l build/cache/rootfs || true
 
       - name: Upload
@@ -265,7 +266,7 @@ jobs:
           repo: "mirror"
           artifacts: "build/cache/rootfs/*"
           artifactErrorsFailBuild: true
-          tag: "_rootfs"
+          tag: "cache"
           omitBody: true
           omitName: true
           allowUpdates: true
