@@ -177,10 +177,12 @@ jobs:
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload || true
           sudo mkdir -p build/cache/rootfs || true
+
+          ls -l build/cache/rootfs/
+          echo "Clean folder"
+          sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
+
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
-              ls -l build/cache/rootfs/
-              echo "Clean folder"
-              sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
               echo "Mounting NFS share"
               sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
           else
