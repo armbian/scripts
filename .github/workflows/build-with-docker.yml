@@ -256,7 +256,7 @@ jobs:
           BRANCH="$BRANCH" \
           MAKE_FOLDERS="$MAKE_FOLDERS" \
           IMAGE_PRESENT="no" \
-          BUILD_ALL="yes" \
+          BUILD_ALL="no" \
           USE_TORRENT="yes" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
           ARMBIAN_CACHE_TOOLCHAIN_PATH="${ARMBIAN_CACHE_TOOLCHAIN_PATH}" \
