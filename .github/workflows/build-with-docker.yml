@@ -220,7 +220,7 @@ jobs:
           
           SKIP_EXTERNAL_TOOLCHAINS="yes"
           REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
-          REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-config,armbian-firmware,armbian-zsh"
+          REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware,armbian-zsh"
           echo "DEPLOYFOLDER=$MAKE_FOLDERS" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
 
