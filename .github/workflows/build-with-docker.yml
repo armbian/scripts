@@ -295,7 +295,7 @@ jobs:
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
 
       - name: Upload artefacts
-        if: inputs.uploading == 'true' && env.UPLOAD == 'true'
+        if: inputs.uploading == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
