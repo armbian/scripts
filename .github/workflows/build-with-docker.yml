@@ -112,18 +112,17 @@ jobs:
 
           var="${{ inputs.variant }}"
           if [[ "$var" == *stable || "$var" == *rc ]]; then
-              FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
+              FILENAME="build/config/targets.conf | grep ${var%:*} | grep \"yes\|adv\""
           else
-              FILENAME="targets-${var%:*}-beta.conf"
+              FILENAME="build/config/targets-${var%:*}-beta.conf"
           fi
-
+          [[ -n "${{ inputs.type }} ]] && FILENAME="targets.txt"
           # if we want to split more
           TEMP=$(mktemp -d || exit 1)
-          LIST="cat build/config/"${FILENAME}" | grep -v \"^$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }}  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
+          LIST="cat "${FILENAME}" | grep -v \"^$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }}  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
           eval $LIST > $TEMP/data.txt
           MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat $TEMP/data.txt"
           [ -s changes ] || unset MATRIX
-          
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           if [[ -z "${{ inputs.runner }}" ]]; then
           echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true
