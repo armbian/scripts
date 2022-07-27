@@ -234,7 +234,7 @@ jobs:
           if [[ "$var" == *stable || "$var" == *rc ]]; then
             FILENAME="build/config/targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             MAKE_FOLDERS=archive
-            OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
+            OLD="ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
             sudo docker tag $OLD ghcr.io/armbian/build:$(cat scripts/VERSION)-$(dpkg --print-architecture)
             # we use nightly repository, but change back to stable right before closing image
             echo "#!""/bin/bash" | sudo tee build/userpatches/customize-image.sh
