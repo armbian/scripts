@@ -79,6 +79,21 @@ jobs:
           ref: ${{ env.REPO }}
           clean: false
 
+      - name: Checkout GitHub Action Repo
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/actions
+          ref: main
+          token: ${{ secrets.CR_PAT }}
+          path: actions
+
+      - name: "Make a list"
+        if: ${{ inputs.type != '' }}
+        id: build-images
+        uses: ./actions/make-list
+        with:
+          type: ${{ inputs.type }}
+
       - name: Remove previous artefacts if any
         run: |
 
@@ -106,6 +121,7 @@ jobs:
           eval $LIST > $TEMP/data.txt
           MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat $TEMP/data.txt"
           [ -s changes ] || unset MATRIX
+          
           echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           if [[ -z "${{ inputs.runner }}" ]]; then
           echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true
