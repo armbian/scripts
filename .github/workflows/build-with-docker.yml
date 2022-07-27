@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
-      type:
+      boardtype:
        required: false
        type: string      
       sourcerepo:
@@ -90,11 +90,11 @@ jobs:
           path: actions
 
       - name: "Make a list"
-        if: ${{ inputs.type != '' }}
+        if: ${{ inputs.boardtype != '' }}
         id: build-images
         uses: ./actions/make-list
         with:
-          type: ${{ inputs.type }}
+          type: ${{ inputs.boardtype }}
 
       - name: Remove previous artefacts if any
         run: |
@@ -116,7 +116,7 @@ jobs:
           else
               FILENAME="build/config/targets-${var%:*}-beta.conf"
           fi
-          [[ -n "${{ inputs.type }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
+          [[ -n "${{ inputs.boardtype }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
           # if we want to split more
           TEMP=$(mktemp -d || exit 1)
           LIST="cat "${FILENAME}" | grep -v \"^$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }}  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
@@ -177,11 +177,11 @@ jobs:
           path: actions
 
       - name: "Make a list"
-        if: ${{ inputs.type != '' }}
+        if: ${{ inputs.boardtype != '' }}
         id: build-images
         uses: ./actions/make-list
         with:
-          type: ${{ inputs.type }}
+          type: ${{ inputs.boardtype }}
 
       - name: Runner cleanup
         uses: igorpecovnik/freespace@main
@@ -251,7 +251,7 @@ jobs:
           fi
           
           # when making all from the list
-          [[ -n "${{ inputs.type }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
+          [[ -n "${{ inputs.boardtype }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
           
           SKIP_EXTERNAL_TOOLCHAINS="yes"
           REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
