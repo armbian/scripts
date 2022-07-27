@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      type:
+       required: false
+       type: string      
       sourcerepo:
        required: true
        type: string
