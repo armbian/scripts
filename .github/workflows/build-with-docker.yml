@@ -116,7 +116,7 @@ jobs:
           else
               FILENAME="build/config/targets-${var%:*}-beta.conf"
           fi
-          [[ -n "${{ inputs.type }}" ]] && FILENAME="targets.txt"
+          [[ -n "${{ inputs.type }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
           # if we want to split more
           TEMP=$(mktemp -d || exit 1)
           LIST="cat "${FILENAME}" | grep -v \"^$\" | grep -v \"^#\" |  ${{ inputs.include }} ${{ inputs.exclude }}  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
