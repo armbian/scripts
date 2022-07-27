@@ -33,6 +33,8 @@ on:
       uploading:
         type: string
     secrets:
+      CR_PAT:
+        required: false 
       GPG_KEY1:
         required: true
       GPG_PASSPHRASE1:
