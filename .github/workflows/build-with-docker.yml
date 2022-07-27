@@ -251,10 +251,14 @@ jobs:
           fi
           
           # when making all from the list
-          [[ -n "${{ inputs.boardtype }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
-          
-          SKIP_EXTERNAL_TOOLCHAINS="yes"
-          REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
+          if [[ -n "${{ inputs.boardtype }}" ]]; then
+             FILENAME="targets.txt | grep ${var%:*}"
+             SKIP_EXTERNAL_TOOLCHAINS="no"
+             REPOSITORY_INSTALL="kernel,armbian-config,armbian-firmware,armbian-zsh"
+          else          
+             SKIP_EXTERNAL_TOOLCHAINS="yes"
+             REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
+          fi
           #### we need to install all from repo since we don't drag compilers here
           #### REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware,armbian-zsh"
           echo "DEPLOYFOLDER=$MAKE_FOLDERS" >> $GITHUB_ENV
