@@ -168,6 +168,21 @@ jobs:
           path: scripts
           clean: false
 
+      - name: Checkout GitHub Action Repo
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/actions
+          ref: main
+          token: ${{ secrets.CR_PAT }}
+          path: actions
+
+      - name: "Make a list"
+        if: ${{ inputs.type != '' }}
+        id: build-images
+        uses: ./actions/make-list
+        with:
+          type: ${{ inputs.type }}
+
       - name: Runner cleanup
         uses: igorpecovnik/freespace@main
 
@@ -213,30 +228,30 @@ jobs:
               ! sudo mountpoint -q build/cache/toolchain && sudo mount --bind /mnt/armbian/cache/toolchain/ build/cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=3 || true
               ! sudo mountpoint -q build/cache/rootfs && sudo mount --bind /mnt/armbian/cache/rootfs/ build/cache/rootfs/ -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=3 || true
           fi
-
-          cd build
-
+          
           var="${{ inputs.variant }}"
           RC="no"
           if [[ "$var" == *stable || "$var" == *rc ]]; then
-            FILENAME="targets.conf | grep ${var%:*} | grep \"yes\|adv\""
+            FILENAME="build/config/targets.conf | grep ${var%:*} | grep \"yes\|adv\""
             MAKE_FOLDERS=archive
             OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
-            #sudo cp ../scripts/VERSION .
             sudo docker tag $OLD ghcr.io/armbian/build:$(cat ../scripts/VERSION)-$(dpkg --print-architecture)
             # we use nightly repository, but change back to stable right before closing image
-            echo "#!""/bin/bash" | sudo tee userpatches/customize-image.sh
-            echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
-            echo "sed -i 's/https/http/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a userpatches/customize-image.sh
-            echo "sed -i 's/IMAGE_TYPE=.*/IMAGE_TYPE=stable/' /etc/armbian-image-release" | sudo tee -a userpatches/customize-image.sh
-            echo "sed -i 's/IMAGE_TYPE=.*/IMAGE_TYPE=stable/' /etc/armbian-release" | sudo tee -a userpatches/customize-image.sh
+            echo "#!""/bin/bash" | sudo tee build/userpatches/customize-image.sh
+            echo "sed -i 's/beta/apt/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a build/userpatches/customize-image.sh
+            echo "sed -i 's/https/http/' /etc/apt/sources.list.d/armbian.list" | sudo tee -a build/userpatches/customize-image.sh
+            echo "sed -i 's/IMAGE_TYPE=.*/IMAGE_TYPE=stable/' /etc/armbian-image-release" | sudo tee -a build/userpatches/customize-image.sh
+            echo "sed -i 's/IMAGE_TYPE=.*/IMAGE_TYPE=stable/' /etc/armbian-release" | sudo tee -a build/userpatches/customize-image.sh
             if [[ "$var" == *rc ]]; then
               MAKE_FOLDERS=rc
             fi
           else
-            FILENAME="targets-${var%:*}-beta.conf"
+            FILENAME="build/config/targets-${var%:*}-beta.conf"
             MAKE_FOLDERS=nightly
           fi
+          
+          # when making all from the list
+          [[ -n "${{ inputs.type }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
           
           SKIP_EXTERNAL_TOOLCHAINS="yes"
           REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
@@ -249,7 +264,7 @@ jobs:
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
           echo "BOARD=$BOARD" >> $GITHUB_ENV
-          LINIJA="cat config/${FILENAME} | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed -n ''$LINE'p'"
+          LINIJA="cat ${FILENAME} | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed -n ''$LINE'p'"
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
           <<< $(eval $LINIJA)
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED//,/ }"
@@ -257,6 +272,8 @@ jobs:
           BUILD_MINIMAL="no"
           [[ ${BUILD_TARGET} == "desktop" ]] && BUILD_DESKTOP="yes"
           [[ ${BUILD_TARGET} == "minimal" ]] && BUILD_MINIMAL="yes"
+
+          cd build
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes
 
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf
