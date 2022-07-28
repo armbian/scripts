@@ -256,10 +256,12 @@ jobs:
              SKIP_EXTERNAL_TOOLCHAINS="no"
              IGNORE_UPDATES="no"
              REPOSITORY_INSTALL="kernel,armbian-config,armbian-firmware,armbian-zsh"
+             UPLOAD_FOLDER="images-csc/"
           else          
              SKIP_EXTERNAL_TOOLCHAINS="yes"
              IGNORE_UPDATES="yes"
              REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
+             UPLOAD_FOLDER="images/"
           fi
           #### we need to install all from repo since we don't drag compilers here
           #### REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware,armbian-zsh"
@@ -330,13 +332,6 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy to server
-        if: ${{ github.repository_owner == 'Armbian' && (github.event.inputs.choice == 'stable' || github.event.inputs.choice == 'rc') }}
-        run: |
-          ls -l build/output/images/*/*/
-          sudo apt-get -y -qq install lftp
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ images/ ;bye" sftp://users.armbian.com
-
       - name: Upload artefacts
         if: inputs.uploading == 'true'
         uses: svenstaro/upload-release-action@v2
@@ -347,3 +342,11 @@ jobs:
           overwrite: true
           file_glob: true
           body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
+
+      - name: Deploy to server
+        if: ${{ github.repository_owner == 'Armbian' && (github.event.inputs.choice == 'stable' || github.event.inputs.choice == 'rc') }}
+        run: |
+          ls -l build/output/images/*/*/
+          sudo apt-get -y -qq install lftp
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/output/images/ ${UPLOAD_FOLDER} ;bye" sftp://users.armbian.com
+
