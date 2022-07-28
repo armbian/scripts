@@ -274,6 +274,7 @@ jobs:
           LINE=$(echo $CHUNK | cut -d":" -f1)
           BOARD=$(echo $CHUNK | cut -d":" -f2)
           echo "BOARD=$BOARD" >> $GITHUB_ENV
+          echo "VERSION=$(cat build/VERSION)" >> $GITHUB_ENV
           LINIJA="cat ${FILENAME} | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed -n ''$LINE'p'"
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
           <<< $(eval $LINIJA)
@@ -341,7 +342,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/output/images/*/*/Armbian*
           #tag: "${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}"
-          tag: "$(cat build/VERSION)"
+          tag: "${{ env.VERSION }}"
           overwrite: true
           file_glob: true
           body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
