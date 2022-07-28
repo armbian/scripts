@@ -254,9 +254,11 @@ jobs:
           if [[ -n "${{ inputs.boardtype }}" ]]; then
              FILENAME="targets.txt | grep ${var%:*}"
              SKIP_EXTERNAL_TOOLCHAINS="no"
+             IGNORE_UPDATES="no"
              REPOSITORY_INSTALL="kernel,armbian-config,armbian-firmware,armbian-zsh"
           else          
              SKIP_EXTERNAL_TOOLCHAINS="yes"
+             IGNORE_UPDATES="yes"
              REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
           fi
           #### we need to install all from repo since we don't drag compilers here
@@ -286,7 +288,7 @@ jobs:
           RELEASE="${RELEASE}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="$SKIP_EXTERNAL_TOOLCHAINS" \
-          IGNORE_UPDATES="yes" \
+          IGNORE_UPDATES="${IGNORE_UPDATES}" \
           SYNC_CLOCK="no" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="$DESKTOP_ENVIRONMENT_CONFIG_NAME" \
           BUILD_DESKTOP="$BUILD_DESKTOP" \
