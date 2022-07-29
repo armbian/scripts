@@ -63,7 +63,7 @@ jobs:
     steps:
 
       - name: Runner cleanup
-        uses: igorpecovnik/freespace@main
+        uses: armbian/actions/runner-prepare@main
 
       - name: Set ENV vars
         run: |
