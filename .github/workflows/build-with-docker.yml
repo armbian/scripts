@@ -160,19 +160,10 @@ jobs:
           path: scripts
           clean: false
 
-      - name: Checkout GitHub Action Repo
+      - name: Make build list
         if: ${{ inputs.boardtype != '' }}
-        uses: actions/checkout@v3
-        with:
-          repository: armbian/actions
-          ref: main
-          token: ${{ secrets.CR_PAT }}
-          path: actions
-
-      - name: "Make a list"
-        if: ${{ inputs.boardtype != '' }}
-        id: build-images
-        uses: ./actions/make-list
+        id: make-list
+        uses: armbian/actions/make-list@main
         with:
           type: ${{ inputs.boardtype }}
 
