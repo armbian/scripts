@@ -324,8 +324,8 @@ jobs:
         with:
           artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
           tag: "${{ env.VERSION }}"
-          name: "Armbian ${{ env.VERSION }}"
-          bodyFile: ".github/Releases-wip.md"
+          omitBody: true
+          omitName: true
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
