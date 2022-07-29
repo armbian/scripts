@@ -307,7 +307,8 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
-      - uses: ncipollo/release-action@v1
+      - name: Upload artefacts 1
+        uses: ncipollo/release-action@v1
         if: ${{ github.repository_owner == 'Armbian' && inputs.uploading != 'true' && github.event.inputs.choice != 'stable' && github.event.inputs.choice != 'rc' }}
         with:
           artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
@@ -317,17 +318,24 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artefacts
+      - name: Upload artefacts 2
         if: inputs.uploading == 'true'
-        uses: svenstaro/upload-release-action@v2
+        #uses: svenstaro/upload-release-action@v2
+        uses: ncipollo/release-action@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/output/images/*/*/Armbian*
-          #tag: "${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}"
+          artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
           tag: "${{ env.VERSION }}"
-          overwrite: true
-          file_glob: true
-          body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
+          name: "Armbian ${{ env.VERSION }}"
+          bodyFile: ".github/Releases-wip.md"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }
+          #repo_token: ${{ secrets.GITHUB_TOKEN }}
+          #file: build/output/images/*/*/Armbian*
+          #tag: "${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}"
+          #tag: "${{ env.VERSION }}"
+          #overwrite: true
+          #file_glob: true
+          #body: "<p align='center'><a href='https://www.armbian.com'><img src='https://raw.githubusercontent.com/armbian/.github/master/profile/tux-two.png' width='400' height='226' alt='Armbian Linux'></a></p>"
 
       - name: Deploy to server
         if: ${{ github.repository_owner == 'Armbian' && (github.event.inputs.choice == 'stable' || github.event.inputs.choice == 'rc') }}
