@@ -327,7 +327,7 @@ jobs:
           name: "Armbian ${{ env.VERSION }}"
           bodyFile: ".github/Releases-wip.md"
           allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to server
         if: ${{ github.repository_owner == 'Armbian' && (github.event.inputs.choice == 'stable' || github.event.inputs.choice == 'rc') }}
