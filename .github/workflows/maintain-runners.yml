@@ -79,7 +79,7 @@ jobs:
   Purge:
   
     needs: [ Prepare ]
-    runs-on: [self-hosted, Linux, small]
+    runs-on: [Linux]
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 480
     strategy:
