@@ -49,6 +49,8 @@ on:
         required: true
       KNOWN_HOSTS_UPLOAD:
         required: true
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
 
