@@ -103,6 +103,8 @@ jobs:
            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
            sudo wget https://apt.armbian.com/armbian.key -O key
            sudo gpg --dearmor < key | sudo tee /usr/share/keyrings/armbian.gpg > /dev/null
+           sudo chmod go+r /usr/share/keyrings/armbian.gpg
+           sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
            sudo echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] http://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/githubcli.list
            sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com $TO_RELEASE main ${TO_RELEASE}-utils ${TO_RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
            sudo sed -i 's/continue/pass/g' /usr/lib/python3/dist-packages/UpdateManager/Core/MetaRelease.py
