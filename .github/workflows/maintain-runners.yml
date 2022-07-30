@@ -62,7 +62,7 @@ jobs:
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
           sudo mkdir -p build/output/tmp || true          
-          sudo sshfs upload@users.armbian.com:/ build/output/tmp -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          sudo sshfs upload@users.armbian.com:/ build/output/tmp -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other
           sudo rm -rf build/output/tmp/debs/* || true
           sudo rm -rf build/output/tmp/debs-beta/* || true
           sudo rm -rf build/output/tmp/images/* || true
