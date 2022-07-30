@@ -100,12 +100,15 @@ jobs:
           
            FROM_RELEASE=hirsute
            TO_RELEASE=jammy
+           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
            sudo wget https://apt.armbian.com/armbian.key -O key
            sudo gpg --dearmor < key | sudo tee /usr/share/keyrings/armbian.gpg > /dev/null
+           sudo echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] http://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/githubcli.list
            sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com $TO_RELEASE main ${TO_RELEASE}-utils ${TO_RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
            sudo sed -i 's/continue/pass/g' /usr/lib/python3/dist-packages/UpdateManager/Core/MetaRelease.py
            sudo sed -i 's/'$FROM_RELEASE'/'$TO_RELEASE'/g' /etc/apt/sources.list
            sudo apt-get update
+           sudo apt-get -y install gh
            echo "Upgrade distro"
            #sudo do-release-upgrade
            sudo apt-get update
