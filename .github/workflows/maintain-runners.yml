@@ -94,9 +94,9 @@ jobs:
       - name: Upgrading
         run: |
            
-           sudo sed -i 's/jammy/hirsute/g' /etc/apt/sources.list
-           sudo apt-get update
-           sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
+           #sudo sed -i 's/jammy/hirsute/g' /etc/apt/sources.list
+           #sudo apt-get update
+           #sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
           
            FROM_RELEASE=hirsute
            TO_RELEASE=jammy
@@ -107,7 +107,7 @@ jobs:
            sudo sed -i 's/'$FROM_RELEASE'/'$TO_RELEASE'/g' /etc/apt/sources.list
            sudo apt-get update
            echo "Upgrade distro"
-           sudo do-release-upgrade
+           #sudo do-release-upgrade
            sudo apt-get update
            sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
            sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade -y
