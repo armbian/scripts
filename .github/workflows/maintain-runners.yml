@@ -119,7 +119,7 @@ jobs:
            sudo DEBIAN_FRONTEND=noninteractive apt-get install -f -y
            sudo DEBIAN_FRONTEND=noninteractive apt-get autoremove --purge -y
            sudo shutdown -r
-           sleep 50
+           sleep 60
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
