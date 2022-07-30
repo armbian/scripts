@@ -93,6 +93,10 @@ jobs:
    
       - name: Upgrading
         run: |
+           
+           sudo sed -i 's/jammy/hirsute/g' /etc/apt/sources.list
+           sudo apt-get update
+           sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
           
            FROM_RELEASE=hirsute
            TO_RELEASE=jammy
