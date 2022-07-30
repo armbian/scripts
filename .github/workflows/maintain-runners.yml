@@ -111,7 +111,8 @@ jobs:
            sudo sed -i 's/'$FROM_RELEASE'/'$TO_RELEASE'/g' /etc/apt/sources.list
            sudo rm -f /etc/apt/sources.list.d/docker.list 
            sudo apt-get update
-           sudo apt-get -y install gh npm
+           sudo apt-get -y install gh npm nodejs
+           sudo npm install json --global || true
            echo "Upgrade distro"
            #sudo do-release-upgrade
            sudo apt-get update
