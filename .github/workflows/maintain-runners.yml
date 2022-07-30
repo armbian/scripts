@@ -109,6 +109,8 @@ jobs:
            sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade -y
            sudo DEBIAN_FRONTEND=noninteractive apt-get install -f -y
            sudo DEBIAN_FRONTEND=noninteractive apt-get autoremove --purge -y
+           sudo sync
+           sudo reboot
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
