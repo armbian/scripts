@@ -96,8 +96,8 @@ jobs:
           sudo cp ~/.ssh/known_hosts /root/.ssh/
           sudo mkdir -p build/output/debs || true
           sudo mkdir -p build/output/debs-beta || true
-          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
-          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect,nonempty -o allow_other
+          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other
+          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other
           fi
 
       - name: Sync
