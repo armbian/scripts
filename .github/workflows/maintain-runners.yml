@@ -23,21 +23,8 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
-      - name: Remove previous artefacts if any
-        run: |
-        
-          sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-          sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-          sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-          sudo rm -rf changes 2>/dev/null || true
-          sudo rm -rf build/.tmp 2>/dev/null || true
-          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-              sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
-              sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
-          fi
-          sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-          sudo mountpoint -q build/output/tmp && sudo fusermount -u build/output/tmp || true
-          sudo chown -R $USER:$USER build/.git
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - name: Download changes
         if: ${{ inputs.checking }}
@@ -101,64 +88,27 @@ jobs:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
     steps:
    
-      - name: Cleaning
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+   
+      - name: Upgrading
         run: |
           
-          # Check where we are
-          pwd
-        
-          # make sure no temporally dirs are mounted from previous runs
-          while :
-          do
-              sudo pkill compile.sh || true
-              sudo pkill arm-binfmt-P || true
-              sudo pkill aarch64-binfmt-P || true
-              sudo pkill pixz || true              
-              sudo mountpoint -q build/output/images && sudo fusermount -u build/output/images || true
-              sudo mountpoint -q build/output/tmp && sudo fusermount -u build/output/tmp || true
-              sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
-              sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true              
-              [[ "$(df | grep "/.tmp" | wc -l)" -eq 0 && $(sudo mountpoint -q build/output/images; echo $?) -eq 1 ]] && sudo rm -rf build/.tmp && break
-              echo "Mounted temp directories. Trying to unmount."
-              df | grep ".tmp" | awk '{print $6}' | xargs sudo umount 2>/dev/null || true
-              sleep 10
-          done
-
-          if [[ -f build/VERSION ]]; then
-          
-            sudo docker system prune -af  || true
-            sudo docker volume rm $(sudo docker volume ls -q) 2>/dev/null || true
-            # sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
-            # sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true          
-            # sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
-
-          fi
-          
-          # check if swap exists
-          swapon
-
-          # remove aptly - we don't need it anymore
-          sudo rm -f /etc/apt/sources.list.d/aptly.list
-          sudo echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y purge needrestart unattended-upgrades
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install jq
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y  -y -qq --with-new-pkgs upgrade
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y autoremove
-          [[ -d build/.git ]] && sudo chown -R $USER:$USER build/.git || true
-          [[ -d build/output/images ]] && sudo rm -rf build/output/images/* || true
-          sudo rm -rf build-* 2>/dev/null || true
-          sudo rm -rf temp 2>/dev/null || true
-          sudo rm -rf changes.txt 2>/dev/null || true
-          sudo rm *.conf 2>/dev/null || true
-          sudo rm *.txt 2>/dev/null || true
-          sudo rm -rf cache/sources/ || true
-          sudo rm -rf output/ || true          
-          sudo chown -R $USER:$USER build/.git || true
-          # rm $HOME/.ssh/known_hosts
-          
-          # mount all back
-          sudo mount -a
+           FROM_RELEASE=hirsute
+           TO_RELEASE=jammy
+           sudo wget https://apt.armbian.com/armbian.key -O key
+           sudo gpg --dearmor < key | sudo tee /usr/share/keyrings/armbian.gpg > /dev/null
+           sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com $TO_RELEASE main ${TO_RELEASE}-utils ${TO_RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
+           sudo sed -i 's/continue/pass/g' /usr/lib/python3/dist-packages/UpdateManager/Core/MetaRelease.py
+           sudo sed -i 's/'$FROM_RELEASE'/'$TO_RELEASE'/g' /etc/apt/sources.list
+           sudo apt-get update
+           echo "Upgrade distro"
+           sudo do-release-upgrade
+           sudo apt-get update
+           sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y
+           sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade -y
+           sudo DEBIAN_FRONTEND=noninteractive apt-get install -f -y
+           sudo DEBIAN_FRONTEND=noninteractive apt-get autoremove --purge -y
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v2
