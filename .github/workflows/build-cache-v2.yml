@@ -225,7 +225,7 @@ jobs:
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
           #GPG_PASS="${{ secrets.GPG_PASSPHRASE1 }}" 
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf
-          suud sed -i "s/lz4 -5 -c/lz4 -12 -c/" lib/debootstrap.sh
+          sudo sed -i "s/lz4 -5 -c/lz4 -12 -c/" lib/debootstrap.sh
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes 
           ./compile.sh docker \
           BETA="no" \
