@@ -314,7 +314,8 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && inputs.uploading != 'true' && github.event.inputs.choice != 'stable' && github.event.inputs.choice != 'rc' }}
         with:
           artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
-          tag: "latest"
+          #tag: "latest"
+          tag: "${{ env.VERSION }}"          
           omitBody: true
           omitName: true
           allowUpdates: true
