@@ -49,7 +49,7 @@ jobs:
         if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           repository: armbian/build
           path: build
           ref: nightly
