@@ -182,6 +182,7 @@ jobs:
           else
               echo "Mounting SSH share"
               sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
           fi
           # remove true when all runners are on jammy
           sudo df          
