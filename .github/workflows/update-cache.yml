@@ -267,7 +267,7 @@ jobs:
       - name: Sign
         run: |
 
-          sudo apt-get -y -qq install parallel buildtorrent
+          sudo apt-get -y -qq install jq parallel buildtorrent
           FILE=$(ls -1 build/cache/rootfs/*.lz4 | awk -F/ '{print $NF}')
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_all.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
