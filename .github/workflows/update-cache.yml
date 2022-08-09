@@ -120,6 +120,7 @@ jobs:
           repository: armbian/build
           fetch-depth: 1
           path: build
+          ref: AR-1277
           clean: false
 
       - name: Checkout support scripts
