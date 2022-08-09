@@ -272,7 +272,7 @@ jobs:
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | head -1)ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_all.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
           WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.release-start.outputs.rootfscache_version }}/\$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/${{ needs.release-start.outputs.rootfscache_version }}\/$FILE/' |  tr '\n' , | sed 's/.$//')"
-          cd build/cache/rootfs.upload/${{ needs.release-start.outputs.rootfscache_version }}
+          cd build/cache/rootfs
           TARGET=$(ls -1 *.lz4)
           echo "Signing"
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback *.lz4
