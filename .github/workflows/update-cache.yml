@@ -275,10 +275,10 @@ jobs:
           WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.release-start.outputs.rootfscache_version }}/\$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/${{ needs.release-start.outputs.rootfscache_version }}\/$FILE/' |  tr '\n' , | sed 's/.$//')"
           cd build/cache/rootfs
           TARGET=$(ls -1 *.lz4)
-          echo "Signing"
+          echo "Sign"
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback *.lz4
-          echo "Torrent"
-          buildtorrent -q -s -m '$WEBSEEDS' --announce="'$ANNOUNCE'" --announcelist="'$TRACKERS'" $TARGET -c "Armbian rootfs cache" ${TARGET}.torrent >/dev/null
+          echo "Generate torrent"
+          buildtorrent -q  -m $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $TARGET -c "Armbian rootfs cache" ${TARGET}.torrent
 
       - name: Upload
         uses: ncipollo/release-action@v1
