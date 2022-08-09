@@ -45,8 +45,8 @@ jobs:
       
     steps:
 
-      - name: Runner cleanup
-        uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
           
       - name: Checkout build repository
         uses: actions/checkout@v3
@@ -111,8 +111,8 @@ jobs:
     runs-on: ["${{ needs.Prepare.outputs.runner }}"]
     steps:
 
-      - name: Runner cleanup
-        uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - name: Checkout repository
         uses: actions/checkout@v3
