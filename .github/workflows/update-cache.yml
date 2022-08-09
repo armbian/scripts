@@ -275,9 +275,9 @@ jobs:
           cd build/cache/rootfs
           TARGET=$(ls -1 *.lz4)
           echo "Signing"
-          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback *.lz4
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | sudo gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback *.lz4
           echo "Torrent"
-          buildtorrent -q -s -m '$WEBSEEDS' --announce="'$ANNOUNCE'" --announcelist="'$TRACKERS'" $TARGET -c "Armbian rootfs cache" ${TARGET}.torrent >/dev/null
+          sudo buildtorrent -q -s -m '$WEBSEEDS' --announce="'$ANNOUNCE'" --announcelist="'$TRACKERS'" $TARGET -c "Armbian rootfs cache" ${TARGET}.torrent >/dev/null
 
       - name: Upload
         uses: ncipollo/release-action@v1
