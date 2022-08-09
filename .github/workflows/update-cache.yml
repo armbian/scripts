@@ -270,15 +270,16 @@ jobs:
         run: |
 
           sudo apt-get -y -qq install parallel buildtorrent
-          ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | head -1)ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
+          FILE=$(ls -1 build/cache/rootfs/*.lz4 | awk -F/ '{print $NF}')
+          ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_all.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
-          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.release-start.outputs.rootfscache_version }}/\$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/${{ needs.release-start.outputs.rootfscache_version }}\/$FILE/' |  tr '\n' , | sed 's/.$//')"
+          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.release-start.outputs.rootfscache_version }}/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/${{ needs.release-start.outputs.rootfscache_version }}\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
           cd build/cache/rootfs
-          TARGET=$(ls -1 *.lz4)
+          #TARGET=$(ls -1 *.lz4)
           echo "Sign"
-          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback *.lz4
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
           echo "Generate torrent"
-          buildtorrent -q  -m $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $TARGET -c "Armbian rootfs cache" ${TARGET}.torrent
+          buildtorrent -q  -m $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
 
       - name: Upload
         uses: ncipollo/release-action@v1
