@@ -178,7 +178,7 @@ jobs:
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
-          sudo mkdir -p build/cache/rootfs || true
+          sudo mkdir -p build/cache/rootfs || true          
 
           ls -l build/cache/rootfs/
           echo "Clean folder"
@@ -262,6 +262,7 @@ jobs:
 
           df          
           cd ..
+          sudo chown -R $USER:$USER build/cache/rootfs || true
           ls -l build/cache/rootfs || true
 
 
@@ -275,9 +276,9 @@ jobs:
           cd build/cache/rootfs
           TARGET=$(ls -1 *.lz4)
           echo "Signing"
-          sudo sudo --preserve-env  bash -c "echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback *.lz4"
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback *.lz4
           echo "Torrent"
-          sudo buildtorrent -q -s -m '$WEBSEEDS' --announce="'$ANNOUNCE'" --announcelist="'$TRACKERS'" $TARGET -c "Armbian rootfs cache" ${TARGET}.torrent >/dev/null
+          buildtorrent -q -s -m '$WEBSEEDS' --announce="'$ANNOUNCE'" --announcelist="'$TRACKERS'" $TARGET -c "Armbian rootfs cache" ${TARGET}.torrent >/dev/null
 
       - name: Upload
         uses: ncipollo/release-action@v1
