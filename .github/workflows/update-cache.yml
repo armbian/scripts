@@ -234,7 +234,7 @@ jobs:
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
           #GPG_PASS="${{ secrets.GPG_PASSPHRASE1 }}" 
           sudo sed -i "s/-it --rm/-i --rm/" userpatches/config-docker.conf
-          sudo sed -i "s/lz4 -5 -c/lz4 -12 -c/" lib/debootstrap.sh
+          
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes 
           ./compile.sh docker \
           BETA="no" \
@@ -269,12 +269,12 @@ jobs:
         run: |
 
           sudo apt-get -y -qq install jq parallel buildtorrent
-          FILE=$(ls -1 build/cache/rootfs/*.lz4 | awk -F/ '{print $NF}')
+          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_all.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
           WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.Prepare.outputs.rootfscache_version }}/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/'${{ needs.Prepare.outputs.rootfscache_version }}'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
           cd build/cache/rootfs
-          #TARGET=$(ls -1 *.lz4)
+          #TARGET=$(ls -1 *.zst)
           echo "Sign"
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
           echo "Generate torrent"
