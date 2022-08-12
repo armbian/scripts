@@ -212,12 +212,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Delete control artefact
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: geekyeggo/delete-artifact@v1
-        with:
-          name: changes
-
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
