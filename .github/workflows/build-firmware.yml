@@ -34,7 +34,8 @@ jobs:
     runs-on: ${{ inputs.runner }}    
     steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - run: |
 
@@ -48,14 +49,14 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          fetch-depth: '100'
+          fetch-depth: '1'
           ref:  ${{ env.REFERENCE }}
           clean: false
 
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: '100'
+          fetch-depth: '1'
           repository: armbian/scripts
           path: scripts
           clean: false
@@ -142,19 +143,5 @@ jobs:
           SKIP_EXTERNAL_TOOLCHAINS=yes \
           USE_MAINLINE_GOOGLE_MIRROR="yes"
 
-      - name: Upload artefacts
-        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: firmware-zsh-armbian-config
-          path: build/output/debs-beta/*.deb
-          if-no-files-found: ignore
-          retention-days: 7
-
-      - name: Unmount folders
-        if: ${{ github.repository_owner == 'Armbian' && inputs.uploading == 'true' && env.SKIP != 'yes' }}
-        run: |
-
-            sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-            sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-            sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
