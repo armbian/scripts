@@ -39,7 +39,8 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - run: |
 
@@ -47,23 +48,6 @@ jobs:
           echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
           PACKAGESREPO=${{ inputs.packagesrepo }}
           echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
-
-      - name: Checkout Armbian build script
-        uses: actions/checkout@v3
-        with:
-          repository: armbian/build
-          path: build
-          ref:  ${{ env.REFERENCE }}
-          fetch-depth: 0
-          clean: false
-
-      - name: Checkout support scripts
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          repository: armbian/scripts
-          path: scripts
-          clean: false
 
       - name: Remove previous artefacts if any
         run: |
@@ -93,7 +77,8 @@ jobs:
 
     steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - run: |
 
@@ -113,14 +98,14 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          fetch-depth: 0
+          fetch-depth: 1
           ref:  ${{ env.REFERENCE }}
           clean: false
           
       - name: Checkout support scripts
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           repository: armbian/scripts
           path: scripts
           clean: false
@@ -208,10 +193,6 @@ jobs:
               echo "FILE_HASH=$(ls -1 cache/hash-beta/*.githash | head -1)"  >> $GITHUB_ENV
               echo "FILE_NAME=${BRANCH}-${FAMILY}" >> $GITHUB_ENV
               echo "UPLOAD=true" >> $GITHUB_ENV
-              # Cleanup
-              # sudo find output/debs-beta/. -type f -not \( -name 'linux*' -or -name 'armbian*' -or -name '.*' \) -print0 | sudo xargs -0 -I {} rm {}
-              # copy edge brach to stable repo
-              # sudo cp output/debs-beta/linux-{dtb,image,source,headers}-edge-* output/debs/ || true
           fi
 
       - name: Upload hash      
@@ -231,10 +212,11 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Unmount folders
+      - name: Delete control artefact
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: changes
 
-        run: |
-
-            sudo mountpoint -q build/output/debs && sudo fusermount -u build/output/debs || true
-            sudo mountpoint -q build/output/debs-beta && sudo fusermount -u build/output/debs-beta || true
-            sudo mountpoint -q build/cache/toolchain && sudo fusermount -u build/cache/toolchain || true
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main

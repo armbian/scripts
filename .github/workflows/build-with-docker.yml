@@ -77,7 +77,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           repository: armbian/build
           path: build
           ref: ${{ env.REPO }}
@@ -136,6 +136,9 @@ jobs:
     runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     steps:
 
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
       - name: Set environment variables
         run: |
 
@@ -148,7 +151,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           repository: armbian/build
           path: build
           ref: ${{ env.REPO }}
@@ -157,7 +160,7 @@ jobs:
       - name: Checkout support scripts
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           repository: armbian/scripts
           path: scripts
           clean: false
@@ -168,9 +171,6 @@ jobs:
         uses: armbian/actions/make-list@main
         with:
           type: ${{ inputs.boardtype }}
-
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
 
       - name: Copy templates
         run: |
