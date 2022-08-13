@@ -204,6 +204,12 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "dpkg --configure -a; apt -y -qq install neofetch; apt -y autoremove"
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "neofetch"
 
+      - name: To nightly
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+         
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "armbian-config main=System selection=Nightly"
+
       - name: Dmesg
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
