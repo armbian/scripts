@@ -100,7 +100,7 @@ jobs:
           path: build
           fetch-depth: 0
           ref:  ${{ env.REFERENCE }}
-          clean: false
+          clean: true
 
       - name: Checkout support scripts
         uses: actions/checkout@v3
@@ -108,7 +108,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/scripts
           path: scripts
-          clean: false
+          clean: true
 
       - name: Install SSH key for storage
         if: ${{ inputs.uploading == 'true' }}
