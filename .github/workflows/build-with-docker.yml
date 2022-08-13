@@ -90,6 +90,14 @@ jobs:
         with:
           type: ${{ inputs.boardtype }}
 
+      - name: Upload build list
+        if: ${{ inputs.boardtype != '' }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: targets.txt
+          name: targets
+          if-no-files-found: ignore
+
       - name: Remove previous artefacts if any
         run: |
 
@@ -165,12 +173,18 @@ jobs:
           path: scripts
           clean: false
 
-      - name: Make build list
+#      - name: Make build list
+#        if: ${{ inputs.boardtype != '' }}
+#        id: make-list
+#        uses: armbian/actions/make-list@main
+#        with:
+#          type: ${{ inputs.boardtype }}
+
+      - name: Download build list
         if: ${{ inputs.boardtype != '' }}
-        id: make-list
-        uses: armbian/actions/make-list@main
+        uses: actions/download-artifact@v3
         with:
-          type: ${{ inputs.boardtype }}
+          name: targets
 
       - name: Copy templates
         run: |
