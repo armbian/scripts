@@ -259,6 +259,12 @@ jobs:
           BOARD=$(echo $CHUNK | cut -d":" -f2)
           echo "BOARD=$BOARD" >> $GITHUB_ENV
           echo "VERSION=$(cat build/VERSION)" >> $GITHUB_ENV
+
+          # community builds are weekly
+          if [[ -n "${{ inputs.boardtype }}" ]]; then          
+          echo "VERSION=$(date +%U)" >> $GITHUB_ENV
+          fi
+                   
           LINIJA="cat ${FILENAME} | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed -n ''$LINE'p'"
           read -r BOARD BRANCH RELEASE BUILD_TARGET BUILD_STABILITY BUILD_IMAGE DESKTOP_ENVIRONMENT DESKTOP_ENVIRONMENT_CONFIG_NAME DESKTOP_APPGROUPS_SELECTED \
           <<< $(eval $LINIJA)
