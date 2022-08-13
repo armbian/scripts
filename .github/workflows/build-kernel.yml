@@ -100,7 +100,7 @@ jobs:
           path: build
           fetch-depth: 0
           ref:  ${{ env.REFERENCE }}
-          clean: true
+          clean: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout support scripts
@@ -109,7 +109,7 @@ jobs:
           fetch-depth: 0
           repository: armbian/scripts
           path: scripts
-          clean: true
+          clean: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install SSH key for storage
