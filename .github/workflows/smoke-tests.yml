@@ -288,7 +288,7 @@ jobs:
 
           rm -rf status
           mkdir -p status
-          echo "\"${{ matrix.ip }}\",\"${{ env.ONLINE }}\"" >> status/${{ matrix.ip }}.txt
+          echo "\"${{ matrix.ip }}\",\"${{ matrix.name }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ matrix.ip }}.txt
 
       - name: Upload hash
         if: ${{ github.repository_owner == 'Armbian' }}
