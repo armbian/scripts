@@ -284,7 +284,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
-          mkdir status
+          mkdir -p status
           echo "\"${{ matrix.ip }}\",\"${{ env.ONLINE }}\"" >> status/${{ matrix.ip }}.txt
 
       - name: Upload hash
