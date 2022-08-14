@@ -344,12 +344,12 @@ jobs:
           name: status
           path: status
 
-      - name: Power off
-        if: always()
-        uses: armbian/actions/power-off@main
-        with:
-        
-          KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
-          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
-          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
-          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+#      - name: Power off
+#        if: always()
+#        uses: armbian/actions/power-off@main
+#        with:
+#        
+#          KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
+#          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+#          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+#          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
