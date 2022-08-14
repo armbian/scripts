@@ -306,6 +306,11 @@ jobs:
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
+      - name: Clean
+        run: |
+
+          sudo rm -rf status
+
       - name: Download changes
         uses: actions/download-artifact@v3
         with:
