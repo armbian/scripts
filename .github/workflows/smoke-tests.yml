@@ -301,6 +301,7 @@ jobs:
 
   Stop:
     name: "Power system off"
+    if: always()
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
@@ -340,7 +341,8 @@ jobs:
           path: status
 
       - name: Power off
-        uses: armbian/actions/power-on@main
+        if: always()
+        uses: armbian/actions/power-off@main
         with:
           KEY_POWER_ON: ${{ secrets.KEY_POWER_OFF }}
           USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
