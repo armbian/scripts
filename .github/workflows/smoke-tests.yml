@@ -8,8 +8,8 @@ on:
 
 jobs:
   
-  Prepare:
-    runs-on: small
+  Prepare:    
+    runs-on: [self-hosted, Linux, local]
     steps:
     
       - name: Runner prepare
