@@ -205,6 +205,9 @@ jobs:
       - name: Is online?
         run: |
 
+          # set this here
+          echo "REBOOT=false" >> $GITHUB_ENV
+
           server="${{ matrix.ip }}"
           if nc -z $server 22 2>/dev/null; then
             echo "$server ✓"
@@ -278,8 +281,7 @@ jobs:
               echo "REBOOT=true" >> $GITHUB_ENV
           else
               # power cycle
-              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
-               echo "REBOOT=false" >> $GITHUB_ENV
+              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true              
           fi
 
       - name: Assemble
