@@ -329,18 +329,13 @@ jobs:
           name: status
           path: status
 
-      - name: Delete control artefact
-        uses: geekyeggo/delete-artifact@v1
-        with:
-          name: status
-
       - name: Calculate
         run: |
 
           ls -1 status | wc -l > status/total
           grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
           echo "scale=2 ; (100*($(cat status/total.txt)-$(cat status/failed.txt | wc -l))/$(cat status/total.txt))" | bc > status/success
-          rm -f status/*
+          rm -f status/*.txt
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' }}
