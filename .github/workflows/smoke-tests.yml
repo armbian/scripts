@@ -16,18 +16,18 @@ jobs:
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
-      - name: Power on
-        uses: armbian/actions/power-on@main
-        with:
-          KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
-          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
-          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
-          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+#      - name: Power on
+#        uses: armbian/actions/power-on@main
+#        with:
+#          KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
+#          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+#          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+#          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
     
-      - name: Sleep for 3m to make sure switches were booted up
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '3m'
+#      - name: Sleep for 3m to make sure switches were booted up
+#        uses: jakejarvis/wait-action@master
+#        with:
+#          time: '3m'
 
   Test:
     name: "DUT"
@@ -192,7 +192,8 @@ jobs:
             power-socket: ""
     steps:
     
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
     
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
@@ -210,7 +211,7 @@ jobs:
             echo "PROCEED=true" >> $GITHUB_ENV
           else
             echo "$server ✗ needs to be power cycled"
-            [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
+            [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
           fi
     
       - name: Login
