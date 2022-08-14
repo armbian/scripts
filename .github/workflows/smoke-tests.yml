@@ -8,14 +8,36 @@ on:
 
 jobs:
   
+  Prepare:
+    name: "Power system on"
+    runs-on: [self-hosted, Linux, local]
+    steps:
+    
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
+      - name: Power on
+        uses: armbian/actions/power-on@main
+        with:
+          KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
+          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+    
+      - name: Sleep for 3m to make sure switches were booted up
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '3m'
+
   Test:
     name: "DUT"
     runs-on: igor
+    needs: Prepare
     if: ${{ github.repository_owner == 'Armbian' }}
     timeout-minutes: 15
     strategy:
       #max-parallel: 16
-      fail-fast: false
+      fail-fast: true
       matrix: 
         include:
           - ip: "10.0.50.158" 
@@ -170,7 +192,8 @@ jobs:
             power-socket: ""
     steps:
     
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
     
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
@@ -182,13 +205,18 @@ jobs:
       - name: Is online?
         run: |
 
+          # set this here
+          echo "REBOOT=false" >> $GITHUB_ENV
+
           server="${{ matrix.ip }}"
           if nc -z $server 22 2>/dev/null; then
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
-          else
+            echo "ONLINE=true" >> $GITHUB_ENV
+          else          
             echo "$server ✗ needs to be power cycled"
-            [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
+            echo "ONLINE=false" >> $GITHUB_ENV
+            [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
           fi
     
       - name: Login
@@ -250,16 +278,74 @@ jobs:
           ping -w5 ${{ matrix.ip }}
           if [[ $? -eq 0 ]]; then
               ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+              echo "REBOOT=true" >> $GITHUB_ENV
           else
               # power cycle
-              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
+              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true              
           fi
-#  Stop:
-#    runs-on: igor
-#    if: ${{ always() }}
-#    needs: Test
-#    steps:
-#    - name: Stop
-#      run: |
-#
-#        echo "Stop"
+
+      - name: Assemble
+        if: ${{ github.repository_owner == 'Armbian' }}
+        run: |
+
+          rm -rf status
+          mkdir -p status
+          echo "\"${{ matrix.ip }}\",\"${{ matrix.name }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ matrix.ip }}.txt
+
+      - name: Upload status
+        if: ${{ github.repository_owner == 'Armbian' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: status
+          path: status
+
+  Stop:
+    name: "Power system off"
+    if: always()
+    needs: Test
+    runs-on: [self-hosted, Linux, local]
+    steps:
+    
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
+      - name: Clean
+        run: |
+
+          sudo rm -rf status
+
+      - name: Download changes
+        uses: actions/download-artifact@v3
+        with:
+          name: status
+          path: status
+
+      - name: Delete control artefact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: status
+
+      - name: Calculate
+        run: |
+
+          ls -1 status | wc -l > status/total
+          grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
+          echo "scale=2 ; (100*($(cat status/total.txt)-$(cat status/failed.txt | wc -l))/$(cat status/total.txt))" | bc > status/success
+          rm -f status/*
+
+      - name: Upload status
+        if: ${{ github.repository_owner == 'Armbian' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: status
+          path: status
+
+      - name: Power off
+        if: always()
+        uses: armbian/actions/power-off@main
+        with:
+        
+          KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
+          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
