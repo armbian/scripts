@@ -19,9 +19,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        board: [uefi-x86,rpi4b]
-        #target: ["debian:bullseye:10","ubuntu:focal:8","ubuntu:jammy:12"]
-        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
+        board: [uefi-x86,uefi-arm64]
+        #target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
+        target: ["debian:bullseye:10","ubuntu:jammy:12"]
         desktop: [xfce,gnome,mate,cinnamon,budgie]
     
     name: Make
