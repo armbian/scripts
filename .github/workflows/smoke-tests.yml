@@ -8,9 +8,20 @@ on:
 
 jobs:
   
+  Prepare:
+    runs-on: small
+    steps:
+    
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
+      - name: Power on
+        uses: armbian/actions/power-on@main
+
   Test:
     name: "DUT"
     runs-on: igor
+    needs: Prepare
     if: ${{ github.repository_owner == 'Armbian' }}
     timeout-minutes: 15
     strategy:
