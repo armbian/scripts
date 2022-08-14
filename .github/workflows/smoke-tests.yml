@@ -281,12 +281,13 @@ jobs:
           fi
 
       - name: Assemble
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
           echo ${{ env.ONLINE }} >> status
 
       - name: Upload hash
+        if: ${{ github.repository_owner == 'Armbian' }}
         uses: actions/upload-artifact@v3
         with:
           name: status
