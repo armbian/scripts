@@ -17,6 +17,8 @@ jobs:
 
       - name: Power on
         uses: armbian/actions/power-on@main
+        with:
+          key: ${{ secrets.KEY_POWER_ON }}
 
   Test:
     name: "DUT"
