@@ -292,7 +292,7 @@ jobs:
           mkdir -p status
           echo "\"${{ matrix.ip }}\",\"${{ matrix.name }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ matrix.ip }}.txt
 
-      - name: Upload hash
+      - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' }}
         uses: actions/upload-artifact@v3
         with:
@@ -319,10 +319,25 @@ jobs:
           name: status
           path: status
 
+      - name: Delete control artefact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: status
+
       - name: Calculate
         run: |
 
-          ls -l status
+          ls -1 status | wc -l > status/total
+          grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
+          echo "scale=2 ; (100*($(cat status/total.txt)-$(cat status/failed.txt | wc -l))/$(cat status/total.txt))" | bc > status/success
+          rm -f status/*
+
+      - name: Upload status
+        if: ${{ github.repository_owner == 'Armbian' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: status
+          path: status
 
       - name: Power off
         uses: armbian/actions/power-on@main
