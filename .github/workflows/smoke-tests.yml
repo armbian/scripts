@@ -310,6 +310,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: status
+          path: status
 
       - name: Calculate
         run: |
