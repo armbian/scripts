@@ -5,7 +5,14 @@ on:
     secrets:
       KEY_CI:
         required: true
-
+      KEY_POWER_ON:
+        required: true
+      USER_REPOSITORY:
+        required: true
+      HOST_REPOSITORY:
+        required: true
+      KNOWN_HOSTS_REPOSITORY:
+        required: true
 jobs:
   
   Prepare:
