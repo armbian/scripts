@@ -209,7 +209,7 @@ jobs:
           if nc -z $server 22 2>/dev/null; then
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
-            echo "ONLINe=true" >> $GITHUB_ENV
+            echo "ONLINE=true" >> $GITHUB_ENV
           else          
             echo "$server ✗ needs to be power cycled"
             echo "ONLINE=false" >> $GITHUB_ENV
@@ -275,9 +275,11 @@ jobs:
           ping -w5 ${{ matrix.ip }}
           if [[ $? -eq 0 ]]; then
               ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/"
+              echo "REBOOT=true" >> $GITHUB_ENV
           else
               # power cycle
-              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
+              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
+               echo "REBOOT=false" >> $GITHUB_ENV
           fi
 
       - name: Assemble
@@ -304,7 +306,17 @@ jobs:
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
-      - name: Power on
+      - name: Download changes
+        uses: actions/download-artifact@v3
+        with:
+          name: status
+
+      - name: Calculate
+        run: |
+
+          ls -l status
+
+      - name: Power off
         uses: armbian/actions/power-on@main
         with:
           KEY_POWER_ON: ${{ secrets.KEY_POWER_OFF }}
