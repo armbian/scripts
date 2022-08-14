@@ -209,8 +209,10 @@ jobs:
           if nc -z $server 22 2>/dev/null; then
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
-          else
+            echo "ONLINe=true" >> $GITHUB_ENV
+          else          
             echo "$server ✗ needs to be power cycled"
+            echo "ONLINE=false" >> $GITHUB_ENV
             [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
           fi
     
@@ -277,6 +279,18 @@ jobs:
               # power cycle
               [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}"
           fi
+
+      - name: Assemble
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          echo ${{ env.ONLINE }} >> status
+
+      - name: Upload hash
+        uses: actions/upload-artifact@v3
+        with:
+          name: status
+          path: status
 
   Stop:
     name: "Power system off"
