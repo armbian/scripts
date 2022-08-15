@@ -55,7 +55,7 @@ jobs:
           - ip: "10.0.30.137" 
             name: "Lime A64"
             power-socket: ""
-          - ip: "10.0.30.176" 
+          - ip: "10.0.30.161" 
             name: "Nanopi R4S"
             power-socket: ""
           - ip: "10.0.30.135" 
