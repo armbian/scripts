@@ -218,7 +218,7 @@ jobs:
           echo "REBOOT=false" >> $GITHUB_ENV
 
           server="${{ matrix.ip }}"
-          if nc -z $server 22 2>/dev/null; then
+          if nc -z $server 22 -w 5 2>/dev/null; then
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
             echo "ONLINE=true" >> $GITHUB_ENV
