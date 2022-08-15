@@ -67,7 +67,7 @@ jobs:
           - ip: "10.0.30.103" 
             name: "Orange Pi One"
             power-socket: 6
-          - ip: "10.0.30.151" 
+          - ip: "10.0.30.129" 
             name: "Espressobin"
             power-socket: "203"
 #          - ip: "10.0.50.153"
