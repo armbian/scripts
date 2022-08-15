@@ -26,7 +26,7 @@ jobs:
     
     name: Make
     #runs-on: ${{ inputs.runner }}
-    runs-on: small
+    runs-on: big
     steps:
 
       - name: Runner prepare
