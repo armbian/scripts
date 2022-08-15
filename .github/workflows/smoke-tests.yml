@@ -43,7 +43,7 @@ jobs:
     runs-on: igor
     needs: Prepare
     if: ${{ github.repository_owner == 'Armbian' }}
-    timeout-minutes: 20
+    timeout-minutes: 15
     strategy:
       #max-parallel: 16
       fail-fast: false
