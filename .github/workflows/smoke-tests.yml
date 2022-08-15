@@ -36,7 +36,7 @@ jobs:
       - name: Sleep for 3m to make sure switches were booted up
         uses: jakejarvis/wait-action@master
         with:
-          time: '3s'
+          time: '3m'
 
   Test:
     name: "DUT"
