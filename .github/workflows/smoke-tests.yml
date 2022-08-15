@@ -94,7 +94,7 @@ jobs:
           - ip: "10.0.30.119" 
             name: "Tinkerboard"
             power-socket: ""
-          - ip: "10.0.30.203"
+          - ip: "10.0.30.138"
             name: "Orange Pi One+"
             power-socket: ""
           - ip: "10.0.30.120" 
