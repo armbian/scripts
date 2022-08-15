@@ -46,7 +46,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       #max-parallel: 16
-      fail-fast: true
+      fail-fast: false
       matrix: 
         include:
           - ip: "10.0.50.158" 
