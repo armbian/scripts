@@ -201,6 +201,7 @@ jobs:
           DESKTOP_ENVIRONMENT="${DE}" \
           KERNEL_ONLY="yes" \
           KERNEL_CONFIGURE="no" \
+          COMPRESS_OUTPUTIMAGE="no" \
           BOARD="uefi-x86" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
           BRANCH="current" \
