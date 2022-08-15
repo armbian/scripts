@@ -302,7 +302,7 @@ jobs:
           echo "\"${{ matrix.ip }}\",\"${{ matrix.name }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ matrix.ip }}.txt
 
       - name: Upload status
-        if: ${{ github.repository_owner == 'Armbian' }}
+        if: ${{ github.repository_owner == 'Armbian' &&  always() }}
         uses: actions/upload-artifact@v3
         with:
           name: status
