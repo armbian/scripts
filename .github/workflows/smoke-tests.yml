@@ -151,7 +151,7 @@ jobs:
           - ip: "10.0.30.167" 
             name: "Cubietruck"
             power-socket: ""
-          - ip: "10.0.30.206" 
+          - ip: "10.0.30.168" 
             name: "Cubieboard"
             power-socket: ""
           - ip: "10.0.30.169" 
