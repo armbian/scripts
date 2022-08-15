@@ -260,13 +260,12 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ping -w5 ${{ matrix.ip }}
-          if [[ $? -eq 0 ]]; then
+          STR=$(LC_ALL=C ping -w5 ${{ matrix.ip }} || true)
+          if grep -q "Unreachable" <<< "$STR"; then
+              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
+          else
               ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "run-parts /etc/update-motd.d/" || true
               echo "REBOOT=true" >> $GITHUB_ENV
-          else              
-              echo "# power cycle"
-              [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
           fi
 
       - name: Assemble
