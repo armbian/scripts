@@ -190,6 +190,9 @@ jobs:
           - ip: "10.0.30.254" 
             name: "Orange Pi Zero"  
             power-socket: ""
+          - ip: "10.0.30.117" 
+            name: "Orange Pi Zero Plus"  
+            power-socket: ""
           - ip: "10.0.30.146" 
             name: "Udoo Quad"  
             power-socket: 3
