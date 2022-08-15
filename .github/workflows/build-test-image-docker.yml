@@ -26,8 +26,8 @@ jobs:
         desktop: [xfce,gnome,mate,cinnamon,budgie,kde-plasma]
     
     name: Make
-    #runs-on: ${{ inputs.runner }}
-    runs-on: big
+    runs-on: ${{ inputs.runner }}
+    #runs-on: big
     steps:
 
       - name: Runner prepare
