@@ -170,3 +170,6 @@ jobs:
 #          path: build/output/images/*
 #          if-no-files-found: error
 #          retention-days: 7
+
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
