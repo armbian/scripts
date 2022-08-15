@@ -242,7 +242,7 @@ jobs:
           echo "Write u-boot to $root_partition_device with $root_uuid" "$(date  +%R:%S)" || true
           fi
 
-          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade" || true
+          timeout 5 ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade" || true
 
       - name: Reboot
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
