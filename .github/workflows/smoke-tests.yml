@@ -259,14 +259,14 @@ jobs:
 
           if [[ "$(dpkg --print-architecture)" == arm* ]]; then
           echo "Update bootloader"
-          root_uuid=$(sed -e 's/^.*root=//' -e 's/ .*$//' < /proc/cmdline)
-          root_partition=$(blkid | tr -d '":' | grep "${root_uuid}" | awk '{print $1}')
-          root_partition_device="${root_partition::-2}"
-          [[ -f /usr/lib/u-boot/platform_install.sh ]] && source /usr/lib/u-boot/platform_install.sh && write_uboot_platform $DIR ${root_partition_device}
-          echo "Write u-boot to $root_partition_device with $root_uuid" "$(date  +%R:%S)"
+          root_uuid=$(sed -e 's/^.*root=//' -e 's/ .*$//' < /proc/cmdline) || true
+          root_partition=$(blkid | tr -d '":' | grep "${root_uuid}" | awk '{print $1}') || true
+          root_partition_device="${root_partition::-2}" || true
+          [[ -f /usr/lib/u-boot/platform_install.sh ]] && source /usr/lib/u-boot/platform_install.sh && write_uboot_platform $DIR ${root_partition_device}  || true
+          echo "Write u-boot to $root_partition_device with $root_uuid" "$(date  +%R:%S)" || true
           fi
 
-          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade"
+          ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade" || true
 
       - name: Reboot
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
