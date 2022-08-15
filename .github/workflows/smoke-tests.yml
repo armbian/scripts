@@ -294,7 +294,7 @@ jobs:
           fi
 
       - name: Assemble
-        if: ${{ github.repository_owner == 'Armbian' }}
+        if: ${{ github.repository_owner == 'Armbian' && always() }}
         run: |
 
           rm -rf status
