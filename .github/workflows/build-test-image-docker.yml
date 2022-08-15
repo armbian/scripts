@@ -15,7 +15,7 @@ on:
 jobs:  
 
   gradle:
-    #if: ${{ github.repository_owner == 'Armbian' && inputs.reference != '' }}
+    if: ${{ github.repository_owner }}
     strategy:
       fail-fast: false
       matrix:
@@ -161,11 +161,11 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="3dsupport browsers" \
           ROOTFSCACHE_VERSION="$(shuf -i 1-100000 -n 1)"
 
-      - name: Upload artefacts        
-        if: ${{ env.SKIP != 'yes' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
-          path: build/output/images/*
-          if-no-files-found: error
-          retention-days: 7
+#      - name: Upload artefacts        
+#        if: ${{ env.SKIP != 'yes' }}
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
+#          path: build/output/images/*
+#          if-no-files-found: error
+#          retention-days: 7
