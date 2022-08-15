@@ -274,11 +274,11 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no root@${{ matrix.ip }} "shutdown -r 1"
 
-      - name: Sleep for 10 min
+      - name: Sleep for 5 min
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         uses: juliangruber/sleep-action@v1
         with:
-          time: 10m
+          time: 5m
 
       - name: Ping
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
