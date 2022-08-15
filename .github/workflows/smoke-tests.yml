@@ -61,12 +61,12 @@ jobs:
           - ip: "10.0.30.135" 
             name: "Jetson Nano"
             power-socket: ""
-          - ip: "10.0.50.189" 
-            name: "Orange Pi Lite 2"
-            power-socket: ""
-          - ip: "10.0.30.103" 
-            name: "Orange Pi One"
-            power-socket: 6
+#          - ip: "10.0.50.189" 
+#            name: "Orange Pi Lite 2"
+#            power-socket: ""
+#          - ip: "10.0.30.103" 
+#            name: "Orange Pi One"
+#            power-socket: 6
           - ip: "10.0.30.129" 
             name: "Espressobin"
             power-socket: "203"
