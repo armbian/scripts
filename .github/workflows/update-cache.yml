@@ -96,7 +96,7 @@ jobs:
           
           # This later will become obsolete
           [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo ::set-output name=runner::$(echo 'small') || true
-          [[ $ARC == uefi-x86 ]] && echo ::set-output name=runner::$(echo 'X64') || true
+          [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo ::set-output name=runner::$(echo 'X64') || true          
 
   image:
   
