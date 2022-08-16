@@ -32,7 +32,7 @@ jobs:
   Prepare:
 
     name: targets
-    runs-on: self-hosted
+    runs-on: [Linux]
     outputs:
     
       runner:   ${{steps.list_dirs.outputs.runner}}
