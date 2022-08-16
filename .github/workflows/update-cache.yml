@@ -91,8 +91,8 @@ jobs:
           # Let's choose runners wisely
           echo ::set-output name=runner::$(echo 'ubuntu-latest') || true # default
           
-          # As we currently don't have many ARM runners, build only server stuff with them
-          [[ $VAR != desktop && ($ARC == tinkerboard || $ARC == uefi-arm64) ]] && echo ::set-output name=runner::$(echo 'aarch64') || true
+          # As we currently don't have many ARM runners and until signing is not done elsewhere, comment them
+          #[[ $VAR != desktop && ($ARC == tinkerboard || $ARC == uefi-arm64) ]] && echo ::set-output name=runner::$(echo 'aarch64') || true
           
           # This later will become obsolete
           [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo ::set-output name=runner::$(echo 'small') || true
