@@ -1,0 +1,39 @@
+name: Get values
+on:
+  workflow_dispatch:
+
+jobs:
+
+  Prepare:
+    runs-on: ubuntu-latest
+    name: Enable test system
+    outputs:
+      matrix: ${{steps.list_dirs.outputs.matrix}}
+    steps:
+
+      - name: Get runners capacity
+        run: |
+          
+          sudo apt-get -y install datamash
+          LIST=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
+          "https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500?name__empty=false&tag=github-runner" \
+          | jq -r '.results[] | .display, .vcpus, .memory, .cluster.name, .tenant.name' | sed -e 's/^\|$/"/g' \
+          | xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g'  | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 4 sum 2,3 --output-delimiter=,)
+          (echo "CPU|MEM";
+          echo "$LIST" | sed "s/,/\t/g" | datamash --sort sum 2,3  | sed "s/\t/|/g") | jq -Rn '
+          ( input  | split("|") ) as $keys |
+          ( inputs | split("|") ) as $vals |
+          [[$keys, $vals] | transpose[] | {key:.[0],value:.[1]}] | from_entries
+          ' > runners_capacity.json
+
+          cat runners_capacity.json
+
+      - name: "Upload status"
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "runners_capacity.json"
+          tag: "latest"
+          omitBody: true
+          omitName: true
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
