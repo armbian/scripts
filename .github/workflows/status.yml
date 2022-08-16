@@ -32,7 +32,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "runners_capacity.json"
-          tag: "latest"
+          tag: "status"
           omitBody: true
           omitName: true
           allowUpdates: true
