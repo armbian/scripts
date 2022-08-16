@@ -283,7 +283,6 @@ jobs:
         uses: ncipollo/release-action@v1
         if: ${{ github.repository_owner == 'Armbian' }}
         with:
-          repo: "cache"
           artifacts: "build/cache/rootfs/*"
           artifactErrorsFailBuild: true
           tag: "${{ needs.Prepare.outputs.rootfscache_version }}"
