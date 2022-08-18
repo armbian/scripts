@@ -3,6 +3,8 @@ on:
   workflow_dispatch:
   workflow_call:
     secrets:
+      NETBOX_TOKEN:
+        required: true
       KEY_CI:
         required: true
       KEY_POWER_ON:
