@@ -168,7 +168,7 @@ jobs:
 
           rm -rf status
           mkdir -p status
-          echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ matrix.ip }}.txt
+          echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' &&  always() }}
