@@ -201,7 +201,8 @@ jobs:
         run: |
 
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-             CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"
+             #CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"
+             CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
              else
              CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
           fi
