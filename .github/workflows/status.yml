@@ -13,6 +13,26 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
+      - name: Checkout Armbian support scripts
+        if: ${{ env.SKIP != 'yes' }}
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: armbian/scripts
+          token: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
+          path: scripts
+          clean: true
+
+      - name: Import GPG key
+        if: ${{ env.SKIP != 'yes' }}
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY2 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE2 }}
+          workdir: scripts
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Get runners capacity
         run: |
           
@@ -38,7 +58,7 @@ jobs:
           | xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g'  | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 5 sum 2,3 --output-delimiter=, \
           | awk -F , -v OFS=\| '$3/=1024' | cut -d"," -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
 
-          cat label.tmp
+          cat label.tmp > scripts/README.md
 
       - name: "Upload status"
         uses: ncipollo/release-action@v1
@@ -49,3 +69,18 @@ jobs:
           omitName: true
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update scripts
+        run: |
+
+          cd scripts
+          sudo chown -R $USER:$USER .git
+          if git status --porcelain | grep .; then
+             git config --global user.email "info@armbian.com"
+             git config --global user.name "Armbianworker"
+             git config pull.rebase false
+             git pull
+             git add .
+             git commit --allow-empty -m "Update runners status"
+             git push
+          fi
