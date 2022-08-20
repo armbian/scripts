@@ -14,6 +14,22 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
+      - name: Checkout Armbian support scripts
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          repository: armbian/scripts
+          path: scripts
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY2 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE2 }}
+          workdir: scripts
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Get runners capacity
         run: |
           
@@ -31,15 +47,19 @@ jobs:
 
           cat runners_capacity.json
 
-          echo "|Sponsor &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| vCPU Cores |Memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|" > label.tmp
+          echo "|Donated by &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Virtual CPU cores |Memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|" > label.tmp
           echo "|--|--:|--:|" >> label.tmp
           curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
           | jq -r '.results[] | .display, .vcpus, .memory, .cluster.name, .tenant.name' | sed -e 's/^\|$/"/g' \
           | xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g'  | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 5 sum 2,3 --output-delimiter=, \
-          | awk -F , -v OFS=\| '$3/=1024' | cut -d"," -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
+          | LC_ALL=C awk -F , -v OFS=\| '$3/=1024' | cut -d"." -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
 
-          cat label.tmp
+          # header and footer are edited at GitHub
+          echo "<br>&nbsp;<br>" > scripts/README.md
+          cat scripts/.github/header.inc >> scripts/README.md
+          cat label.tmp >> scripts/README.md
+          cat scripts/.github/footer.inc >> scripts/README.md
 
       - name: "Upload status"
         uses: ncipollo/release-action@v1
@@ -50,3 +70,18 @@ jobs:
           omitName: true
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update scripts
+        run: |
+
+          cd scripts
+          sudo chown -R $USER:$USER .git
+          if git status --porcelain | grep .; then
+             git config --global user.email "info@armbian.com"
+             git config --global user.name "Armbianworker"
+             git config pull.rebase false
+             git pull
+             git add .
+             git commit --allow-empty -m "Update runners status"
+             git push
+          fi
