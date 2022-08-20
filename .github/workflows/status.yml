@@ -30,6 +30,16 @@ jobs:
 
           cat runners_capacity.json
 
+          echo "|Sponsor &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| vCPU Cores |Memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|" > label.tmp
+          echo "|--|--:|--:|" >> label.tmp
+          curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
+          "https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
+          | jq -r '.results[] | .display, .vcpus, .memory, .cluster.name, .tenant.name' | sed -e 's/^\|$/"/g' \
+          | xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g'  | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 5 sum 2,3 --output-delimiter=, \
+          | awk -F , -v OFS=\| '$3/=1024' | cut -d"," -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
+
+          cat label.tmp
+
       - name: "Upload status"
         uses: ncipollo/release-action@v1
         with:
