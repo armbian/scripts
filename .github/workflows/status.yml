@@ -18,7 +18,7 @@ jobs:
           
           sudo apt-get -y install datamash
           LIST=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
-          "https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500?name__empty=false&tag=github-runner" \
+          "https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
           | jq -r '.results[] | .display, .vcpus, .memory, .cluster.name, .tenant.name' | sed -e 's/^\|$/"/g' \
           | xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g'  | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 4 sum 2,3 --output-delimiter=,)
           (echo "CPU|MEM";
