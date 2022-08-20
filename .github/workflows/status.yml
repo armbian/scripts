@@ -14,17 +14,13 @@ jobs:
     steps:
 
       - name: Checkout Armbian support scripts
-        if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           repository: armbian/scripts
-          token: ${{ secrets.SCRIPTS_ACCESS_TOKEN }}
           path: scripts
-          clean: true
 
       - name: Import GPG key
-        if: ${{ env.SKIP != 'yes' }}
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.GPG_KEY2 }}
