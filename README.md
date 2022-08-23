@@ -15,7 +15,6 @@
 |GitHub|40|136 Gb|
 |Igor|660|554 Gb|
 |JetHub|32|39 Gb|
-|Lane|60|93 Gb|
 |Xogium|14|7 Gb|
 ## Donating Virtual Machine to Armbian?
 
