@@ -13,7 +13,7 @@
 |--|--:|--:|
 |Cats|12|15 Gb|
 |GitHub|40|136 Gb|
-|Igor|672|562 Gb|
+|Igor|696|610 Gb|
 |JetHub|32|39 Gb|
 |Lane|96|93 Gb|
 |Xogium|14|7 Gb|
