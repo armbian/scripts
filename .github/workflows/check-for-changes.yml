@@ -12,9 +12,6 @@ on:
       packagesrepo:
         required: false
         type: string
-      ignorechanges:
-        required: false
-        type: string
 
 jobs:
 
