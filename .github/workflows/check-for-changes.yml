@@ -67,7 +67,7 @@ jobs:
 
            VALUES="legacy current edge"
 
-           [[ "$BETA" == no ]] && VALUES="legacy current"
+           # [[ "$BETA" == no ]] && VALUES="legacy current"
            MATRIX=$(for BRANCH in $VALUES; do
               FILES=$(cat build/config/targets*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               while IFS= read -r line; do
