@@ -105,7 +105,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y -qq install neofetch; apt-get -y dist-upgrade; apt-get -y autoremove" || true
+          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y -qq install neofetch" || true
           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "timeout 5 neofetch" || true
 
       - name: To nightly
@@ -133,7 +133,7 @@ jobs:
           echo "Write u-boot to $root_partition_device with $root_uuid" "$(date  +%R:%S)" || true
           fi
 
-          timeout 5 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade" || true
+          timeout 5 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade; apt-get -y dist-upgrade; apt-get -y autoremove" || true
 
       - name: Reboot
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
