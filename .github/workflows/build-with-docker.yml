@@ -138,9 +138,9 @@ jobs:
           fi
           
           if [[ -z "${{ inputs.parallel }}" ]]; then
-          echo ::set-output name=parallel::$(echo '["128"]' | jq) || true
+          echo ::set-output name=parallel::128 || true
           else
-          echo ::set-output name=parallel::${{ inputs.parallel }}"|| true
+          echo ::set-output name=parallel::${{ inputs.parallel }} || true
           fi
 
   image:
