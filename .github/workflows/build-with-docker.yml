@@ -3,9 +3,13 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      parallel:
+       required: false
+       type: string
+       description: How many runners for matrix
       boardtype:
        required: false
-       type: string      
+       type: string
       sourcerepo:
        required: true
        type: string
@@ -62,6 +66,7 @@ jobs:
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
       runner: ${{steps.list_dirs.outputs.runner}}
+      parallel: ${{steps.list_dirs.outputs.parallel}}
     steps:
 
       - name: Runner prepare
@@ -131,6 +136,12 @@ jobs:
           else
           echo ::set-output name=runner::$(echo '["${{ inputs.runner }}"]' | jq) || true
           fi
+          
+          if [[ -z "${{ inputs.parallel }}" ]]; then
+          echo ::set-output name=parallel::$(echo '["128"]' | jq) || true
+          else
+          echo ::set-output name=parallel::$(echo '["${{ inputs.parallel }}"]' | jq) || true
+          fi
 
   image:
 
@@ -138,6 +149,7 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
       fail-fast: false
+      max-parallel: ${{fromJson(needs.Prepare.outputs.parallel)}}
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
