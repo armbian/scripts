@@ -149,7 +149,7 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
       fail-fast: false
-      max-parallel: ${{ needs.Prepare.outputs.parallel }}
+      max-parallel: ${{fromJson(needs.Prepare.outputs.parallel)}}
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
