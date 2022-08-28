@@ -140,7 +140,7 @@ jobs:
           if [[ -z "${{ inputs.parallel }}" ]]; then
           echo ::set-output name=parallel::$(echo '["128"]' | jq) || true
           else
-          echo ::set-output name=parallel::$(echo '["${{ inputs.parallel }}"]' | jq) || true
+          echo ::set-output name=parallel::${{ inputs.parallel }}"|| true
           fi
 
   image:
