@@ -5,7 +5,7 @@ on:
     inputs:
       parallel:
        required: false
-       type: string
+       type: number
        description: How many runners for matrix
       boardtype:
        required: false
@@ -149,7 +149,7 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
       fail-fast: false
-      max-parallel: ${{fromJson(needs.Prepare.outputs.parallel)}}
+      max-parallel: ${{ needs.Prepare.outputs.parallel }}
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
