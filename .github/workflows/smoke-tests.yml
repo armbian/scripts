@@ -139,7 +139,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          timeout 5 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} \
+          timeout 15 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} \
           "iperf3 -c 10.0.40.2 -t 5 -J | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | LC_ALL=C awk -F , -v OFS=\| '\$1/=1048576'| cut -d"-" -f2 | sed -e 's/$/ Mbits\/sec/g'"
 
       - name: Reboot
