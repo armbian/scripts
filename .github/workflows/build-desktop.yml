@@ -105,7 +105,7 @@ jobs:
       if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
       timeout-minutes: 480
       strategy:
-        max-parallel: 8
+        max-parallel: 16
         fail-fast: false
         matrix: 
           node: ${{fromJson(needs.Prepare.outputs.matrix)}}
