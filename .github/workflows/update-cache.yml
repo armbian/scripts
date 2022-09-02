@@ -277,9 +277,10 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
-          sudo chown -R 1008.1002 build/cache/rootfs.upload/.
+          sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
+          sudo chown -R 1008.1002 build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}/.
           # Do it twice, then you may fail
-          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true          
+          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
           sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
 
       - name: Unmount folders
