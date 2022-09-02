@@ -360,9 +360,30 @@ jobs:
 
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
-        
-#          sudo apt-get -y -qq install jq parallel buildtorrent
-#          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
+
+      - name: Download changes
+        uses: actions/download-artifact@v3
+        with:
+          name: rootfs
+
+      - name: Checkout repository
+        if: ${{ github.repository_owner == 'Armbian' }}
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/build
+          fetch-depth: 1
+          path: build
+          clean: false
+
+      - name: Signining and torrent creation
+
+        run: |
+
+          sudo apt-get -y -qq install jq parallel buildtorrent
+          
+          echo ${{ matrix.node }}
+          
+#          FILE=$(ls -1 build/cache/rootfs/${{ matrix.node }} | awk -F/ '{print $NF}')
 #          ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
 #          TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
 #          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.Prepare.outputs.rootfscache_version }}/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/'${{ needs.Prepare.outputs.rootfscache_version }}'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
