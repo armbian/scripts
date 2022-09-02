@@ -294,6 +294,16 @@ jobs:
   
     needs: image
     runs-on: [big]
+    strategy:
+      max-parallel: 10
+      fail-fast: false
+      matrix:
+       
+        release: ${{fromJson(needs.Prepare.outputs.release)}}
+        variant: ${{fromJson(needs.Prepare.outputs.variant)}}
+        desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
+        appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
+    
     steps:
 
       - name: Runner prepare
@@ -332,6 +342,7 @@ jobs:
 
           cat version.cache
           cat filename.cache
+          echo ${{ inputs.variant }}
 
 #          sudo apt-get -y -qq install jq parallel buildtorrent
 #          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
