@@ -397,7 +397,7 @@ jobs:
           FILE=${{ matrix.node }}          
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
-          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/$ROOTFSCACHE_VERSION/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/$ROOTFSCACHE_VERSION'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
+          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/$ROOTFSCACHE_VERSION/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/cache\/'$ROOTFSCACHE_VERSION'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
           cd build/cache/rootfs.upload/$ROOTFSCACHE_VERSION
           echo "Sign"
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
