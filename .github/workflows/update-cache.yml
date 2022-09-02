@@ -31,7 +31,7 @@ jobs:
 
   Prepare:
 
-    name: "Prepare build targets"
+    name: "Make build list"
     runs-on: [Linux]
     outputs:
     
@@ -112,7 +112,6 @@ jobs:
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
     runs-on: ["${{ needs.Prepare.outputs.runner }}"]
-#    runs-on: [Linux]
     steps:
 
       - name: Runner prepare
