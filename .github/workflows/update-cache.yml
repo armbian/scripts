@@ -410,7 +410,7 @@ jobs:
       - name: Mount folders
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
-          libpcre2-8-0
+          
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
               echo "Mounting NFS share"
               sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
