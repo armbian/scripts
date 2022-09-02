@@ -414,9 +414,9 @@ jobs:
           WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/$ROOTFSCACHE_VERSION/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/cache\/'$ROOTFSCACHE_VERSION'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
           cd build/cache/rootfs.upload/$ROOTFSCACHE_VERSION
           echo "Sign"
-          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | sudo --preserve-env gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
           echo "Generate torrent"
-          buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent          
+          sudo --preserve-env buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent          
 
       - name: Upload signature and torrent
         uses: ncipollo/release-action@v1
