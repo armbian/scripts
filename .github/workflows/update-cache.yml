@@ -423,7 +423,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: ${{ github.repository_owner == 'Armbian' }}
         with:
-          artifacts: "build/cache/rootfs.upload/*.asc,build/cache/rootfs.upload/*.torrent"
+          artifacts: "build/cache/rootfs.upload/${{ env.VERSION }}/*.asc,build/cache/rootfs.upload/${{ env.VERSION }}/*.torrent"
           artifactErrorsFailBuild: true
           tag: "${{ env.VERSION }}"
           omitBody: true
