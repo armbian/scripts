@@ -31,17 +31,17 @@ jobs:
 
   Prepare:
 
-    name: targets
+    name: "Prepare build targets"
     runs-on: [Linux]
     outputs:
     
-      runner:   ${{steps.list_dirs.outputs.runner}}
-      board:    ${{steps.list_dirs.outputs.board}}
-      release:  ${{steps.list_dirs.outputs.release}}
-      variant:  ${{steps.list_dirs.outputs.variant}}
-      desktop:  ${{steps.list_dirs.outputs.desktop}}
-      appgroup: ${{steps.list_dirs.outputs.appgroup}}
-      rootfscache_version: ${{steps.list_dirs.outputs.rootfscache_version}}
+      runner:                ${{steps.list_dirs.outputs.runner}}
+      board:                 ${{steps.list_dirs.outputs.board}}
+      release:               ${{steps.list_dirs.outputs.release}}
+      variant:               ${{steps.list_dirs.outputs.variant}}
+      desktop:               ${{steps.list_dirs.outputs.desktop}}
+      appgroup:              ${{steps.list_dirs.outputs.appgroup}}
+      rootfscache_version:   ${{steps.list_dirs.outputs.rootfscache_version}}
       
     steps:
 
@@ -429,7 +429,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: ${{ github.repository_owner == 'Armbian' }}
         with:
-          artifacts: "build/cache/rootfs.upload/${{ env.VERSION }}/*.asc,build/cache/rootfs.upload/${{ env.VERSION }}/*.torrent"
+          artifacts: "build/cache/rootfs.upload/${{ env.VERSION }}/${{ matrix.node }}.asc,build/cache/rootfs.upload/${{ env.VERSION }}/${{ matrix.node }}.torrent"
           artifactErrorsFailBuild: true
           tag: "${{ env.VERSION }}"
           omitBody: true
