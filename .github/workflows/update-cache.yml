@@ -243,7 +243,7 @@ jobs:
           ./compile.sh docker \
           BETA="no" \
           ROOT_FS_CREATE_ONLY="yes" \
-          ROOTFSCACHE_VERSION="${{ needs.Prepare.outputs.rootfscache_version }}" \
+          ROOTFSCACHE_VERSION=$(date --utc "+%Y%M%d") \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
