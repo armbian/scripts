@@ -255,7 +255,7 @@ jobs:
           echo ${{ needs.Prepare.outputs.rootfscache_version }} > version.cache
           ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' | cut -d"-" -f1 > arch.cache
 
-      - name: Upload signature and torrent
+      - name: Upload rootfs archive and packages list
         uses: ncipollo/release-action@v1
         if: ${{ github.repository_owner == 'Armbian' }}
         with:
