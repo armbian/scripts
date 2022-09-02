@@ -270,7 +270,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: "*.cache"
-          name: rootfs
+          name: ${{ inputs.variant }}
           if-no-files-found: ignore
 
       - name: Upload to NAS
@@ -307,7 +307,7 @@ jobs:
       - name: Download changes
         uses: actions/download-artifact@v3
         with:
-          name: rootfs
+          name: ${{ inputs.variant }}
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
@@ -369,7 +369,7 @@ jobs:
       - name: Download changes
         uses: actions/download-artifact@v3
         with:
-          name: rootfs
+          name: ${{ inputs.variant }}
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5
