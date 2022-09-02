@@ -44,7 +44,7 @@ jobs:
       rootfscache_version: ${{steps.list_dirs.outputs.rootfscache_version}}
       
     steps:
-fs
+
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
           
