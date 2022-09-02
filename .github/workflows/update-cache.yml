@@ -393,6 +393,8 @@ jobs:
         run: |
 
           sudo apt-get -y -qq install jq buildtorrent
+          echo "VERSION=$(cat version.cache)" >> $GITHUB_ENV
+
           ROOTFSCACHE_VERSION=$(cat version.cache)
           FILE=${{ matrix.node }}          
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
@@ -411,7 +413,7 @@ jobs:
         with:
           artifacts: "build/cache/rootfs.upload/*.asc,build/cache/rootfs.upload/*.torrent"
           artifactErrorsFailBuild: true
-          tag: "${{ needs.Prepare.outputs.rootfscache_version }}"
+          tag: "${{ env.VERSION }}"
           omitBody: true
           omitName: true
           allowUpdates: true
