@@ -418,3 +418,6 @@ jobs:
           omitName: true
           allowUpdates: true
           token: ${{ secrets.PAT1 }}
+
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
