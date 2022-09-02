@@ -250,6 +250,8 @@ jobs:
           cd ..
           sudo chown -R $USER:$USER build/cache/rootfs || true
           
+          echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
+          
           # pass value via artefacts
           echo ${{ needs.Prepare.outputs.rootfscache_version }} > version.cache
           ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' | cut -d"-" -f1 > arch.cache
@@ -270,7 +272,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: "*.cache"
-          name: ${{ inputs.variant }}
+          name: ${{ env.UPLOAD }}
           if-no-files-found: ignore
 
       - name: Upload to NAS
@@ -300,6 +302,11 @@ jobs:
    
     steps:
 
+      - name: Read
+        run: |
+        
+          echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
+
       - name: Runner prepare
         if: ${{ github.repository_owner == 'Armbian' }}
         uses: armbian/actions/runner-prepare@main
@@ -307,7 +314,7 @@ jobs:
       - name: Download changes
         uses: actions/download-artifact@v3
         with:
-          name: ${{ inputs.variant }}
+          name: ${{ env.UPLOAD }}
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
@@ -363,13 +370,18 @@ jobs:
           
     steps:
 
+      - name: Read
+        run: |
+        
+          echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
+
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
       - name: Download changes
         uses: actions/download-artifact@v3
         with:
-          name: ${{ inputs.variant }}
+          name: ${{ env.UPLOAD }}
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5
