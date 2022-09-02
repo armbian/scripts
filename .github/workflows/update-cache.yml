@@ -142,14 +142,6 @@ jobs:
           path: trackerslist
           clean: false
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_KEY1 }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
-          workdir: build
-          git_user_signingkey: true
-
       - name: Copy templates
         run: |
 
@@ -365,6 +357,14 @@ jobs:
         with:
           name: rootfs
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY1 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
+          workdir: build
+          git_user_signingkey: true
+
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
         uses: actions/checkout@v3
@@ -380,23 +380,24 @@ jobs:
           
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
               echo "Mounting NFS share"
-              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs/$(cat version.cache) build/cache/rootfs.upload
+              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
           else
               echo "Mounting SSH share"
-              sudo sshfs upload@users.armbian.com:/rootfs/$(cat version.cache) build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
-              sudo sshfs upload@users.armbian.com:/rootfs/$(cat version.cache) build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
           fi
 
       - name: Signining and torrent creation
         run: |
 
+          ROOTFSCACHE_VERSION=$(cat version.cache)
+
           sudo apt-get -y -qq install jq parallel buildtorrent
-          FILE=${{ matrix.node }}
-          FILE=$(ls -1 build/cache/rootfs/${{ matrix.node }} | awk -F/ '{print $NF}')
+          FILE=${{ matrix.node }}          
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
-          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.Prepare.outputs.rootfscache_version }}/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/'${{ needs.Prepare.outputs.rootfscache_version }}'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
-          cd build/cache/rootfs.upload
+          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/$ROOTFSCACHE_VERSION/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/$ROOTFSCACHE_VERSION'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
+          cd build/cache/rootfs.upload/$ROOTFSCACHE_VERSION
           echo "Sign"
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
           echo "Generate torrent"
