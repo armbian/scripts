@@ -111,7 +111,8 @@ jobs:
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
-    runs-on: ["${{ needs.Prepare.outputs.runner }}"]
+#    runs-on: ["${{ needs.Prepare.outputs.runner }}"]
+    runs-on: [Linux]
     steps:
 
       - name: Runner prepare
@@ -263,38 +264,17 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
           EXPERT="yes"
 
-          df
           cd ..
           sudo chown -R $USER:$USER build/cache/rootfs || true
-          ls -l build/cache/rootfs || true
+          echo ${{ needs.Prepare.outputs.rootfscache_version }} > version.cache
+          ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' > filename.cache
 
-      - name: Signining and torrent creation
-        run: |
-
-          sudo apt-get -y -qq install jq parallel buildtorrent
-          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
-          ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
-          TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
-          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.Prepare.outputs.rootfscache_version }}/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/'${{ needs.Prepare.outputs.rootfscache_version }}'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
-          cd build/cache/rootfs
-          rm -f *.current
-          #TARGET=$(ls -1 *.zst)
-          echo "Sign"
-          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
-          echo "Generate torrent"
-          buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
-
-      - name: Upload
-        uses: ncipollo/release-action@v1
-        if: ${{ github.repository_owner == 'Armbian' }}
+      - name: Upload build list
+        uses: actions/upload-artifact@v3
         with:
-          artifacts: "build/cache/rootfs/*"
-          artifactErrorsFailBuild: true
-          tag: "${{ needs.Prepare.outputs.rootfscache_version }}"
-          omitBody: true
-          omitName: true
-          allowUpdates: true
-          token: ${{ secrets.PAT1 }}
+          path: "*.cache"
+          name: rootfs
+          if-no-files-found: ignore
 
       - name: Sync
         if: ${{ github.repository_owner == 'Armbian' }}
@@ -309,3 +289,71 @@ jobs:
         run: |
 
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
+
+  sign:
+  
+    needs: image
+    runs-on: [big]
+    steps:
+
+      - name: Runner prepare
+        if: ${{ github.repository_owner == 'Armbian' }}
+        uses: armbian/actions/runner-prepare@main
+
+      - name: Download changes
+        uses: actions/download-artifact@v3
+        with:
+          name: rootfs
+
+      - name: Checkout repository
+        if: ${{ github.repository_owner == 'Armbian' }}
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/build
+          fetch-depth: 1
+          path: build
+          clean: false
+          
+      - name: Unmount folders
+        if: ${{ github.repository_owner == 'Armbian' }}
+        run: |
+          
+          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
+              echo "Mounting NFS share"
+              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
+          else
+              echo "Mounting SSH share"
+              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+          fi
+          
+      - name: Signining and torrent creation
+        run: |
+
+          cat version.cache
+          cat filename.cache
+
+#          sudo apt-get -y -qq install jq parallel buildtorrent
+#          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
+#          ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
+#          TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
+#          WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.Prepare.outputs.rootfscache_version }}/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/'${{ needs.Prepare.outputs.rootfscache_version }}'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
+#          cd build/cache/rootfs
+#          rm -f *.current
+#          #TARGET=$(ls -1 *.zst)
+#          echo "Sign"
+#          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
+#          echo "Generate torrent"
+#          buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
+
+ #     - name: Upload
+ #       uses: ncipollo/release-action@v1
+ #       if: ${{ github.repository_owner == 'Armbian' }}
+ #       with:
+ #         artifacts: "build/cache/rootfs/*"
+ #         artifactErrorsFailBuild: true
+ #         tag: "${{ needs.Prepare.outputs.rootfscache_version }}"
+ #         omitBody: true
+ #         omitName: true
+ #         allowUpdates: true
+ #         token: ${{ secrets.PAT1 }}
