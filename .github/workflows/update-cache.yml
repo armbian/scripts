@@ -292,6 +292,7 @@ jobs:
   sign-list:
   
     needs: image
+    name: "Signing on powerful servers"
     runs-on: [Linux]
     outputs:
     
