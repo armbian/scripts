@@ -347,7 +347,7 @@ jobs:
   sign:
   
     needs: sign-list
-    if: ${{ needs.sign-list.outputs.matrix != '[]' && needs.sign-list.outputs.matrix != '' }}
+    #if: ${{ needs.sign-list.outputs.matrix != '[]' && needs.sign-list.outputs.matrix != '' }}
     runs-on: [big]
     strategy:
       max-parallel: 60
