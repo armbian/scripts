@@ -296,7 +296,7 @@ jobs:
     runs-on: [big]
     outputs:
     
-      runner:   ${{steps.sign-list.outputs.matrix}}
+      files:   ${{steps.sign-list.outputs.files}}
    
     steps:
 
@@ -340,9 +340,8 @@ jobs:
           cat arch.cache
           echo ${{ inputs.variant }}
           ls -1 build/cache/rootfs.upload/$(cat version.cache)/$(cat arch.cache)*.zst | awk -F/ '{print $NF}'
-          echo ::set-output name=file::$(echo 'ubuntu-latest') || true # default
           MATRIX=$(ls -1 build/cache/rootfs.upload/$(cat version.cache)/$(cat arch.cache)*.zst | awk -F/ '{print $NF}')
-          echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo ::set-output name=files::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           
   sign:
   
@@ -354,7 +353,7 @@ jobs:
       fail-fast: false
       matrix: 
       
-        node: ${{fromJson(needs.sign-list.outputs.matrix)}}
+        node: ${{fromJson(needs.sign-list.outputs.files)}}
           
     steps:
 
