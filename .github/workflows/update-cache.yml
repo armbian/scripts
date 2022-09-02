@@ -415,9 +415,10 @@ jobs:
           sudo chown -R $USER:$USER build/cache/rootfs.upload || true
           cd build/cache/rootfs.upload/$ROOTFSCACHE_VERSION
           echo "Sign"
-          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
+          echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback | sudo tee ${FILE}
           echo "Generate torrent"
-          buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
+          buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" /tmp/${FILE}.torrent
+          sudo mv /tmp/${FILE}.torrent .
 
       - name: Upload signature and torrent
         uses: ncipollo/release-action@v1
