@@ -274,13 +274,13 @@ jobs:
           name: rootfs
           if-no-files-found: ignore
 
-      - name: Sync
+      - name: Upload to NAS
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
-          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
-          # try again just in case
-          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
+          # Do it twice, then you may fail
+          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true          
+          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
 
       - name: Unmount folders
         if: ${{ github.repository_owner == 'Armbian' }}
@@ -340,7 +340,13 @@ jobs:
           #ls -1 build/cache/rootfs.upload/$(cat version.cache)/$(cat arch.cache)*.zst | awk -F/ '{print $(NF-1)"/"$NF}'
           MATRIX=$(ls -1 build/cache/rootfs.upload/$(cat version.cache)/$(cat arch.cache)*.zst | awk -F/ '{print $NF}')
           echo ::set-output name=files::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
-          
+
+      - name: Unmount folders
+        if: ${{ github.repository_owner == 'Armbian' }}
+        run: |
+
+          sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
+
   sign:
   
     needs: sign-list
@@ -430,6 +436,12 @@ jobs:
           omitName: true
           allowUpdates: true
           token: ${{ secrets.PAT1 }}
+
+      - name: Unmount folders
+        if: ${{ github.repository_owner == 'Armbian' }}
+        run: |
+
+          sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
 
       - name: Runner cleanup
         uses: armbian/actions/runner-prepare@main
