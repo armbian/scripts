@@ -365,7 +365,6 @@ jobs:
           fetch-depth: 1
           repository: ngosang/trackerslist
           path: trackerslist
-          clean: false
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
