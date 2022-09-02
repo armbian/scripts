@@ -290,10 +290,13 @@ jobs:
 
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
 
-  sign:
+  sign-list:
   
     needs: image
     runs-on: [big]
+    outputs:
+    
+      runner:   ${{steps.sign-list.outputs.matrix}}
    
     steps:
 
@@ -327,14 +330,32 @@ jobs:
               sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
               sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
           fi
-          
+
       - name: Signining and torrent creation
+        id: sign-list
         run: |
 
           cat version.cache
           cat filename.cache
           echo ${{ inputs.variant }}
           ls -l build/cache/rootfs.upload
+          echo ::set-output name=file::$(echo 'ubuntu-latest') || true # default
+          MATRIX=$(ls -l build/cache/rootfs.upload)
+          echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          
+          
+  sign:
+  
+    needs: sign-list
+    if: ${{ needs.sign-list.outputs.matrix != '[]' && needs.sign-list.outputs.matrix != '' }}
+    runs-on: [big]
+    strategy:
+      max-parallel: 60
+      fail-fast: false
+      matrix: 
+      
+        node: ${{fromJson(needs.sign-list.outputs.matrix)}}
+          
 
 #          sudo apt-get -y -qq install jq parallel buildtorrent
 #          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
