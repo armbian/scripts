@@ -277,6 +277,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
+          sudo chown -R 1008.1002 build/cache/rootfs.upload/.
           # Do it twice, then you may fail
           sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true          
           sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
@@ -421,8 +422,7 @@ jobs:
           echo "Sign"
           echo ${{ secrets.GPG_PASSPHRASE1 }} | sudo --preserve-env gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
           echo "Generate torrent"
-          sudo --preserve-env buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
-          sudo chown 1008.1002 *.*
+          sudo --preserve-env buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent          
 
       - name: Upload signature and torrent
         uses: ncipollo/release-action@v1
