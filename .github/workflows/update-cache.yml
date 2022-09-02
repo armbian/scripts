@@ -258,6 +258,8 @@ jobs:
 
           cd ..
           sudo chown -R $USER:$USER build/cache/rootfs || true
+          
+          # pass value via artefacts
           echo ${{ needs.Prepare.outputs.rootfscache_version }} > version.cache
           ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' | cut -d"-" -f1 > arch.cache
 
@@ -285,7 +287,7 @@ jobs:
   sign-list:
   
     needs: image
-    runs-on: [big]
+    runs-on: [Linux]
     outputs:
     
       files:   ${{steps.sign-list.outputs.files}}
@@ -388,11 +390,11 @@ jobs:
           fi
 
       - name: Signining and torrent creation
+        if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
+          sudo apt-get -y -qq install jq buildtorrent
           ROOTFSCACHE_VERSION=$(cat version.cache)
-
-          sudo apt-get -y -qq install jq parallel buildtorrent
           FILE=${{ matrix.node }}          
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
@@ -403,11 +405,11 @@ jobs:
           echo "Generate torrent"
           buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
 
-      - name: Upload
+      - name: Upload signature and torrent
         uses: ncipollo/release-action@v1
         if: ${{ github.repository_owner == 'Armbian' }}
         with:
-          artifacts: "build/cache/rootfs/*.asc"
+          artifacts: "build/cache/rootfs/*.asc,build/cache/rootfs/*.torrent"
           artifactErrorsFailBuild: true
           tag: "${{ needs.Prepare.outputs.rootfscache_version }}"
           omitBody: true
@@ -415,5 +417,5 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.PAT1 }}
 
-      - name: Runner prepare
+      - name: Runner cleanup
         uses: armbian/actions/runner-prepare@main
