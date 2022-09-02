@@ -134,14 +134,6 @@ jobs:
           path: scripts
           clean: false
 
-      - name: Checkout tracker lists
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-          repository: ngosang/trackerslist
-          path: trackerslist
-          clean: false
-
       - name: Copy templates
         run: |
 
@@ -366,6 +358,14 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
           workdir: build
           git_user_signingkey: true
+
+      - name: Checkout tracker lists
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          repository: ngosang/trackerslist
+          path: trackerslist
+          clean: false
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
