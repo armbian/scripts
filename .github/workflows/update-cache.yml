@@ -334,6 +334,7 @@ jobs:
           cat version.cache
           cat filename.cache
           echo ${{ inputs.variant }}
+          ls -l build/cache/rootfs.upload
 
 #          sudo apt-get -y -qq install jq parallel buildtorrent
 #          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
