@@ -44,7 +44,7 @@ jobs:
       rootfscache_version: ${{steps.list_dirs.outputs.rootfscache_version}}
       
     steps:
-
+fs
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
           
@@ -356,7 +356,11 @@ jobs:
       
         node: ${{fromJson(needs.sign-list.outputs.matrix)}}
           
+    steps:
 
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+        
 #          sudo apt-get -y -qq install jq parallel buildtorrent
 #          FILE=$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
 #          ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
