@@ -388,16 +388,11 @@ jobs:
           fi
 
       - name: Signining and torrent creation
-
         run: |
 
           sudo apt-get -y -qq install jq parallel buildtorrent
-          
-          #echo ${{ matrix.node }}
           FILE=${{ matrix.node }}
-          #ls -l build/cache/rootfs.upload/$(cat version.cache)/${{ matrix.node }}
-
-#          FILE=$(ls -1 build/cache/rootfs/${{ matrix.node }} | awk -F/ '{print $NF}')
+          FILE=$(ls -1 build/cache/rootfs/${{ matrix.node }} | awk -F/ '{print $NF}')
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
           WEBSEEDS="--webseeds="https://github.com/armbian/cache/releases/download/${{ needs.Prepare.outputs.rootfscache_version }}/$FILE,"$(curl -s https://cache.armbian.com/mirrors | jq -r '.'default' | .[] | values' | sed -e 's/$/rootfs\/'${{ needs.Prepare.outputs.rootfscache_version }}'\/'$FILE'/' |  tr '\n' , | sed 's/.$//')"
