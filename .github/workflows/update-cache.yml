@@ -251,6 +251,8 @@ jobs:
           cd ..
           sudo chown -R $USER:$USER build/cache/rootfs || true
           FOLDER=$(echo ${{ inputs.variant }} | sed "s/://" )
+          # clean it
+          rm -rf $FOLDER
           echo "UPLOAD=$FOLDER" >> $GITHUB_ENV
           
           # pass value via artefacts
