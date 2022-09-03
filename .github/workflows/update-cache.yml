@@ -438,7 +438,7 @@ jobs:
         run: |
 
           sudo apt-get -y -qq install jq buildtorrent
-          echo "VERSION=${{ env.UPLOAD }}/$(cat version)" >> $GITHUB_ENV
+          echo "VERSION=$(cat ${{ env.UPLOAD }}/version)" >> $GITHUB_ENV
 
           ROOTFSCACHE_VERSION=${{ env.VERSION }}
           FILE=${{ matrix.node }}          
