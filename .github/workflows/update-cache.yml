@@ -225,7 +225,7 @@ jobs:
           
           [[ ! -f .ignore_changes ]] && sudo touch .ignore_changes 
           ./compile.sh docker \
-          BETA="no" \
+          BETA="yes" \
           ROOT_FS_CREATE_ONLY="yes" \
           ROOT_FS_CREATE_VERSION=${{ needs.Prepare.outputs.rootfscache_version }} \
           RELEASE="${{ matrix.release }}" \
