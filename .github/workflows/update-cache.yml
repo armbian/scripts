@@ -440,6 +440,10 @@ jobs:
           sudo apt-get -y -qq install jq buildtorrent
           echo "VERSION=$(cat ${{ env.UPLOAD }}/version)" >> $GITHUB_ENV
 
+          ls -l
+          echo "_"
+          ls -l ${{ env.UPLOAD }}
+
           ROOTFSCACHE_VERSION=${{ env.VERSION }}
           FILE=${{ matrix.node }}          
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
