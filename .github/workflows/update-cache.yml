@@ -103,7 +103,7 @@ jobs:
   
     needs: Prepare
     strategy:
-      max-parallel: 32
+      max-parallel: 16
       fail-fast: false
       matrix:
        
