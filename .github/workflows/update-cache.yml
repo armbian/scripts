@@ -65,8 +65,9 @@ jobs:
           ARC=$(echo $CHUNK | cut -d":" -f2)
           echo ::set-output name=board::$(echo $ARC) || true
         
-          ROOTFSCACHE_VERSION=${{ inputs.rootfscache_version }}                    
-          echo ::set-output name=rootfscache_version::$(echo ${ROOTFSCACHE_VERSION:-"0"}) || true
+          ROOTFSCACHE_VERSION=${{ inputs.rootfscache_version }}
+          [[ -z "$ROOTFSCACHE_VERSION" ]] && ROOTFSCACHE_VERSION=$(date --utc +"%Y%m%d")
+          echo ::set-output name=rootfscache_version::$(echo $ROOTFSCACHE_VERSION) || true
                     
           echo "$VAR $ARC"
 
@@ -226,7 +227,7 @@ jobs:
           ./compile.sh docker \
           BETA="no" \
           ROOT_FS_CREATE_ONLY="yes" \
-          ROOTFSCACHE_VERSION=$(date --utc "+%Y%M%d") \
+          ROOT_FS_CREATE_VERSION=$ROOTFSCACHE_VERSION \
           RELEASE="${{ matrix.release }}" \
           KERNEL_ONLY="no" \
           SKIP_EXTERNAL_TOOLCHAINS="yes" \
