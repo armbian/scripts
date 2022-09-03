@@ -319,6 +319,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.UPLOAD }}
+          path: ${{ env.UPLOAD }}
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
