@@ -439,17 +439,17 @@ jobs:
 
           sudo apt-get -y -qq install jq buildtorrent
           UPLOAD=${{ env.UPLOAD }}
-          echo "VERSION=$(cat $UPLOAD/version)" >> $GITHUB_ENV
+          echo "ROOTFSCACHE_VERSION=$(cat $UPLOAD/version)" >> $GITHUB_ENV
 
-          ls -l
-          echo "_ $UPLOAD"
-          cat $UPLOAD/version
-          echo "++++"
-          ls -l ${{ env.UPLOAD }}
-          echo "----- ${{ env.VERSION }}"
+          echo ">>>>>>>>>>>> $ROOTFSCACHE_VERSION"
+          
+          #cat $UPLOAD/version
+          #echo "++++"
+          #ls -l ${{ env.UPLOAD }}
+          #echo "----- ${{ env.VERSION }}"
           ls -l build/cache/rootfs.upload/$ROOTFSCACHE_VERSION
 
-          ROOTFSCACHE_VERSION=${{ env.VERSION }}
+          #ROOTFSCACHE_VERSION=${{ env.VERSION }}
           FILE=${{ matrix.node }}          
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
