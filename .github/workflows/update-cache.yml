@@ -254,6 +254,7 @@ jobs:
           echo "UPLOAD=$FOLDER" >> $GITHUB_ENV
           
           # pass value via artefacts
+          mkdir -p $FOLDER
           echo ${{ needs.Prepare.outputs.rootfscache_version }} > $FOLDER/version
           touch $FOLDER/$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' | cut -d"-" -f1)
 
