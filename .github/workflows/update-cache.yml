@@ -382,6 +382,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.UPLOAD }}
+          path: ${{ env.UPLOAD }}
 
       - name: Checkout tracker lists
         uses: actions/checkout@v3
@@ -437,9 +438,9 @@ jobs:
         run: |
 
           sudo apt-get -y -qq install jq buildtorrent
-          echo "VERSION=$(cat version.cache)" >> $GITHUB_ENV
+          echo "VERSION=${{ env.UPLOAD }}/$(cat version)" >> $GITHUB_ENV
 
-          ROOTFSCACHE_VERSION=$(cat version.cache)
+          ROOTFSCACHE_VERSION=${{ env.VERSION }}
           FILE=${{ matrix.node }}          
           ANNOUNCE=$(cat trackerslist/trackers_best_ip.txt | sed '/^$/d' | shuf -n 1)
           TRACKERS=$(cat trackerslist/trackers_best_ip.txt | sed '/^\s*$/d' | while read line; do printf ",""${line}"; done | cut -c 2-)
