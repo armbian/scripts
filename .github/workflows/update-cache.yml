@@ -103,7 +103,7 @@ jobs:
   
     needs: Prepare
     strategy:
-      max-parallel: 60
+      max-parallel: 32
       fail-fast: false
       matrix:
        
@@ -364,7 +364,7 @@ jobs:
     #if: ${{ needs.sign-list.outputs.matrix != '[]' && needs.sign-list.outputs.matrix != '' }}
     runs-on: [big,igor]
     strategy:
-      max-parallel: 60
+      max-parallel: 8
       fail-fast: false
       matrix: 
       
