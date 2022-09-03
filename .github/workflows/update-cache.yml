@@ -384,14 +384,6 @@ jobs:
         with:
           name: ${{ env.UPLOAD }}
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_KEY1 }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
-          workdir: build
-          git_user_signingkey: true
-
       - name: Checkout tracker lists
         uses: actions/checkout@v3
         with:
@@ -407,6 +399,14 @@ jobs:
           fetch-depth: 1
           path: build
           clean: false
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY1 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
+          workdir: build
+          git_user_signingkey: true
 
       - name: Mount folders
         if: ${{ github.repository_owner == 'Armbian' }}
