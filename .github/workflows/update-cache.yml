@@ -443,6 +443,8 @@ jobs:
 
           ls -l
           echo "_ $UPLOAD"
+          cat $UPLOAD/version
+          echo "++++"
           ls -l ${{ env.UPLOAD }}
           echo "----- ${{ env.VERSION }}"
           ls -l build/cache/rootfs.upload/$ROOTFSCACHE_VERSION
