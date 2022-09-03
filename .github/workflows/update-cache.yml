@@ -443,6 +443,8 @@ jobs:
           ls -l
           echo "_"
           ls -l ${{ env.UPLOAD }}
+          echo "-----"
+          ls -l build/cache/rootfs.upload/$ROOTFSCACHE_VERSION
 
           ROOTFSCACHE_VERSION=${{ env.VERSION }}
           FILE=${{ matrix.node }}          
