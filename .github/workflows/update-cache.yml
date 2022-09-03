@@ -250,12 +250,12 @@ jobs:
 
           cd ..
           sudo chown -R $USER:$USER build/cache/rootfs || true
-          
-          echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
+          FOLDER=$(echo ${{ inputs.variant }} | sed "s/://" )
+          echo "UPLOAD=$FOLDER" >> $GITHUB_ENV
           
           # pass value via artefacts
-          echo ${{ needs.Prepare.outputs.rootfscache_version }} > version.cache
-          ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' | cut -d"-" -f1 > arch.cache
+          echo ${{ needs.Prepare.outputs.rootfscache_version }} > $FOLDER/version
+          touch $FOLDER/$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' | cut -d"-" -f1)
 
       - name: Upload rootfs archive and packages list
         uses: ncipollo/release-action@v1
@@ -272,7 +272,7 @@ jobs:
       - name: Upload build list
         uses: actions/upload-artifact@v3
         with:
-          path: "*.cache"
+          path: ${{ env.UPLOAD }}
           name: ${{ env.UPLOAD }}
           if-no-files-found: ignore
 
@@ -343,12 +343,7 @@ jobs:
         id: sign-list
         run: |
 
-          ARCH=$(echo ${{ inputs.variant }} | cut -d":" -f2)
-          cat filename.cache
-          cat arch.cache
-          echo ${{ inputs.variant }}
-          #ls -1 build/cache/rootfs.upload/$(cat version.cache)/$(cat arch.cache)*.zst | awk -F/ '{print $(NF-1)"/"$NF}'
-          MATRIX=$(ls -1 build/cache/rootfs.upload/$(cat version.cache)/$(cat arch.cache)*.zst | awk -F/ '{print $NF}')
+          MATRIX=$(ls -1 ${{ env.UPLOAD }}/*.zst | awk -F/ '{print $NF}')
           echo ::set-output name=files::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
 
       - name: Unmount folders
