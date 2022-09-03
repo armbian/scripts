@@ -439,8 +439,9 @@ jobs:
 
           sudo apt-get -y -qq install jq buildtorrent
           UPLOAD=${{ env.UPLOAD }}
-          echo "ROOTFSCACHE_VERSION=$(cat $UPLOAD/version)" >> $GITHUB_ENV
-          ROOTFSCACHE_VERSION=${{ env.ROOTFSCACHE_VERSION }}
+          ROOTFSCACHE_VERSION=$(cat $UPLOAD/version)
+          echo "ROOTFSCACHE_VERSION=$ROOTFSCACHE_VERSION" >> $GITHUB_ENV
+          
           echo ">>>>>>>>>>>> $ROOTFSCACHE_VERSION"
           
           #cat $UPLOAD/version
