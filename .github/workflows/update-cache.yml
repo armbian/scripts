@@ -256,7 +256,7 @@ jobs:
           # pass value via artefacts
           mkdir -p $FOLDER
           echo ${{ needs.Prepare.outputs.rootfscache_version }} > $FOLDER/version
-          touch $FOLDER/$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}' | cut -d"-" -f1)
+          touch $FOLDER/$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
 
       - name: Upload rootfs archive and packages list
         uses: ncipollo/release-action@v1
@@ -307,7 +307,9 @@ jobs:
       - name: Read
         run: |
         
-          echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
+          FOLDER=$(echo ${{ inputs.variant }} | sed "s/://" )
+          echo "UPLOAD=$FOLDER" >> $GITHUB_ENV
+          rm -rf $FOLDER
 
       - name: Runner prepare
         if: ${{ github.repository_owner == 'Armbian' }}
