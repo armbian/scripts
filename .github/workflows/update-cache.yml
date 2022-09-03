@@ -440,7 +440,7 @@ jobs:
           sudo apt-get -y -qq install jq buildtorrent
           UPLOAD=${{ env.UPLOAD }}
           echo "ROOTFSCACHE_VERSION=$(cat $UPLOAD/version)" >> $GITHUB_ENV
-
+          ROOTFSCACHE_VERSION=${{ env.ROOTFSCACHE_VERSION }}
           echo ">>>>>>>>>>>> $ROOTFSCACHE_VERSION"
           
           #cat $UPLOAD/version
@@ -466,7 +466,7 @@ jobs:
         with:
           artifacts: "build/cache/rootfs.upload/${{ env.VERSION }}/${{ matrix.node }}.asc,build/cache/rootfs.upload/${{ env.VERSION }}/${{ matrix.node }}.torrent"
           artifactErrorsFailBuild: true
-          tag: "${{ env.VERSION }}"
+          tag: "${{ env.ROOTFSCACHE_VERSION }}"
           omitBody: true
           omitName: true
           allowUpdates: true
