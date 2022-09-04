@@ -456,7 +456,11 @@ jobs:
           echo "Sign"
           echo ${{ secrets.GPG_PASSPHRASE1 }} | sudo --preserve-env gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback ${FILE}
           echo "Generate torrent"
-          sudo --preserve-env buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent          
+          sudo --preserve-env buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
+
+          echo "Verify"
+          zstd -t ${FILE}
+          gpg --no-permission-warning --verify --trust-model ${FILE}
 
       - name: Upload signature and torrent
         uses: ncipollo/release-action@v1
