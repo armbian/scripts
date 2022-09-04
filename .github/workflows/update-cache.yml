@@ -458,6 +458,7 @@ jobs:
 
           echo "Sign"
           FOLDER=$(mktemp)
+          mkdir -p ${FOLDER}
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback --output ${FOLDER}/${FILE}.asc ${FILE}
           sudo mv ${FOLDER}/${FILE}.asc .
 
