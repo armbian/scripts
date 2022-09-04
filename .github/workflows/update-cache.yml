@@ -457,8 +457,7 @@ jobs:
           sudo --preserve-env buildtorrent $WEBSEEDS --announce=$ANNOUNCE --announcelist=$TRACKERS $FILE -c "Armbian rootfs cache" ${FILE}.torrent
 
           echo "Sign"
-          FOLDER=$(mktemp)
-          mkdir -p ${FOLDER}
+          FOLDER=$(mktemp -d)          
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --quiet --armor --batch --yes --passphrase-fd 0 --detach-sign --pinentry-mode loopback --output ${FOLDER}/${FILE}.asc ${FILE}
           sudo mv ${FOLDER}/${FILE}.asc .
 
