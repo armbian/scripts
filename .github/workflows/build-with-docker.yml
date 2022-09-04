@@ -91,7 +91,7 @@ jobs:
       - name: Make build list
         if: ${{ inputs.boardtype != '' }}
         id: make-list
-        uses: armbian/actions/make-list@main
+        uses: armbian/actions/make-list@next
         with:
           type: ${{ inputs.boardtype }}
 
