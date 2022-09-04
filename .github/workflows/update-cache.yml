@@ -439,8 +439,8 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
-          # list keys
-          gpg -K
+          # exit if keys were not loaded
+          [[ -z $(gpg -K) ]] && exit 1
 
           sudo apt-get -y -qq install jq buildtorrent
           UPLOAD=${{ env.UPLOAD }}
