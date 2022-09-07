@@ -18,14 +18,14 @@ on:
       KNOWN_HOSTS_REPOSITORY:
         required: true
 jobs:
-  
+
   Prepare:
     name: "Power system on"
     outputs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     runs-on: [self-hosted, Linux, local]
     steps:
-    
+
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
@@ -36,11 +36,11 @@ jobs:
           USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
           HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
           KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
-    
+
       - name: Determine changed kernels
         id: list_dirs
         run: |
-          
+
           echo ::set-output name=matrix::$(
           curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
@@ -56,28 +56,29 @@ jobs:
     strategy:
       #max-parallel: 16
       fail-fast: false
-      matrix: 
+      matrix:
+
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
     steps:
-    
+
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
-    
+
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_CI }}
           known_hosts: github.com ssh-rsa AAAAB3Nz
           if_key_exists: replace
-          
+
       - name: Read values
         run: |
 
           CHUNK="${{ matrix.node }}"
           echo "DUT_NAME=$(echo $CHUNK | cut -d":" -f1)" >> $GITHUB_ENV
           echo "DUT_IP=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
-          
+
       - name: Is online?
         run: |
 
@@ -89,12 +90,12 @@ jobs:
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
             echo "ONLINE=true" >> $GITHUB_ENV
-          else          
+          else
             echo "$server ✗ needs to be power cycled"
             echo "ONLINE=false" >> $GITHUB_ENV
             [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
           fi
-    
+
       - name: Login
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
@@ -111,7 +112,7 @@ jobs:
       - name: To nightly
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
-         
+
           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
 
       - name: Dmesg
@@ -135,12 +136,20 @@ jobs:
 
           timeout 5 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade; apt-get -y dist-upgrade; apt-get -y autoremove" || true
 
-#     - name: Iperf
-#       if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
-#       run: |
-#
-#          timeout 15 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} \
-#          "iperf3 -c 10.0.40.2 -t 5 -J | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | LC_ALL=C awk -F , -v OFS=\| '\$1/=1048576'| cut -d"-" -f2 | sed -e 's/$/ Mbits\/sec/g'"
+      - name: Iperf
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          while :
+          do
+            IPERF=$(timeout 15 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "iperf3 -c 10.0.40.2 -t 5 -J 2>/dev/null | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | cut -d"-" -f2" | LC_ALL=C awk '{$1/=1048576;printf "%.2f Mbit/s\n",$1}')
+            if [[ -n "${IPERF}" ]] ; then
+              echo "IPERF=${IPERF}" >> $GITHUB_ENV
+              break
+            fi
+            echo "The server is busy running a test"
+            sleep 2
+          done
 
       - name: Reboot
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
@@ -172,7 +181,8 @@ jobs:
 
           rm -rf status
           mkdir -p status
-          echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
+          echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
+
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' &&  always() }}
@@ -187,7 +197,7 @@ jobs:
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
-    
+
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
@@ -221,7 +231,7 @@ jobs:
         if: always()
         uses: armbian/actions/power-off@main
         with:
-        
+
           KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
           USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
           HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
