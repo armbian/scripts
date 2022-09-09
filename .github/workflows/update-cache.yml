@@ -364,7 +364,7 @@ jobs:
     #if: ${{ needs.sign-list.outputs.matrix != '[]' && needs.sign-list.outputs.matrix != '' }}
     runs-on: [big,igor]
     strategy:
-      max-parallel: 8
+      max-parallel: 16
       fail-fast: false
       matrix: 
       
