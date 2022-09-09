@@ -145,7 +145,7 @@ jobs:
           ./compile.sh docker \
           JUST_INIT="no" \
           OFFLINE_WORK="no" \
-          BETA=no \
+          BETA=yes \
           EXPERT=yes \
           BOARD=${{ matrix.board }} \
           BRANCH=current \
