@@ -173,7 +173,7 @@ jobs:
 
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
               echo "Mounting NFS share"
-              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
+              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload || true
           else
               echo "Mounting SSH share"
               sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
@@ -338,7 +338,7 @@ jobs:
           
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
               echo "Mounting NFS share"
-              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload
+              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload || true
           else
               echo "Mounting SSH share"
               sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
