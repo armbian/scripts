@@ -463,9 +463,12 @@ jobs:
 
           echo "Verify"
           zstd -t ${FILE}
-          echo "Keys"
-          cat ${FILE}.asc | gpg --list-packets --no-keyring | grep -oE '[0-9A-F]{40}'
-          [[ "$(cat ${FILE}.asc | gpg --list-packets --no-keyring | grep -oE '[0-9A-F]{40}')" != "DF00FAF1C577104B50BF1D0093D6889F9F0E78D5" ]] && exit 1
+          
+          if [[ "$(cat ${FILE}.asc | gpg --list-packets --no-keyring | grep -oE '[0-9A-F]{40}')" == "DF00FAF1C577104B50BF1D0093D6889F9F0E78D5" ]]; then
+            echo "Signature is O.K."
+          else
+            exit 1
+          fi
 
       - name: Upload signature and torrent
         uses: ncipollo/release-action@v1
