@@ -150,8 +150,8 @@ jobs:
         if: ${{ inputs.uploading == 'true' }}
         run: |
 
-          # use this only on our runners
-          if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
+          ###### use this only on our runners
+          ####if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
           # mount deploy target
           sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
@@ -162,7 +162,7 @@ jobs:
           sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
           sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
           sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
-          fi
+          ####fi
 
       - name: Sync
         run: |
