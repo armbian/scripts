@@ -24,6 +24,8 @@ jobs:
     
     name: Make
     runs-on: ubuntu-latest
+    outputs:    
+      release:   ${{steps.gradle.outputs.release}}
     steps:
 
       - name: Runner prepare
@@ -104,6 +106,8 @@ jobs:
         if: ${{ env.SKIP != 'yes' }}
         run: |
 
+          echo ::set-output name=release::${{ env.RELEASE }}
+
           cd build
 
           # framework init
@@ -165,14 +169,17 @@ jobs:
   
     needs: gradle
     runs-on: [Linux]
-    outputs:
-      matrix: ${{steps.list_dirs.outputs.matrix}}
+    strategy:
+      max-parallel: 16
+      fail-fast: false
+      matrix: 
+        node: ${{fromJson(needs.gradle.outputs.release)}}
     steps:
 
       - name: Read
         run: |
 
-          echo ${{ matrix.target }}
+          echo ${{ matrix.node }}
 
       - name: Checkout repository
         uses: actions/checkout@v3
