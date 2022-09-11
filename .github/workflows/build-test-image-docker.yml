@@ -153,7 +153,7 @@ jobs:
         if: ${{ env.SKIP != 'yes' }}
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
+          name: "${{ matrix.board }}-${{ env.RELEASE }}"
           path: build/output/images/*
           if-no-files-found: error
           retention-days: 7
@@ -173,12 +173,6 @@ jobs:
         run: |
 
           echo ${{ matrix.target }}
-
-      - name: Download changes
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.UPLOAD }}
-          path: ${{ env.UPLOAD }}
 
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -202,3 +196,5 @@ jobs:
               echo  "$i:$j"
             done
           done)
+ 
+          echo $MATRIX
