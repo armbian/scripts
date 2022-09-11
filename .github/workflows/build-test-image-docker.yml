@@ -160,3 +160,45 @@ jobs:
 
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
+
+  make-list:
+  
+    needs: gradle
+    runs-on: [Linux]
+    outputs:
+      matrix: ${{steps.list_dirs.outputs.matrix}}
+    steps:
+
+      - name: Read
+        run: |
+
+          echo ${{ matrix.target }}
+
+      - name: Download changes
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.UPLOAD }}
+          path: ${{ env.UPLOAD }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/build
+          fetch-depth: 1
+          path: build
+          clean: false
+
+      - name: Build desktops
+        id: list_dirs
+        run: |
+          MATRIX=$(
+          set +e          
+          releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
+          for i in ${releases[@]}
+          do	
+            environments=($([[ -d build/config/desktop/$i/environments ]] && ls -1 build/config/desktop/$i/environments))
+            for j in ${environments[@]}
+            do
+              echo  "$i:$j"
+            done
+          done)
