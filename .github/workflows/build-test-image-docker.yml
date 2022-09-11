@@ -15,20 +15,15 @@ on:
 jobs:  
 
   gradle:
-    if: ${{ github.repository_owner }}
     strategy:
       fail-fast: false
       max-parallel: 8
       matrix:
-        #board: [uefi-x86,uefi-arm64]
         board: [uefi-x86]
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
-        #target: ["debian:bullseye:10","ubuntu:jammy:12"]
-        desktop: [xfce,gnome,mate,cinnamon,budgie,kde-plasma]
     
     name: Make
-    runs-on: ${{ inputs.runner }}
-    #runs-on: big
+    runs-on: ubuntu-latest
     steps:
 
       - name: Runner prepare
@@ -66,13 +61,6 @@ jobs:
           echo "DOCKER_DISTRO=$DOCKER_DISTRO" >> $GITHUB_ENV
           echo "DOCKER_RELEASE=$DOCKER_RELEASE" >> $GITHUB_ENV
           echo "DOCKER_COMPILER=$DOCKER_COMPILER" >> $GITHUB_ENV
-
-#      - name: Handle exceptions
-#        run: |
-#        
-#          if [[ "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" ]]; then
-#          echo "SKIP=yes" >> $GITHUB_ENV
-#          fi
 
       - run: |
 
@@ -150,28 +138,25 @@ jobs:
           BOARD=${{ matrix.board }} \
           BRANCH=current \
           RELEASE=${{ env.RELEASE }} \
-          BUILD_MINIMAL=no \
-          BUILD_DESKTOP=yes \
+          BUILD_MINIMAL=yes \
+          BUILD_DESKTOP=no \
           KERNEL_ONLY=no \
           KERNEL_CONFIGURE=prebuilt \
           COMPRESS_OUTPUTIMAGE=no \
           IGNORE_UPDATES=yes \
           REPOSITORY_INSTALL="u-boot,kernel" \
-          DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
-          DESKTOP_ENVIRONMENT=${{ matrix.desktop }} \
+          DESKTOP_ENVIRONMENT_CONFIG_NAME="" \
+          DESKTOP_ENVIRONMENT="" \
           SKIP_EXTERNAL_TOOLCHAINS=yes \
-          FORCED_MONTH_OFFSET=12 \
-          DESKTOP_APPGROUPS_SELECTED="3dsupport browsers" \
-          ROOTFSCACHE_VERSION="$(shuf -i 1-100000 -n 1)"
 
-#      - name: Upload artefacts        
-#        if: ${{ env.SKIP != 'yes' }}
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
-#          path: build/output/images/*
-#          if-no-files-found: error
-#          retention-days: 7
+      - name: Upload artefacts        
+        if: ${{ env.SKIP != 'yes' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
+          path: build/output/images/*
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
