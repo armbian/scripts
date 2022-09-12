@@ -190,6 +190,9 @@ jobs:
           echo ${{ matrix.target }}
           echo ${RELEASE}
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          
+          # remove old
+          rm -rf "${{ matrix.board }}-${{ env.RELEASE }}"
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
