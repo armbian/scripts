@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         board: [uefi-x86]
-        release: ["bullseye","sid","focal","jammy"]
+        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
     
     outputs:
       desktop: ${{steps.list_dirs.outputs.desktop}}
@@ -20,6 +20,28 @@ jobs:
     runs-on: ubuntu-latest
     name: "Build"    
     steps:
+
+      - name: Read values
+        run: |
+
+          DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
+          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+          COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
+          
+          DOCKER_DISTRO=$DISTRO
+          DOCKER_RELEASE=$RELEASE          
+          DOCKER_COMPILER=$COMPILER
+          
+          BOARD=${{ matrix.board }}
+
+          # export to environment
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          echo "BOARD=$BOARD" >> $GITHUB_ENV
+          echo "COMPILER=$COMPILER" >> $GITHUB_ENV
+          
+          echo "DOCKER_DISTRO=$DOCKER_DISTRO" >> $GITHUB_ENV
+          echo "DOCKER_RELEASE=$DOCKER_RELEASE" >> $GITHUB_ENV
+          echo "DOCKER_COMPILER=$DOCKER_COMPILER" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
         uses: actions/checkout@v3
@@ -68,7 +90,7 @@ jobs:
           EXPERT=yes \
           BOARD=${{ matrix.board }} \
           BRANCH=edge \
-          RELEASE=${{ matrix.release }} \
+          RELEASE=${{ env.RELEASE }} \
           BUILD_MINIMAL=no \
           BUILD_DESKTOP=no \
           KERNEL_ONLY=no \
