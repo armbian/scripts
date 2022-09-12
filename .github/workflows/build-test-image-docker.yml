@@ -17,20 +17,16 @@ jobs:
   Distro:
     strategy:
       fail-fast: false
-      max-parallel: 8
       matrix:
         board: [uefi-x86]
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
     
     name: Make
     runs-on: ubuntu-latest
-    outputs:    
-      release:   ${{steps.gradle.outputs.release}}
     steps:
 
       - name: Runner prepare
         run: |
-        
           echo "start"
 
   Combo:
@@ -43,7 +39,8 @@ jobs:
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
     
     outputs:
-      matrix: ${{steps.list_dirs.outputs.desktop}}
+      desktop: ${{steps.list_dirs.outputs.desktop}}
+ 
     runs-on: Linux
     name: "Test"    
     steps:
