@@ -252,3 +252,5 @@ jobs:
             expect \"*language based on your location*\"
             send \"y\r\"
             expect eof\r"
+        
+          sshpass -p sendmail ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update"
