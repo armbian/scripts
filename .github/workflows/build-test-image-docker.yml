@@ -72,6 +72,20 @@ jobs:
       - name: Build test image
         run: |
 
+          cd build
+          # framework init
+          ./compile.sh \
+          JUST_INIT="yes" \
+          OFFLINE_WORK="yes" \
+          BRANCH=current \
+          RELEASE=focal \
+          BUILD_MINIMAL=yes \
+          BUILD_DESKTOP=no \
+          KERNEL_ONLY=no \
+          KERNEL_CONFIGURE=no \
+          BOARD="zeropi" \
+          NO_HOST_RELEASE_CHECK="yes"
+
           # change template
           sudo sed -i "s/^#DOCKER_FLAGS+=(--privileged)/DOCKER_FLAGS+=(--privileged)/" userpatches/config-docker.conf
           sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.DOCKER_COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
