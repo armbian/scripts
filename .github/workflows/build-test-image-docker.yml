@@ -101,6 +101,7 @@ jobs:
           JUST_INIT="no" \
           OFFLINE_WORK="no" \
           BETA=yes \
+          NO_APT_CACHER="yes" \
           EXPERT=yes \
           BOARD=${{ matrix.board }} \
           BRANCH=edge \
