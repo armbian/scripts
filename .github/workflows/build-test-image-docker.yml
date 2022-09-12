@@ -212,7 +212,7 @@ jobs:
         - name: Find and login
           run: |
          
-            export TERM=linux
+            export TERM=vt100
           
             # get ip
             MAC=$(sudo virsh domiflist Armbian | tail -2 | head -1 | awk '{print $NF}')
@@ -247,4 +247,4 @@ jobs:
             
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "bash /etc/update-motd.d/10-armbian-header"
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update" 
-            sshpass -p ${PASS_ROOT} ssh -o "apt-get -o Dpkg::Options::="--force-confold" --download-only --allow-downgrades -y --install-recommends install armbian-$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)-desktop-${{ env.DESKTOP }}"
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -o Dpkg::Options::="--force-confold" --download-only --allow-downgrades -y --install-recommends install armbian-\$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)-desktop-${{ env.DESKTOP }}"
