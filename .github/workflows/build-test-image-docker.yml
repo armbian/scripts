@@ -46,11 +46,6 @@ jobs:
     name: "Test"
     steps:
 
-      - name: Prepare
-        run: |
-
-          sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin dnsmasq gir1.2-spiceclientgtk-3.0 virt-viewer sshpass
-
       - name: Read
         run: |
 
@@ -59,71 +54,8 @@ jobs:
           echo ${RELEASE}
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           
-          # remove old
-          rm -rf "${{ matrix.board }}-${RELEASE}"
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: "${{ matrix.board }}-${{ env.RELEASE }}"
-          path: "${{ matrix.board }}-${{ env.RELEASE }}"
-          
-      - name: Remove previous if any
-        run: |
-
-          sudo virsh destroy Armbian || true
-          sudo virsh undefine Armbian || true
-
-      - name: Convert to QEMU and resize
-        run: |
-
-          IMAGE=$(ls -1 "${{ matrix.board }}-${{ env.RELEASE }}"/*.img)
-          sudo qemu-img convert -f raw -O qcow2 ${IMAGE} /var/lib/libvirt/images/image.qcow2
-          sudo qemu-img resize /var/lib/libvirt/images/image.qcow2 +10G
-
-      - name: Boot it up and wait 1 minute
-        run: |
-
-          sudo virt-install --name Armbian --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/image.qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
-          sleep 1m
-          
-      - name: Find and login
-        run: |
-        
-          export TERM=linux
-        
-          # get ip
-          MAC=$(sudo virsh domiflist Armbian | tail -2 | head -1 | awk '{print $NF}')
-          USER_HOST=$(sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}')
-
-          # login credentials
-          USER_ROOT=root
-          PASS_ROOT=testpassword
-          USER_NORMAL=guest
-          PASS_NORMAL=testpassword
-
-          expect -c "
-            spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
-            set timeout 120
-            expect \"Create root password: \"
-            send \"${PASS_ROOT}\r\"
-            expect \"Repeat root password: \"
-            send \"${PASS_ROOT}\r\"
-            expect \"zsh\"
-            send \"2\r\"
-            expect \"*to abort\"
-            send \"${USER_NORMAL}\r\"
-            expect \"Create*password:\"
-            send \"${PASS_NORMAL}\r\"
-            expect \"Repeat*password:\"
-            send \"${PASS_NORMAL}\r\"
-            expect \"Please provide your real name: \"
-            send \"${NAME_NORMAL}\r\"
-            expect \"*language based on your location*\"
-            send \"y\r\"
-            expect \"*#\"
-            send \"exit\r\"
-            "
-            
-          sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "bash /etc/update-motd.d/10-armbian-header"
-          sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update"
+          environments=($([[ -d build/config/desktop/${RELEASE}/environments ]] && ls -1 build/config/desktop/${RELEASE}/environments))
+            for j in ${environments[@]}
+            do
+              echo  "${RELEASE}:$j"
+            done
