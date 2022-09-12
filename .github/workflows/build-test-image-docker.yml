@@ -166,42 +166,24 @@ jobs:
         uses: armbian/actions/runner-prepare@main
 
   make-list:
-  
-    needs: gradle
-    runs-on: [Linux]
     strategy:
-      max-parallel: 16
       fail-fast: false
-      matrix: 
-        node: ${{fromJson(needs.gradle.outputs.release)}}
+      max-parallel: 8
+      matrix:
+        board: [uefi-x86]
+        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
+
+    runs-on: ubuntu-latest
     steps:
 
       - name: Read
         run: |
 
-          echo ${{ matrix.node }}
+          echo ${{ matrix.target }}
+          echo ${{ matrix.board }}
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
         with:
-          repository: armbian/build
-          fetch-depth: 1
-          path: build
-          clean: false
-
-      - name: Build desktops
-        id: list_dirs
-        run: |
-          MATRIX=$(
-          set +e          
-          releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
-          for i in ${releases[@]}
-          do	
-            environments=($([[ -d build/config/desktop/$i/environments ]] && ls -1 build/config/desktop/$i/environments))
-            for j in ${environments[@]}
-            do
-              echo  "$i:$j"
-            done
-          done)
- 
-          echo $MATRIX
+          name: "${{ matrix.board }}-${{ env.target }}"
+          path: "${{ matrix.board }}-${{ env.target }}"
