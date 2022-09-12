@@ -37,13 +37,15 @@ jobs:
     needs: gradle
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: 8      
       matrix:
         board: [uefi-x86]
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
-
+    
+    outputs:
+      matrix: ${{steps.list_dirs.outputs.matrix}}
     runs-on: Linux
-    name: "Test"
+    name: "Test"    
     steps:
 
       - name: Checkout Armbian build script
@@ -55,15 +57,34 @@ jobs:
           clean: false
 
       - name: Read
+        id: list_dirs
         run: |
 
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
           echo ${{ matrix.target }}
           echo ${RELEASE}
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
-          
+          MATRIX=$(
+          set +e
           environments=($([[ -d build/config/desktop/${RELEASE}/environments ]] && ls -1 build/config/desktop/${RELEASE}/environments))
             for j in ${environments[@]}
             do
               echo  "${RELEASE}:$j"
-            done
+            done)
+          echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) 
+          
+  Desktop:
+  
+      needs: [ make-list ]
+      runs-on: Linux
+      if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
+      timeout-minutes: 480
+      strategy:
+        max-parallel: 16
+        fail-fast: false
+        matrix: 
+          node: ${{fromJson(needs.Prepare.outputs.matrix)}}
+
+      steps:
+
+      - uses: igorpecovnik/freespace@main
