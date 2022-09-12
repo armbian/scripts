@@ -83,7 +83,6 @@ jobs:
         max-parallel: 16
         fail-fast: false
         matrix: 
-          board: $RELEASE
           node: ${{fromJson(needs.Combo.outputs.desktop)}}
 
       steps:
