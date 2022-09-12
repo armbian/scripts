@@ -246,5 +246,18 @@ jobs:
             "
             
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "bash /etc/update-motd.d/10-armbian-header"
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update" 
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update"
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -o Dpkg::Options::="--force-confold" --allow-downgrades -y --install-recommends install armbian-\$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)-desktop-${{ env.DESKTOP }}"
+
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y install maim"
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "DISPLAY=:0 maim > screenshot.png"
+            # copy screenshot
+            sshpass -p ${PASS_ROOT} scp -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}:/home/${USER_NORMAL}/screenshot.png ${{ env.RELEASE }}-${{ env.DESKTOP }}.png
+
+        - name: Upload artefacts        
+          uses: actions/upload-artifact@v3
+          with:
+            name: "${{ env.RELEASE }}-${{ env.DESKTOP }}.png"
+            path: ${{ env.RELEASE }}-${{ env.DESKTOP }}.png
+            if-no-files-found: error
+            retention-days: 7
