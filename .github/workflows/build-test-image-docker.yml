@@ -142,7 +142,7 @@ jobs:
           BOARD=${{ matrix.board }} \
           BRANCH=current \
           RELEASE=${{ env.RELEASE }} \
-          BUILD_MINIMAL=yes \
+          BUILD_MINIMAL=no \
           BUILD_DESKTOP=no \
           KERNEL_ONLY=no \
           KERNEL_CONFIGURE=prebuilt \
