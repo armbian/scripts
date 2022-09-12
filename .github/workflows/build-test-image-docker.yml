@@ -127,7 +127,7 @@ jobs:
       - name: Upload artefacts        
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ matrix.board }}-${{ matrix.release }}"
+          name: "${{ matrix.board }}-${{ env.RELEASE }}"
           path: build/output/images/*
           if-no-files-found: error
           retention-days: 7
