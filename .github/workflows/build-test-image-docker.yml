@@ -4,13 +4,6 @@ on:
 
   workflow_dispatch:
   workflow_call:
-    inputs:
-      reference:
-        required: true
-        type: string
-      runner:
-        required: true
-        type: string
 
 jobs:  
 
@@ -19,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         board: [uefi-x86]
-        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
+        target: ["debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy"]
     
     name: Make
     runs-on: ubuntu-latest
