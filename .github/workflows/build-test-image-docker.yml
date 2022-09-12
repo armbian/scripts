@@ -209,15 +209,11 @@ jobs:
           sudo qemu-img convert -f raw -O qcow2 image.iso /var/lib/libvirt/images/image.qcow2
           sudo qemu-img resize /var/lib/libvirt/images/image.qcow2 +10G
 
-      - name: Boot it up
+      - name: Boot it up and wait 2 minutes
         run: |
 
           virt-install --name Armbian --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/image.qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
-          
-      - name: Sleep for 2m to make sure image booted up
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '2m'
+          sleep 2m
           
       - name: Find and login
         run: |
