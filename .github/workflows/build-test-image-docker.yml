@@ -213,7 +213,7 @@ jobs:
       - name: Boot it up and wait 2 minutes
         run: |
 
-          virt-install --name Armbian --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/image.qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
+          sudo virt-install --name Armbian --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/image.qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
           sleep 2m
           
       - name: Find and login
