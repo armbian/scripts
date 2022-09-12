@@ -18,7 +18,7 @@ jobs:
       desktop: ${{steps.list_dirs.outputs.desktop}}
  
     runs-on: Linux
-    name: "Test"    
+    name: "Build"    
     steps:
 
       - name: Checkout Armbian build script
@@ -53,6 +53,7 @@ jobs:
   Desktop:
   
       needs: [ Distro ]
+      name: "Install"
       runs-on: Linux
       timeout-minutes: 480
       strategy:
