@@ -206,7 +206,8 @@ jobs:
       - name: Convert to QEMU and resize
         run: |
 
-          sudo qemu-img convert -f raw -O qcow2 "${{ matrix.board }}-${{ env.RELEASE }}" /var/lib/libvirt/images/image.qcow2
+          IMAGE=$(ls -1 "${{ matrix.board }}-${{ env.RELEASE }}"/*.img)
+          sudo qemu-img convert -f raw -O qcow2 ${IMAGE} /var/lib/libvirt/images/image.qcow2
           sudo qemu-img resize /var/lib/libvirt/images/image.qcow2 +10G
 
       - name: Boot it up and wait 2 minutes
