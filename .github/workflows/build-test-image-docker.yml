@@ -166,6 +166,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
 
   make-list:
+    needs: gradle
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -174,16 +175,20 @@ jobs:
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
 
     runs-on: ubuntu-latest
+    name: "Test"
     steps:
 
       - name: Read
         run: |
 
+
+          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
           echo ${{ matrix.target }}
-          echo ${{ matrix.board }}
+          echo ${RELEASE}
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: "${{ matrix.board }}-${{ env.target }}"
-          path: "${{ matrix.board }}-${{ env.target }}"
+          name: "${{ matrix.board }}-${{ env.RELEASE }}"
+          path: "${{ matrix.board }}-${{ env.RELEASE }}"
