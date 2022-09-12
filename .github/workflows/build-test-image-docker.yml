@@ -59,7 +59,7 @@ jobs:
         max-parallel: 16
         fail-fast: false
         matrix: 
-          node: ${{fromJson(needs.Combo.outputs.desktop)}}
+          node: ${{fromJson(needs.Distro.outputs.desktop)}}
 
       steps:
       
