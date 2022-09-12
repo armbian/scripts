@@ -253,7 +253,9 @@ jobs:
             send \"${NAME_NORMAL}\r\"
             expect \"*language based on your location*\"
             send \"y\r\"
-            expect eof\r"
+            expect \"*#\"
+            send \"exit\r\"
+            "
             
           sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "bash /etc/update-motd.d/10-armbian-header"
           sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update"
