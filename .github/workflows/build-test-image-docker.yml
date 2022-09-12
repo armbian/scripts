@@ -203,8 +203,8 @@ jobs:
       - name: Remove previous if any
         run: |
 
-          virsh destroy Armbian || true
-          virsh undefine Armbian || true
+          sudo virsh destroy Armbian || true
+          sudo virsh undefine Armbian || true
 
       - name: Convert to QEMU and resize
         run: |
@@ -252,5 +252,6 @@ jobs:
             expect \"*language based on your location*\"
             send \"y\r\"
             expect eof\r"
-        
-          sshpass -p sendmail ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update"
+            
+          sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "bash /etc/update-motd.d/10-armbian-header"
+          sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update"
