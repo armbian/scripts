@@ -146,6 +146,7 @@ jobs:
           for i in ${releases[@]}
           do
           environments=($([[ -d build/config/desktop/${i}/environments ]] && ls -1 build/config/desktop/${i}/environments))
+          environments=(xfce)
             for j in ${environments[@]}
             do
               echo  "$i:$j"
