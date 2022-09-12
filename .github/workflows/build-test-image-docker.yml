@@ -79,5 +79,5 @@ jobs:
           node: ${{fromJson(needs.Combo.outputs.desktop)}}
 
       steps:
-
-      - uses: igorpecovnik/freespace@main
+      
+        - uses: igorpecovnik/freespace@main
