@@ -192,8 +192,8 @@ jobs:
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           
           # remove old
-          ls -l "${{ matrix.board }}-${{ env.RELEASE }}"
-          rm -rf "${{ matrix.board }}-${{ env.RELEASE }}"
+          ls -l "${{ matrix.board }}-${RELEASE}"
+          rm -rf "${{ matrix.board }}-${RELEASE}"
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
