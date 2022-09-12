@@ -34,6 +34,13 @@ jobs:
           
           BOARD=${{ matrix.board }}
 
+          # Bullseye can't build even itself
+          if [[ "$RELEASE" == "bullseye" ]]; then
+          DOCKER_DISTRO="ubuntu"
+          DOCKER_RELEASE="jammy"
+          DOCKER_COMPILER="12"
+          fi
+
           # export to environment
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "BOARD=$BOARD" >> $GITHUB_ENV
