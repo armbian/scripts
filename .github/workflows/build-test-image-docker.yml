@@ -29,7 +29,9 @@ jobs:
     steps:
 
       - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+        run: |
+        
+          echo "start"
 
   make-list:
     needs: gradle
