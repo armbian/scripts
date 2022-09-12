@@ -12,12 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         board: [uefi-x86]
-        target: ["debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy"]
+        release: ["bullseye","sid","focal","jammy"]
     
     outputs:
       desktop: ${{steps.list_dirs.outputs.desktop}}
  
-    runs-on: Linux
+    runs-on: ubuntu-latest
     name: "Build"    
     steps:
 
@@ -28,6 +28,65 @@ jobs:
           path: build
           fetch-depth: '100'
           clean: false
+
+      - name: Checkout support scripts
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          repository: armbian/scripts
+          path: scripts
+          clean: true
+
+      - name: Sync
+        run: |
+          mkdir -p build/userpatches
+          sudo cp scripts/configs/lib.config build/userpatches/
+          sudo cp scripts/configs/config-default.conf build/userpatches/
+
+      - name: Pull Docker image
+        run: |
+          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.DOCKER_RELEASE }}-$(dpkg --print-architecture)"
+
+      - name: Build test image
+        run: |
+
+          # change template
+          sudo sed -i "s/^#DOCKER_FLAGS+=(--privileged)/DOCKER_FLAGS+=(--privileged)/" userpatches/config-docker.conf
+          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.DOCKER_COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DOCKER_DISTRO }}:${{ env.DOCKER_RELEASE }}/" userpatches/config-docker.conf
+          sudo sed -i "s/^VERSION=.*/VERSION=\$(cat \$SRC\/VERSION | cut -d\".\" -f1-2)\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
+          sudo sed -i 's/armbian:/ghcr.io\/armbian\/build:/g' userpatches/config-docker.conf 
+          sudo sed -i "s/ -it/ -i/" userpatches/config-docker.conf
+          sed -i "s/COMPRESS_OUTPUTIMAGE=.*/COMPRESS_OUTPUTIMAGE=\"no\"/" userpatches/lib.config
+          
+          export TERM=dumb         
+          touch .ignore_changes
+          ./compile.sh docker \
+          JUST_INIT="no" \
+          OFFLINE_WORK="no" \
+          BETA=yes \
+          EXPERT=yes \
+          BOARD=${{ matrix.board }} \
+          BRANCH=edge \
+          RELEASE=${{ matrix.release }} \
+          BUILD_MINIMAL=no \
+          BUILD_DESKTOP=no \
+          KERNEL_ONLY=no \
+          KERNEL_CONFIGURE=prebuilt \
+          COMPRESS_OUTPUTIMAGE=no \
+          IGNORE_UPDATES=yes \
+          REPOSITORY_INSTALL="u-boot,kernel" \
+          DESKTOP_ENVIRONMENT_CONFIG_NAME="" \
+          DESKTOP_ENVIRONMENT="" \
+          SKIP_EXTERNAL_TOOLCHAINS=yes \
+          
+      - name: Upload artefacts        
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{ matrix.board }}-${{ matrix.release }}"
+          path: build/output/images/*
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Read
         id: list_dirs
