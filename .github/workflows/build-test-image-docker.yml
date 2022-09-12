@@ -14,7 +14,7 @@ on:
 
 jobs:  
 
-  gradle:
+  Distro:
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -33,8 +33,8 @@ jobs:
         
           echo "start"
 
-  make-list:
-    needs: gradle
+  Combo:
+    needs: Distro
     strategy:
       fail-fast: false
       max-parallel: 8      
@@ -43,7 +43,7 @@ jobs:
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
     
     outputs:
-      matrix: ${{steps.list_dirs.outputs.matrix}}
+      matrix: ${{steps.list_dirs.outputs.desktop}}
     runs-on: Linux
     name: "Test"    
     steps:
@@ -71,18 +71,18 @@ jobs:
             do
               echo  "${RELEASE}:$j"
             done)
-          echo ::set-output name=matrix::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) 
+          echo ::set-output name=desktop::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) 
           
   Desktop:
   
-      needs: [ make-list ]
+      needs: [ Combo ]
       runs-on: Linux
       timeout-minutes: 480
       strategy:
         max-parallel: 16
         fail-fast: false
         matrix: 
-          node: ${{fromJson(needs.Prepare.outputs.matrix)}}
+          node: ${{fromJson(needs.Combo.outputs.desktop)}}
 
       steps:
 
