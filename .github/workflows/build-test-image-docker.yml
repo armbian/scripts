@@ -222,6 +222,8 @@ jobs:
       - name: Find and login
         run: |
         
+          export TERM=xterm
+        
           # get ip
           MAC=$(sudo virsh domiflist Armbian | tail -2 | head -1 | awk '{print $NF}')
           USER_HOST=$(sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}')
