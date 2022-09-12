@@ -222,7 +222,7 @@ jobs:
       - name: Find and login
         run: |
         
-          export TERM=xterm
+          export TERM=linux
         
           # get ip
           MAC=$(sudo virsh domiflist Armbian | tail -2 | head -1 | awk '{print $NF}')
