@@ -174,13 +174,17 @@ jobs:
         board: [uefi-x86]
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
 
-    runs-on: ubuntu-latest
+    runs-on: qemu
     name: "Test"
     steps:
 
-      - name: Read
+      - name: Prepare
         run: |
 
+          sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin dnsmasq gir1.2-spiceclientgtk-3.0 virt-viewer sshpass
+
+      - name: Read
+        run: |
 
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
           echo ${{ matrix.target }}
@@ -192,3 +196,59 @@ jobs:
         with:
           name: "${{ matrix.board }}-${{ env.RELEASE }}"
           path: "${{ matrix.board }}-${{ env.RELEASE }}"
+          
+      - name: Remove previous if any
+        run: |
+
+          virsh destroy Armbian || true
+          virsh undefine Armbian || true
+
+      - name: Convert to QEMU and resize
+        run: |
+
+          sudo qemu-img convert -f raw -O qcow2 image.iso /var/lib/libvirt/images/image.qcow2
+          sudo qemu-img resize /var/lib/libvirt/images/image.qcow2 +10G
+
+      - name: Boot it up
+        run: |
+
+          virt-install --name Armbian --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/image.qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
+          
+      - name: Sleep for 2m to make sure image booted up
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '2m'
+          
+      - name: Find and login
+        run: |
+        
+          # get ip
+          MAC=$(sudo virsh domiflist Armbian | tail -2 | head -1 | awk '{print $NF}')
+          USER_HOST=$(sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}')
+
+          # login credentials
+          USER_ROOT=root
+          PASS_ROOT=testpassword
+          USER_NORMAL=guest
+          PASS_NORMAL=testpassword
+
+          expect -c "
+            spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
+            set timeout 120
+            expect \"Create root password: \"
+            send \"${PASS_ROOT}\r\"
+            expect \"Repeat root password: \"
+            send \"${PASS_ROOT}\r\"
+            expect \"zsh\"
+            send \"2\r\"
+            expect \"*to abort\"
+            send \"${USER_NORMAL}\r\"
+            expect \"Create*password:\"
+            send \"${PASS_NORMAL}\r\"
+            expect \"Repeat*password:\"
+            send \"${PASS_NORMAL}\r\"
+            expect \"Please provide your real name: \"
+            send \"${NAME_NORMAL}\r\"
+            expect \"*language based on your location*\"
+            send \"y\r\"
+            expect eof\r"
