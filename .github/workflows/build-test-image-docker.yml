@@ -42,9 +42,17 @@ jobs:
         board: [uefi-x86]
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
 
-    runs-on: qemu
+    runs-on: Linux
     name: "Test"
     steps:
+
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/build
+          path: build
+          fetch-depth: '100'
+          clean: false
 
       - name: Read
         run: |
