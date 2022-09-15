@@ -147,7 +147,7 @@ jobs:
           set +e
           releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
           # 
-          releases=("bullseye","sid","jammy")
+          releases=("bullseye" "sid" "jammy")
           
           for i in ${releases[@]}
           do
