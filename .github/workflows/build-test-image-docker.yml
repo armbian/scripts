@@ -18,8 +18,8 @@ jobs:
     outputs:
       desktop: ${{steps.list_dirs.outputs.desktop}}
  
-    runs-on: ubuntu-latest
-    #runs-on: small
+    #runs-on: ubuntu-latest
+    runs-on: small
     name: "Build"    
     steps:
 
