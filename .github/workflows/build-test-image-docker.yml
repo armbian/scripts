@@ -146,9 +146,13 @@ jobs:
           MATRIX=$(
           set +e
           releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
+          # 
+          releases=("bullseye","sid","jammy")
+          
           for i in ${releases[@]}
           do
           environments=($([[ -d build/config/desktop/${i}/environments ]] && ls -1 build/config/desktop/${i}/environments))
+          #
           environments=(xfce)
             for j in ${environments[@]}
             do
