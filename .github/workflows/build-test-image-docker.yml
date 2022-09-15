@@ -83,6 +83,9 @@ jobs:
         run: |
 
           cd build
+          
+          rm -rf output/images/*
+          
           # framework init
           ./compile.sh \
           JUST_INIT="yes" \
