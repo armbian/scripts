@@ -142,7 +142,7 @@ jobs:
 
           while :
           do
-            IPERF=$(timeout 15 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "iperf3 -c 10.0.40.2 -t 5 -J 2>/dev/null | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | cut -d"-" -f2" | LC_ALL=C awk '{$1/=1048576;printf "%.2f Mbit/s\n",$1}')
+            IPERF=$(timeout 30 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "iperf3 -c 10.0.40.2 -t 5 -J 2>/dev/null | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | cut -d"-" -f2" | LC_ALL=C awk '{$1/=1048576;printf "%.2f Mbit/s\n",$1}')
             if [[ -n "${IPERF}" ]] ; then
               echo "IPERF=${IPERF}" >> $GITHUB_ENV
               break
@@ -155,7 +155,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          timeout 5 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 1"
+          timeout 30 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 1"
 
       - name: Sleep for 3 min
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
