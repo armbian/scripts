@@ -173,6 +173,11 @@ jobs:
           else
               ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "run-parts /etc/update-motd.d/" || true
               echo "REBOOT=true" >> $GITHUB_ENV
+              echo "KERNEL=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "uname -r" || true)" >> $GITHUB_ENV
+              # read u-boot
+              root_uuid=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -e 's/^.*root=//' -e 's/ .*$//' < /proc/cmdline" || true)
+              root_partition_device=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "blkid | tr -d '\":' | grep \"${root_uuid}\" | awk '{print \$1}' | rev | cut -c3- | rev" || true)
+              echo "UBOOT=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dd status=none if=${root_partition_device} count=5000 | strings | grep armbian | grep U-Boot | tail -1 | cut -f1 -d\"(\"")" >> $GITHUB_ENV
           fi
 
       - name: Assemble
@@ -181,7 +186,7 @@ jobs:
 
           rm -rf status
           mkdir -p status
-          echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
+          echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.UBOOT }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
 
 
       - name: Upload status
