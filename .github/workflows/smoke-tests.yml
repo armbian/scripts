@@ -52,7 +52,7 @@ jobs:
     runs-on: igor
     needs: Prepare
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
-    timeout-minutes: 15
+    timeout-minutes: 30
     strategy:
       #max-parallel: 16
       fail-fast: false
