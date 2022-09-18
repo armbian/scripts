@@ -362,6 +362,7 @@ jobs:
           artifacts: "build/output/images/${{ env.BOARD }}/${{ env.DEPLOYFOLDER }}/*"
           tag: "${{ env.VERSION }}"
           omitBody: true
+          replacesArtifacts: true
           omitName: true
           allowUpdates: true
           token: ${{ secrets.CR_PAT }}
