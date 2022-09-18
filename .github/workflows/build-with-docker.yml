@@ -353,7 +353,7 @@ jobs:
           omitBody: true
           omitName: true
           allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CR_PAT }}
 
       - name: "Upload artefacts 2"
         if: inputs.uploading == 'true'
@@ -364,7 +364,7 @@ jobs:
           omitBody: true
           omitName: true
           allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CR_PAT }}
 
       - name: Deploy to server
         if: ${{ github.repository_owner == 'Armbian' && (github.event.inputs.choice == 'stable' || github.event.inputs.choice == 'rc') }}
