@@ -353,7 +353,7 @@ jobs:
           omitBody: true
           omitName: true
           allowUpdates: true
-          token: ${{ secrets.CR_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Upload artefacts 2"
         if: inputs.uploading == 'true'
