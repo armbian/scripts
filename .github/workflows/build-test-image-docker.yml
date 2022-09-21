@@ -84,7 +84,7 @@ jobs:
 
           cd build
           
-          rm -rf output/images/*
+          sudo rm -rf output/images/*
           
           # framework init
           ./compile.sh \
