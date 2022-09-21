@@ -261,15 +261,15 @@ jobs:
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt -y --no-install-recommends install lightdm-gtk-greeter lightdm"
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager"
             # desktop package probably needs +       Conflicts: gdm3
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -o Dpkg::Options::="--force-confold" --allow-downgrades -y --install-recommends install armbian-\$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)-desktop-${{ env.DESKTOP }}"
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -o Dpkg::Options::="--force-confold" --allow-downgrades -y --install-recommends install armbian-${{ env.RELEASE }}-desktop-${{ env.DESKTOP }}"
             #
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "service lightdm start 2>/dev/null"
             sleep 20s
             #
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y install maim"
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "DISPLAY=:0 maim > screenshot.png"
+            #sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y install maim"
+            #sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "DISPLAY=:0 maim > screenshot.png"
             # copy screenshot
-            sshpass -p ${PASS_ROOT} scp -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}:/home/${USER_NORMAL}/screenshot.png ${{ env.RELEASE }}-${{ env.DESKTOP }}.png
+            #sshpass -p ${PASS_ROOT} scp -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}:/home/${USER_NORMAL}/screenshot.png ${{ env.RELEASE }}-${{ env.DESKTOP }}.png
 
         - name: Upload artefacts        
           uses: actions/upload-artifact@v3
