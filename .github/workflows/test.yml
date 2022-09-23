@@ -22,4 +22,4 @@ jobs:
           
           GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
           # To list tags
-          curl -H "Authorization: Bearer {GHCR_TOKEN}" https://ghcr.io/v2/USER/IMAGE/tags/list
+          curl -H "Authorization: Bearer {GHCR_TOKEN}" https://ghcr.io/v2/armbian/build/tags/list
