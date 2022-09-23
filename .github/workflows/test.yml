@@ -18,7 +18,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
         
       - name: get Tags
-        run |
+        run: |
           
           GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
           # To list tags
