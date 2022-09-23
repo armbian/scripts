@@ -110,7 +110,7 @@ jobs:
         if: ${{ env.SKIP != 'yes' }}
         run: |
 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-${{ env.DOCKER_RELEASE }}-$(dpkg --print-architecture)"
+          sudo docker pull ghcr.io/armbian/build:latest"-${{ env.DOCKER_RELEASE }}-$(dpkg --print-architecture)"
 
       - name: Build test image
         if: ${{ env.SKIP != 'yes' }}
@@ -135,7 +135,7 @@ jobs:
           sudo sed -i "s/^#DOCKER_FLAGS+=(--privileged)/DOCKER_FLAGS+=(--privileged)/" userpatches/config-docker.conf
           sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.DOCKER_COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
           sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DOCKER_DISTRO }}:${{ env.DOCKER_RELEASE }}/" userpatches/config-docker.conf
-          sudo sed -i "s/^VERSION=.*/VERSION=\$(cat \$SRC\/VERSION | cut -d\".\" -f1-2)\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
+          sudo sed -i "s/^VERSION=.*/VERSION=latest\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
           sudo sed -i 's/armbian:/ghcr.io\/armbian\/build:/g' userpatches/config-docker.conf 
           sudo sed -i "s/ -it/ -i/" userpatches/config-docker.conf
           sed -i "s/COMPRESS_OUTPUTIMAGE=.*/COMPRESS_OUTPUTIMAGE=\"no\"/" userpatches/lib.config

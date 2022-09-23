@@ -162,8 +162,8 @@ jobs:
 
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
           sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
-          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+          sudo docker image rm $(sudo docker images | grep -v latest"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true
+          sudo docker pull ghcr.io/armbian/build:latest"-$(dpkg --print-architecture)"
 
       - name: Build
         run: |
@@ -171,12 +171,12 @@ jobs:
           export TERM=dumb
           cd build
 
-          if [[ "${{ env.REFERENCE }}" != "nightly" ]]; then
-              OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
-              sudo git checkout -f ${{ env.REFERENCE }}
-              #sudo cp ../scripts/VERSION .
-              sudo docker tag $OLD ghcr.io/armbian/build:$(cat ../scripts/VERSION)-$(dpkg --print-architecture)
-          fi
+          #if [[ "${{ env.REFERENCE }}" != "nightly" ]]; then
+          #    OLD="ghcr.io/armbian/build:$(cat VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)
+          #    sudo git checkout -f ${{ env.REFERENCE }}
+          #    #sudo cp ../scripts/VERSION .
+          #    sudo docker tag $OLD ghcr.io/armbian/build:$(cat ../scripts/VERSION)-$(dpkg --print-architecture)
+          #fi
 
           # use local resources if possible
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then

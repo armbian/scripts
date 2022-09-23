@@ -51,7 +51,7 @@ jobs:
          if [[ "$(dpkg --print-architecture)" == arm64 ]]; then
              sudo docker stop $(docker ps -a -q) 2>/dev/null || true
              sudo docker rm $(docker ps -a -q) 2>/dev/null || true
-             sudo docker image rm $(docker images | grep -v $(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
+             sudo docker image rm $(docker images | grep -v latest"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
              sudo docker images -a  | awk '{print $3}' | xargs docker rmi --force  2>/dev/null || true 
              sudo rm -rf build/userpatches || true
          fi
@@ -111,17 +111,17 @@ jobs:
        run: |
 
          # tag
-         sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         #sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
          sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:latest"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
          # push
-         docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         #docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
          docker push ghcr.io/armbian/build:latest"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
          
          if [[ ${{ env.RELEASE }} == jammy ]]; then
             # tag
-            sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+            #sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
             sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:latest"-$(dpkg --print-architecture)"
             # push
-            docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+            #docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
             docker push ghcr.io/armbian/build:latest"-$(dpkg --print-architecture)"
          fi
