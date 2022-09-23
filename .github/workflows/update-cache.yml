@@ -145,8 +145,8 @@ jobs:
 
           [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
           sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
-          sudo docker image rm $(sudo docker images | grep -v $(cat build/VERSION | sed 's/trunk.*/trunk/')"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
-          sudo docker pull ghcr.io/armbian/build:$(cat build/VERSION  | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+          sudo docker image rm $(sudo docker images | grep -v latest"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
+          sudo docker pull ghcr.io/armbian/build:latest"-$(dpkg --print-architecture)"
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
