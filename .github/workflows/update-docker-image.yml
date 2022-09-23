@@ -110,9 +110,16 @@ jobs:
      - name: Push Docker image
        run: |
 
+         # tag
          sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:latest"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         # push
          docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
+         
          if [[ ${{ env.RELEASE }} == jammy ]]; then
+            # tag
             sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
+            sudo docker tag armbian:$(cat build/VERSION) ghcr.io/armbian/build:latest"-$(dpkg --print-architecture)"
+            # push
             docker push ghcr.io/armbian/build:$(cat build/VERSION | cut -d"." -f1-2)"-$(dpkg --print-architecture)"
          fi
