@@ -129,7 +129,7 @@ jobs:
           [[ -n "${{ inputs.boardtype }}" ]] && FILENAME="targets.txt | grep ${var%:*}"
           # if we want to split more
           TEMP=$(mktemp -d || exit 1)
-          
+          REPOSITORY_INSTALL="
           LIST="cat "${FILENAME}" | grep -v \"^$\" | grep -v \"^#\" | awk '{if (\$6 == \"yes\" || \$6 == \"adv\") print \$0;}' |  ${{ inputs.include }} ${{ inputs.exclude }}  cut -f1 -d ' ' | pr -t -n4 | tr -s '[:blank:]' ':' | cut -d\":\" -f2,3"
 
           eval $LIST > $TEMP/data.txt
@@ -268,7 +268,7 @@ jobs:
           fi
           
           # when making all from the list
-          if [[ -n "${{ inputs.fromsources }}" ]]; then
+          if [[ "${{ inputs.fromsources }}" == yes ]]; then
              SKIP_EXTERNAL_TOOLCHAINS="no"
              IGNORE_UPDATES="no"
              UPLOAD_FOLDER="images/"
