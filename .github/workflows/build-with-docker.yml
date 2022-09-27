@@ -272,7 +272,8 @@ jobs:
              SKIP_EXTERNAL_TOOLCHAINS="no"
              IGNORE_UPDATES="no"
              UPLOAD_FOLDER="images/"
-             REPOSITORY_INSTALL=""
+             # we are not building kernel
+             REPOSITORY_INSTALL="kernel"
           elif [[ -n "${{ inputs.boardtype }}" ]]; then
              FILENAME="targets.txt | grep ${var%:*}"
              SKIP_EXTERNAL_TOOLCHAINS="no"
