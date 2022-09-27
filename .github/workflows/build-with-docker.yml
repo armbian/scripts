@@ -268,7 +268,12 @@ jobs:
           fi
           
           # when making all from the list
-          if [[ -n "${{ inputs.boardtype }}" ]]; then
+          if [[ -n "${{ inputs.fromsources }}" ]]; then
+             SKIP_EXTERNAL_TOOLCHAINS="no"
+             IGNORE_UPDATES="no"
+             UPLOAD_FOLDER="images/"
+             REPOSITORY_INSTALL=""
+          elif [[ -n "${{ inputs.boardtype }}" ]]; then
              FILENAME="targets.txt | grep ${var%:*}"
              SKIP_EXTERNAL_TOOLCHAINS="no"
              IGNORE_UPDATES="no"
@@ -282,9 +287,6 @@ jobs:
           fi
           #### we need to install all from repo since we don't drag compilers here
           #### REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware,armbian-zsh"
-          
-          echo ${{ inputs.fromsources }}
-          
           
           echo "DEPLOYFOLDER=$MAKE_FOLDERS" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
