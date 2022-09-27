@@ -32,9 +32,12 @@ on:
         required: false
         type: string
       exclude:
-        required: false
+        required: false        
         type: string
       uploading:
+        type: string
+      fromsources:
+        required: false
         type: string
     secrets:
       CR_PAT:
@@ -279,6 +282,10 @@ jobs:
           fi
           #### we need to install all from repo since we don't drag compilers here
           #### REPOSITORY_INSTALL="u-boot,kernel,armbian-config,armbian-firmware,armbian-zsh"
+          
+          echo ${{ inputs.fromsources }}
+          
+          
           echo "DEPLOYFOLDER=$MAKE_FOLDERS" >> $GITHUB_ENV
           var="${{ inputs.variant }}"
 
