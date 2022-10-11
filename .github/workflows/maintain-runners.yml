@@ -39,7 +39,7 @@ jobs:
           name: changes
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
           repository: armbian/build
@@ -128,7 +128,7 @@ jobs:
            sudo shutdown -r +2 || true
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
           repository: armbian/build
