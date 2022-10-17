@@ -226,6 +226,6 @@ jobs:
     steps:
 
       - name: Delete control artefact
-        uses: geekyeggo/delete-artifact@v1
+        uses: geekyeggo/delete-artifact@v2
         with:
           name: changes
