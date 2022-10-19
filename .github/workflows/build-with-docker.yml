@@ -275,9 +275,7 @@ jobs:
              # we are not building kernel
              REPOSITORY_INSTALL="kernel"
              # headers comes here by default
-             INSTALL_HEADERS="yes"
-             # disable upgrades too
-             BSPFREEZE="yes"
+             # INSTALL_HEADERS="yes"             
           elif [[ -n "${{ inputs.boardtype }}" ]]; then
              FILENAME="targets.txt | grep ${var%:*}"
              SKIP_EXTERNAL_TOOLCHAINS="no"
@@ -286,7 +284,8 @@ jobs:
              UPLOAD_FOLDER="images-csc/"
           else          
              SKIP_EXTERNAL_TOOLCHAINS="yes"
-             IGNORE_UPDATES="yes"
+             IGNORE_UPDATES="yes"             
+             BSPFREEZE="yes"
              REPOSITORY_INSTALL="u-boot,kernel,armbian-bsp-cli,armbian-bsp-desktop,armbian-desktop,armbian-config,armbian-firmware,armbian-zsh"
              UPLOAD_FOLDER="images/"
           fi
