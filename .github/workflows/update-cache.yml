@@ -79,7 +79,7 @@ jobs:
           
           if [[ $VAR == desktop* ]]; then
           #echo ::set-output name=desktop::$(for x in $(grep -rw build/config/desktop/*/environments/*/support -e 'supported'  | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d | grep -v "_" | cut -d"/" -f6 | sort | uniq | sed '/deepin\|enlightenment\|i3-wm\|lxde\|xmonad/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d | grep -v "_" | cut -d"/" -f6 | sort | uniq | sed '/deepin\|enlightenment\|i3-wm\|lxde\|xmonad\|budgie\|kde-plasma/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
               if [[ $ARC == tinkerboard ]]; then
               echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
               fi
