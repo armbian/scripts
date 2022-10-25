@@ -153,6 +153,7 @@ jobs:
           ###### use this only on our runners
           ####if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
           # mount deploy target
+          sudo apt-get -y update
           sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
