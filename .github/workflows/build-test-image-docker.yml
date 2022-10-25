@@ -24,7 +24,8 @@ jobs:
         board: [uefi-x86]
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
         #target: ["debian:bullseye:10","ubuntu:jammy:12"]
-        desktop: [xfce,gnome,mate,cinnamon,budgie,kde-plasma]
+        #desktop: [xfce,gnome,mate,cinnamon,budgie,kde-plasma]
+        desktop: [xfce,gnome,cinnamon]
     
     name: Make
     runs-on: ${{ inputs.runner }}
