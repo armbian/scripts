@@ -202,7 +202,7 @@ jobs:
           USE_TORRENT="yes" \
           KERNEL_ONLY="no" \
           KERNEL_KEEP_CONFIG="no" \
-          RELEASE="focal" \
+          RELEASE="jammy" \
           BSP_BUILD="yes" \
           BUILD_ALL="yes" \
           CLEAN_LEVEL="make,oldcache" \
