@@ -91,7 +91,6 @@ jobs:
                [[ ${BOARDFAMILY} == rk3399 && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                [[ ${BOARDFAMILY} == jetson-nano && ${BRANCH} != legacy ]] && BOARDFAMILY=media
                [[ ${BOARDFAMILY} == media && ${BRANCH} == legacy ]] && BOARDFAMILY=station-p2
-               [[ ${LINUXFAMILY} == station-* && ${BRANCH} != legacy ]] && LINUXFAMILY=media
                [[ ${BOARDFAMILY} == rockpis && ${BRANCH} != legacy ]] && BOARDFAMILY=rockchip64
                [[ ${BOARDFAMILY} == bcm2711 && ${BRANCH} == legacy ]] && continue
                
