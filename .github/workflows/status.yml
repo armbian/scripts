@@ -59,6 +59,10 @@ jobs:
           [[$keys, $vals] | transpose[] | {key:.[0],value:.[1]}] | from_entries
           ' > runners_capacity.json
 
+          # add kernel versions to JSON
+          jq '.CURRENT += "'${{ env.CURRENT }}'"' runners_capacity.json tmp_current.json
+          jq '.EDGE += "'${{ env.EDGE }}'"' tmp_curren.json tmp_edge.json
+          cp tmp_edge.json runners_capacity.json
           cat runners_capacity.json
 
           echo "|Donated by &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Virtual CPU cores |Memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|" > label.tmp
