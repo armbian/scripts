@@ -36,7 +36,8 @@ jobs:
           sudo wget https://apt.armbian.com/armbian.key -O key
           sudo gpg --dearmor < key | sudo tee /usr/share/keyrings/armbian.gpg > /dev/null
           sudo chmod go+r /usr/share/keyrings/armbian.gpg
-          sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com $TO_RELEASE main ${TO_RELEASE}-utils ${TO_RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
+          RELEASE=$(cat /etc/os-release | grep UBUNTU_CODENAME | cut -d"=" -f2)
+          sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
           sudo apt-get update
           apt search --names-only 'linux-image-current' 2> /dev/null | grep version
           apt search --names-only 'linux-image-edge' 2> /dev/null | grep version
