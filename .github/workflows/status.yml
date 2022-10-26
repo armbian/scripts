@@ -61,7 +61,7 @@ jobs:
 
           # add kernel versions to JSON
           jq '.CURRENT += "'${{ env.CURRENT }}'"' runners_capacity.json > tmp_current.json
-          jq '.EDGE += "'${{ env.EDGE }}'"' tmp_curren.json > tmp_edge.json
+          jq '.EDGE += "'${{ env.EDGE }}'"' tmp_current.json > tmp_edge.json
           cp tmp_edge.json runners_capacity.json
           cat runners_capacity.json
 
