@@ -40,12 +40,12 @@ jobs:
           sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://beta.armbian.com $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
           sudo apt-get update
           CURRENT=$(apt search --names-only 'linux-image-current' 2> /dev/null | grep version | grep -oE "(\w*[.]\w*)*")
-          EDGE=$(apt search --names-only 'linux-image-edge' 2> /dev/null | grep version | grep -oE "(\w*[.]\w*)*")
-          echo "ABc= $CURRENT $EDGE"
+          EDGE=$(apt search --names-only 'linux-image-edge' 2> /dev/null | grep version | grep -oE "(\w*[.]\w*)*")          
 
       - name: Get runners capacity
         run: |
           
+          echo "ABc= $CURRENT $EDGE"
           sudo apt-get -y install datamash
           LIST=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
