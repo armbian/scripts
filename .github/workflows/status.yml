@@ -40,8 +40,9 @@ jobs:
           sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://beta.armbian.com $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
           sudo apt-get update
           CURRENT=$(apt search --names-only 'linux-image-current' 2> /dev/null | grep version | grep -oE "(\w*[.]\w*)*")
-          EDGE=$(apt search --names-only 'linux-image-edge' 2> /dev/null | grep version | grep -oE "(\w*[.]\w*)*")          
-
+          EDGE=$(apt search --names-only 'linux-image-edge' 2> /dev/null | grep version | grep -oE "(\w*[.]\w*)*")
+          echo "CURRENT=${CURRENT}" >> $GITHUB_ENV
+          echo "EDGE=${EDGE}" >> $GITHUB_ENV
       - name: Get runners capacity
         run: |
           
