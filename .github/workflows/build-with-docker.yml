@@ -141,11 +141,11 @@ jobs:
           #echo "matrix=$value" >> $GITHUB_OUTPUT
           
           if [[ -z "${{ inputs.runner }}" ]]; then
-             #echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true             
-             echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT
+             echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true             
+             #echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT
           else
-             #echo ::set-output name=runner::$(echo '["${{ inputs.runner }}"]' | jq) || true
-             echo "runner=${{ inputs.runner }}" >> $GITHUB_OUTPUT
+             echo ::set-output name=runner::$(echo '["${{ inputs.runner }}"]' | jq) || true
+             #echo "runner=${{ inputs.runner }}" >> $GITHUB_OUTPUT
           fi
           
           if [[ -z "${{ inputs.parallel }}" ]]; then
@@ -162,11 +162,11 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
       fail-fast: false
-      max-parallel: ${{fromJson(needs.Prepare.outputs.parallel)}}
+      max-parallel: ${{needs.Prepare.outputs.parallel}}
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: ${{needs.Prepare.outputs.runner}}
+    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
     steps:
 
       - name: Runner prepare
