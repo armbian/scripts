@@ -149,11 +149,11 @@ jobs:
           fi
           
           if [[ -z "${{ inputs.parallel }}" ]]; then
-              #echo ::set-output name=parallel::128 || true
-              echo "parallel=128" >> $GITHUB_OUTPUT
+              echo ::set-output name=parallel::128 || true
+              #echo "parallel=128" >> $GITHUB_OUTPUT
           else
-              #echo ::set-output name=parallel::${{ inputs.parallel }} || true
-              echo "parallel=${{ inputs.parallel }}" >> $GITHUB_OUTPUT
+              echo ::set-output name=parallel::${{ inputs.parallel }} || true
+              #echo "parallel=${{ inputs.parallel }}" >> $GITHUB_OUTPUT
           fi
 
   image:
@@ -162,7 +162,7 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     strategy:
       fail-fast: false
-      max-parallel: ${{needs.Prepare.outputs.parallel}}
+      max-parallel: ${{fromJson(needs.Prepare.outputs.parallel)}}
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
