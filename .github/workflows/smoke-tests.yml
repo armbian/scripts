@@ -159,9 +159,9 @@ jobs:
 
       - name: Sleep for 3 min
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
-        uses: juliangruber/sleep-action@v1
-        with:
-          time: 3m
+        run: |
+        
+          sleep 3m
 
       - name: Ping
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
