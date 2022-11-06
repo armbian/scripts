@@ -74,6 +74,11 @@ jobs:
           #echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|sid/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           # list all but remove particular here
           echo ::set-output name=release::$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+
+          if [[ $ARC == uefi-riscv64 ]]; then
+          echo ::set-output name=appgroup::$(echo -n "Jammy\nKinetic" |jq -cnR '[inputs | select(length>0)]' | jq) || true
+          fi
+
           echo ::set-output name=desktop::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo ::set-output name=appgroup::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           
@@ -83,7 +88,11 @@ jobs:
               if [[ $ARC == tinkerboard ]]; then
               echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
               fi
-          echo ::set-output name=appgroup::$(for x in $(seq -w 01 04); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+              echo ::set-output name=appgroup::$(for x in $(seq -w 01 04); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+              if [[ $ARC == uefi-riscv64 ]]; then
+                   echo ::set-output name=desktop::$(echo "xfce" |jq -cnR '[inputs | select(length>0)]' | jq) || true
+                   echo ::set-output name=appgroup::$(echo "04" |jq -cnR '[inputs | select(length>0)]' | jq) || true
+              fi
           fi
           
           # passing minimal, server or desktop
