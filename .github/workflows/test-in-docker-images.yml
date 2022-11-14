@@ -21,7 +21,7 @@ jobs:
     name: Compile site assets
     runs-on: ubuntu-latest
     container:
-        image: debian:bullseye
+        image: "${{ matrix.image }}"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
