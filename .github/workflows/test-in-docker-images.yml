@@ -32,6 +32,9 @@ jobs:
       - name: Show
         run: |
 
+
+          echo ${{ inputs.url }}
+          echo ${{ inputs.package }}
           RELEASE=$(echo "${{ matrix.image }}" | cut -d":" -f2)
           apt update
           apt -y install wget gpg
