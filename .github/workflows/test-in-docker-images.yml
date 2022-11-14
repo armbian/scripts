@@ -39,6 +39,4 @@ jobs:
           gpg --dearmor < key | tee /usr/share/keyrings/armbian.gpg > /dev/null
           chmod go+r /usr/share/keyrings/armbian.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | tee /etc/apt/sources.list.d/armbian.list
-          pwd
-          cat /etc/apt/sources.list
           apt update
