@@ -8,6 +8,10 @@ on:
       url:
         required: false
         type: string
+      package:
+        required: false
+        type: string
+
 
 jobs:  
 
@@ -16,9 +20,9 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        image: ["debian:buster","debian:bullseye","debian:bookworm","debian:sid","ubuntu:focal","ubuntu:jammy","ubuntu:kinetic"]
+        image: ["debian:buster","debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy","ubuntu:kinetic"]
     
-    name: Compile site assets
+    name: Install into
     runs-on: ubuntu-latest
     container:
         image: "${{ matrix.image }}"
