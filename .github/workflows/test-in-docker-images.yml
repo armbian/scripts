@@ -1,0 +1,31 @@
+name: Test inside container
+
+on:
+
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      url:
+        required: false
+        type: string
+
+jobs:  
+
+  gradle:
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        image: [debian:bullseye,debian:sid]
+    
+    name: Compile site assets
+    runs-on: ubuntu-latest
+    container:
+        image: ${{ matrix.image }}
+    name: Make
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Show
+        run: |
+          echo "test"
