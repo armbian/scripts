@@ -28,7 +28,7 @@ jobs:
       - name: Show
         run: |
 
-          RELEASE=$(echo "${{ matrix.image }}" | cut -d":" -f1)
+          RELEASE=$(echo "${{ matrix.image }}" | cut -d":" -f2)
           apt update
           apt -y install wget gpg
           wget https://apt.armbian.com/armbian.key -O key
