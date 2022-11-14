@@ -16,13 +16,12 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        image: [debian:bullseye,debian:sid]
+        image: ["debian:bullseye","debian:sid"]
     
     name: Compile site assets
     runs-on: ubuntu-latest
     container:
-        image: ${{ matrix.image }}
-    
+        image: debian:bullseye
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
