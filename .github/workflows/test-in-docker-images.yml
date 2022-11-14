@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
         image: ${{ matrix.image }}
-    name: Make
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
