@@ -136,9 +136,9 @@ jobs:
           MATRIX="split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat $TEMP/data.txt"
           [ -s changes ] || unset MATRIX
           
-          echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
-          #value=$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
-          #echo "matrix=$value" >> $GITHUB_OUTPUT
+          #echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          #value=$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)
+          echo "matrix=$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           
           if [[ -z "${{ inputs.runner }}" ]]; then
              echo ::set-output name=runner::$(echo '["ubuntu-latest"]' | jq) || true             
