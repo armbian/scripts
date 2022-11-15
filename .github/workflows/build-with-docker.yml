@@ -166,7 +166,7 @@ jobs:
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
-    runs-on: ${{fromJson(needs.Prepare.outputs.runner)}}
+    runs-on: ${{needs.Prepare.outputs.runner}}
     steps:
 
       - name: Runner prepare
