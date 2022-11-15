@@ -22,7 +22,8 @@ jobs:
 
     steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       # we are comparing hash on subdirs so we need full clone
       - name: Checkout repository
