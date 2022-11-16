@@ -32,3 +32,6 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
+      - name: List
+        run: |
+          tree
