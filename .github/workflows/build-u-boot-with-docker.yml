@@ -79,7 +79,7 @@ jobs:
 
           MATRIX="cat build/config/target*.conf | grep -v \"^$\" | grep -v \"^#\" | ${{ inputs.include }} ${{ inputs.exclude }} sed 's/\s\s*/ /g' | cut -d' ' -f1,2 | sed 's/ /:/g' | sort | uniq"
           [ -s changes ] || unset MATRIX
-          echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo "matrix=$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' |  jq -c)" >> $GITHUB_OUTPUT
        
   U-boot:
 
