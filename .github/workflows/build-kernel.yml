@@ -78,6 +78,7 @@ jobs:
       fail-fast: false
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
+        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
 
     steps:
 
@@ -93,6 +94,15 @@ jobs:
 
       - name: "Read"
         run: |
+
+          DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
+          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+          COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
+
+          # export to environment
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          echo "DISTRO=$DISTRO" >> $GITHUB_ENV
+          echo "COMPILER=$COMPILER" >> $GITHUB_ENV
 
           INPUT_REFERENCE=${{ inputs.reference }}
           INPUT_REFERENCE=${INPUT_REFERENCE:-"nightly"}
@@ -153,15 +163,20 @@ jobs:
       - name: Pull Docker image
         run: |
 
-          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true
-          sudo docker image rm $(sudo docker images | grep -v latest"-$(dpkg --print-architecture)" | awk 'NR>1 {print $3}') 2> /dev/null || true 
-          sudo docker pull ghcr.io/armbian/build:latest"-$(dpkg --print-architecture)"
+          sudo docker pull ghcr.io/armbian/build:latest"-${{ env.RELEASE }}-$(dpkg --print-architecture)"
 
       - name: Build
         run: |
 
           cd build
+
+          # change template
+          sudo sed -i "s/^#DOCKER_FLAGS+=(--privileged)/DOCKER_FLAGS+=(--privileged)/" userpatches/config-docker.conf
+          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DISTRO }}:${{ env.RELEASE }}/" userpatches/config-docker.conf
+          sudo sed -i "s/^VERSION=.*/VERSION=latest\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
+          sudo sed -i 's/armbian:/ghcr.io\/armbian\/build:/g' userpatches/config-docker.conf 
+          sudo sed -i "s/ -it/ -i/" userpatches/config-docker.conf
 
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
              sudo mkdir -p cache/toolchain cache/rootfs || true
