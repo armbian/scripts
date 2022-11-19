@@ -78,7 +78,7 @@ jobs:
       fail-fast: false
       matrix:
         node: ${{fromJson(needs.Prepare.outputs.matrix)}}
-        target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
+        target: ["debian:bullseye:10","debian:sid:12","ubuntu:jammy:12","ubuntu:kinetic:12"]
 
     steps:
 

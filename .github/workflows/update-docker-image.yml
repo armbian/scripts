@@ -13,7 +13,7 @@ jobs:
       matrix:
       
         runner: ["ubuntu-latest","aarch64"]
-        target: ["debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy"]
+        target: ["debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy","ubuntu:kinetic"]
 
     name: ${{ matrix.runner }} ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
@@ -67,10 +67,10 @@ jobs:
               sid)
               PACKAGES="g++-12-arm-linux-gnueabihf libssl1.1"
               ;;
-              focal)
-              PACKAGES="g++-8-arm-linux-gnueabihf libssl1.1 qemu"
-              ;;
               jammy)
+              PACKAGES="g++-12-arm-linux-gnueabihf libssl3 qemu"
+              ;;
+              kinetic)
               PACKAGES="g++-12-arm-linux-gnueabihf libssl3 qemu"
               ;;
          esac
