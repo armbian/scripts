@@ -70,7 +70,7 @@ jobs:
           echo "matrix=$(for x in $(cat changes 2>/dev/null); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           TARGETS="ubuntu:jammy:12"
           [[ "$(cat changes | grep uefi-x86 2>/dev/null)" ]] && TARGETS="debian:bullseye:10,debian:sid:12,ubuntu:jammy:12,ubuntu:kinetic:12"
-          echo "target=$(for x in $(echo $TARGETS 2>/dev/null); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c" >> $GITHUB_OUTPUT
+          echo "target=$(for x in $(echo $TARGETS 2>/dev/null); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
   gcc:
 
