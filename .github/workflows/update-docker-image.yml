@@ -71,7 +71,7 @@ jobs:
               PACKAGES="g++-12-arm-linux-gnueabihf libssl3 qemu"
               ;;
               kinetic)
-              PACKAGES="g++-12-arm-linux-gnueabihf libssl3 qemu"
+              PACKAGES="g++-12-arm-linux-gnueabihf libssl3"
               ;;
          esac
 
