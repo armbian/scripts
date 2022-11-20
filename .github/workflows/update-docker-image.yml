@@ -13,7 +13,7 @@ jobs:
       matrix:
       
         runner: ["ubuntu-latest","aarch64"]
-        target: ["debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy","ubuntu:kinetic"]
+        target: ["debian:bullseye","debian:sid","ubuntu:jammy","ubuntu:kinetic"]
 
     name: ${{ matrix.runner }} ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
