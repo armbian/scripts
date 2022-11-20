@@ -203,6 +203,7 @@ jobs:
           BOARD="$BOARD" \
           CLEAN_LEVEL="make,oldcache" \
           PRIVATE_CCACHE="yes" \
+          KERNEL_DISTRO_PATH="${DISTRO}" \
           BETA="${{ env.BETA }}" \
           KERNEL_ONLY="yes" \
           BRANCH="$BRANCH" \
