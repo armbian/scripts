@@ -137,11 +137,11 @@ jobs:
                   [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
                   # in bugfix rebuild, we rebuild all kernels (current branch only)
                   if [[ "$BETA" == no ]]; then
-                        echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
+                        echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${ARCH}"
                   elif [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
                       :
                   else
-                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
+                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${ARCH}"
                   fi
                   done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,3 )
