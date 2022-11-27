@@ -120,9 +120,6 @@ jobs:
         id: list_dirs
         run: |
 
-          cat targets.txt
-
-
           var="${{ inputs.variant }}"
           if [[ "$var" == *stable || "$var" == *rc ]]; then
               FILENAME="build/config/targets.conf | grep ${var%:*} | grep \"yes\|adv\""
