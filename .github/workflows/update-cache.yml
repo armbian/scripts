@@ -118,9 +118,9 @@ jobs:
           
           # This later will become obsolete
           #[[ $VAR == desktop && $ARC != uefi-x86 ]] && echo ::set-output name=runner::$(echo 'small') || true
-          [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo "runner='small'" >> $GITHUB_OUTPUT
+          [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo "runner='small'" >> $GITHUB_OUTPUT || true
           #[[ $VAR == desktop && $ARC == uefi-x86 ]] && echo ::set-output name=runner::$(echo 'X64') || true
-          [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo "runner='X64'" >> $GITHUB_OUTPUT
+          [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo "runner='X64'" >> $GITHUB_OUTPUT || true
 
   image:
   
