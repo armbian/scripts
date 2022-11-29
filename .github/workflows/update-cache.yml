@@ -212,10 +212,11 @@ jobs:
               DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
           ;;
           "03")
-          
               DESKTOP_APPGROUPS_SELECTED="3dsupport browsers chat desktop_tools editors email internet multimedia office programming remote_desktop"
           ;;
-          
+          "04")
+              DESKTOP_APPGROUPS_SELECTED="browsers chat desktop_tools editors email internet multimedia office programming remote_desktop"
+          ;;
           *)
               DESKTOP_APPGROUPS_SELECTED=""
           ;;
