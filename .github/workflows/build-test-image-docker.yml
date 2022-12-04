@@ -37,10 +37,6 @@ jobs:
       - name: Read values
         run: |
 
-          echo ${RUNNER_NAME}
-          echo "---"
-          export
-
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
