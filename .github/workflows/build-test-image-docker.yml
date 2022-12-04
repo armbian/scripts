@@ -28,6 +28,8 @@ jobs:
     
     name: Make
     runs-on: ${{ inputs.runner }}
+    outputs:
+      matrix: ${{steps.list_dirs.outputs.desktop}}
     #runs-on: big
     steps:
 
@@ -204,7 +206,7 @@ jobs:
         max-parallel: 16
         fail-fast: false
         matrix: 
-          node: ${{fromJson(needs.Make.outputs.desktop)}}
+          node: ${{fromJson(needs.gradle.outputs.desktop)}}
 
       steps:
       
