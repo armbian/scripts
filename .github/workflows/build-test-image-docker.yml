@@ -196,7 +196,7 @@ jobs:
               echo  "$i:$j"
             done
           done)
-          echo ::set-output name=desktop::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) 
+          echo "desktop=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT 
 
   Upgrade:
   
