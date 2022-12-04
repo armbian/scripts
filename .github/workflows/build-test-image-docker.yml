@@ -213,7 +213,7 @@ jobs:
         - name: Prepare
           run: |
     
-            sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin dnsmasq gir1.2-spiceclientgtk-3.0 virt-viewer sshpass nmap
+            #sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin dnsmasq gir1.2-spiceclientgtk-3.0 virt-viewer sshpass nmap
             
         - name: Read
           run: |
@@ -233,13 +233,26 @@ jobs:
           
         - name: Remove previous if any
           run: |
-            sudo virsh destroy Armbian || true
-            sudo virsh undefine Armbian || true
+
+            sudo virsh destroy "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" || true
+            sudo virsh undefine "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" || true
 
         - name: Convert to QEMU and resize
           run: |
           
-            ls -l 
-            #IMAGE=$(ls -1 "uefi-x86-${{ env.RELEASE }}"/*.img)
-            #sudo qemu-img convert -f raw -O qcow2 ${IMAGE} /var/lib/libvirt/images/image.qcow2
-            #sudo qemu-img resize /var/lib/libvirt/images/image.qcow2 +10G
+            IMAGE=$(ls -1 "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}"/*.img)
+            sudo qemu-img convert -f raw -O qcow2 ${IMAGE} /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2
+            sudo qemu-img resize /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2 +10G
+
+        - name: Run image in QEMU
+          run: |
+
+            virt-install --name "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br1 --noautoconsole
+            sleep 20s
+
+        - name: Get IP address
+          run: |
+
+            MAC=$(sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}')
+            USER_HOST=$(sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}')
+            echo $USER_HOST
