@@ -32,7 +32,6 @@ jobs:
     steps:
 
       - name: Runner prepare
-        if: ${{ runner.user != 'runner' }}
         uses: armbian/actions/runner-prepare@main
 
       - name: Read values
