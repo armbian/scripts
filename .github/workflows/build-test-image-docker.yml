@@ -62,6 +62,7 @@ jobs:
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "BOARD=$BOARD" >> $GITHUB_ENV
           echo "COMPILER=$COMPILER" >> $GITHUB_ENV
+          echo "DESKTOP=${{ matrix.desktop }}" >> $GITHUB_ENV
           
           echo "DOCKER_DISTRO=$DOCKER_DISTRO" >> $GITHUB_ENV
           echo "DOCKER_RELEASE=$DOCKER_RELEASE" >> $GITHUB_ENV
@@ -163,7 +164,7 @@ jobs:
       - name: Upload artefacts        
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ matrix.board }}-${{ env.RELEASE }}"
+          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ env.DESKTOP }}"
           path: build/output/images/*
           if-no-files-found: error
           retention-days: 7
@@ -203,7 +204,7 @@ jobs:
         max-parallel: 16
         fail-fast: false
         matrix: 
-          node: ${{fromJson(needs.Distro.outputs.desktop)}}
+          node: ${{fromJson(needs.Make.outputs.desktop)}}
 
       steps:
       
@@ -225,8 +226,8 @@ jobs:
         - name: Download artifacts
           uses: actions/download-artifact@v3
           with:
-            name: "uefi-x86-${{ env.RELEASE }}"
-            path: "uefi-x86-${{ env.RELEASE }}"
+            name: "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}"
+            path: "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}"
           
         - name: Remove previous if any
           run: |
