@@ -32,6 +32,7 @@ jobs:
     steps:
 
       - name: Runner prepare
+        if: ${{ env.RUNNER_NAME != 'ubuntu-latest' }}
         uses: armbian/actions/runner-prepare@main
 
       - name: Read values
