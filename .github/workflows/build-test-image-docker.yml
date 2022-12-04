@@ -12,7 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         board: [uefi-x86]
-        #target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
         target: ["debian:bullseye:10","debian:sid:12","ubuntu:jammy:12"]
     
     outputs:
@@ -57,7 +56,6 @@ jobs:
         with:
           repository: armbian/build
           path: build
-          ref: AR-1330
           fetch-depth: '100'
           clean: false
 
