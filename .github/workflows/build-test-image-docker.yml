@@ -42,7 +42,7 @@ jobs:
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
-          
+          IMAGE=$(ls -1 "uefi-x86-jammy-xfce"/*.img)
           DOCKER_DISTRO=$DISTRO
           DOCKER_RELEASE=$RELEASE          
           DOCKER_COMPILER=$COMPILER
@@ -240,6 +240,7 @@ jobs:
         - name: Convert to QEMU and resize
           run: |
           
+            xz -d "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}"/*.xz
             IMAGE=$(ls -1 "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}"/*.img)
             sudo qemu-img convert -f raw -O qcow2 ${IMAGE} /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2
             sudo qemu-img resize /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2 +10G
