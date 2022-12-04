@@ -42,7 +42,7 @@ jobs:
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
           COMPILER=$(echo ${{ matrix.target }} | cut -d":" -f3)
-          IMAGE=$(ls -1 "uefi-x86-jammy-xfce"/*.img)
+
           DOCKER_DISTRO=$DISTRO
           DOCKER_RELEASE=$RELEASE          
           DOCKER_COMPILER=$COMPILER
