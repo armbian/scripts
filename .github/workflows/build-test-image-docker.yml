@@ -159,6 +159,7 @@ jobs:
           KERNEL_CONFIGURE=prebuilt \
           IGNORE_UPDATES=yes \
           REPOSITORY_INSTALL="u-boot,kernel" \
+          COMPRESS_OUTPUTIMAGE="sha,gpg,xz" \
           SKIP_EXTERNAL_TOOLCHAINS=yes \
           FORCED_MONTH_OFFSET=12 \
           DESKTOP_APPGROUPS_SELECTED="3dsupport browsers" \
