@@ -152,27 +152,66 @@ jobs:
           BRANCH=current \
           RELEASE=${{ env.RELEASE }} \
           BUILD_MINIMAL=no \
-          BUILD_DESKTOP=yes \
+          BUILD_DESKTOP=no \
           KERNEL_ONLY=no \
           KERNEL_CONFIGURE=prebuilt \
           COMPRESS_OUTPUTIMAGE=no \
           IGNORE_UPDATES=yes \
           REPOSITORY_INSTALL="u-boot,kernel" \
-          DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
-          DESKTOP_ENVIRONMENT=${{ matrix.desktop }} \
           SKIP_EXTERNAL_TOOLCHAINS=yes \
           FORCED_MONTH_OFFSET=12 \
           DESKTOP_APPGROUPS_SELECTED="3dsupport browsers" \
           ROOTFSCACHE_VERSION="$(shuf -i 1-100000 -n 1)"
 
-#      - name: Upload artefacts        
-#        if: ${{ env.SKIP != 'yes' }}
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ matrix.desktop }}"
-#          path: build/output/images/*
-#          if-no-files-found: error
-#          retention-days: 7
+      - name: Upload artefacts        
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{ matrix.board }}-${{ env.RELEASE }}"
+          path: build/output/images/*
+          if-no-files-found: error
+          retention-days: 7
 
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+      - name: Read
+        id: list_dirs
+        run: |
+          RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
+          echo ${{ matrix.target }}
+          echo ${RELEASE}
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          MATRIX=$(
+          set +e
+          releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
+          # 
+          releases=("bullseye" "sid" "jammy")
+          
+          for i in ${releases[@]}
+          do
+          environments=($([[ -d build/config/desktop/${i}/environments ]] && ls -1 build/config/desktop/${i}/environments))
+          #
+          #environments=(xfce)
+            for j in ${environments[@]}
+            do
+              echo  "$i:$j"
+            done
+          done)
+          echo ::set-output name=desktop::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) 
+
+  Upgrade:
+  
+      needs: [ gradle ]
+      name: "Install"
+      runs-on: qemu
+      timeout-minutes: 480
+      strategy:
+        max-parallel: 16
+        fail-fast: false
+        matrix: 
+          node: ${{fromJson(needs.Distro.outputs.desktop)}}
+
+      steps:
+      
+        - name: Prepare
+          run: |
+    
+            sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin dnsmasq gir1.2-spiceclientgtk-3.0 virt-viewer sshpass nmap
+    
