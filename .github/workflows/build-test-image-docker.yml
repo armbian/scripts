@@ -256,20 +256,13 @@ jobs:
               send \"exit\r\"
             "
             
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "bash /etc/update-motd.d/10-armbian-header"
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y update"
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt -y --no-install-recommends install lightdm-gtk-greeter lightdm"
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager"
-            # desktop package probably needs +       Conflicts: gdm3
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -o Dpkg::Options::="--force-confold" --allow-downgrades -y --install-recommends install armbian-${{ env.RELEASE }}-desktop-${{ env.DESKTOP }}"
-            #
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "service lightdm start 2>/dev/null"
-            sleep 20s
-            #
-            #sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y install maim"
-            #sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "DISPLAY=:0 maim > screenshot.png"
-            # copy screenshot
-            #sshpass -p ${PASS_ROOT} scp -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}:/home/${USER_NORMAL}/screenshot.png ${{ env.RELEASE }}-${{ env.DESKTOP }}.png
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y install maim"
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y upgrade"
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "git clone https://github.com/armbian/configng -b desktop"
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "cd configng/test; ./desktop_test.sh"
+            sleep 10
+            sshpass -p ${PASS_NORMAL} ssh -o "StrictHostKeyChecking=accept-new" ${USER_NORMAL}@${USER_HOST} "export DISPLAY=:0;maim" > "${{ env.RELEASE }}-${{ env.DESKTOP }}.png"
 
         - name: Upload artefacts        
           uses: actions/upload-artifact@v3
