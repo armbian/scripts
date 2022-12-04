@@ -24,7 +24,7 @@ jobs:
         #target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
         target: ["ubuntu:jammy:12"]
         #desktop: [xfce,gnome,mate,cinnamon,budgie,kde-plasma]
-        desktop: [xfce]
+        desktop: [xfce,gnome]
     
     name: Make
     runs-on: ${{ inputs.runner }}
@@ -39,6 +39,8 @@ jobs:
         run: |
 
           echo ${RUNNER_NAME}
+          echo "---"
+          export
 
           DISTRO=$(echo ${{ matrix.target }} | cut -d":" -f1)
           RELEASE=$(echo ${{ matrix.target }} | cut -d":" -f2)
@@ -190,7 +192,7 @@ jobs:
           do
           environments=($([[ -d build/config/desktop/${i}/environments ]] && ls -1 build/config/desktop/${i}/environments))
           #
-          environments=(xfce)
+          environments=(xfce,gnome)
             for j in ${environments[@]}
             do
               echo  "$i:$j"
