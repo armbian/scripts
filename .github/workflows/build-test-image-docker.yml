@@ -143,7 +143,6 @@ jobs:
           sudo sed -i "s/^VERSION=.*/VERSION=latest\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
           sudo sed -i 's/armbian:/ghcr.io\/armbian\/build:/g' userpatches/config-docker.conf 
           sudo sed -i "s/ -it/ -i/" userpatches/config-docker.conf
-          sed -i "s/COMPRESS_OUTPUTIMAGE=.*/COMPRESS_OUTPUTIMAGE=\"no\"/" userpatches/lib.config
           
           export TERM=dumb         
           touch .ignore_changes
@@ -157,11 +156,10 @@ jobs:
           RELEASE=${{ env.RELEASE }} \
           BUILD_MINIMAL=no \
           BUILD_DESKTOP=no \
-          KERNEL_ONLY=no \
           KERNEL_CONFIGURE=prebuilt \
           IGNORE_UPDATES=yes \
           REPOSITORY_INSTALL="u-boot,kernel" \
-          COMPRESS_OUTPUTIMAGE="sha,gpg,xz" \
+          COMPRESS_OUTPUTIMAGE="yes" \
           SKIP_EXTERNAL_TOOLCHAINS=yes \
           FORCED_MONTH_OFFSET=12 \
           DESKTOP_APPGROUPS_SELECTED="3dsupport browsers" \
