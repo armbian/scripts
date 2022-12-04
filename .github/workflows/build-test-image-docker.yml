@@ -29,12 +29,12 @@ jobs:
     name: Make
     runs-on: ${{ inputs.runner }}
     outputs:
-      matrix: ${{steps.list_dirs.outputs.desktop}}
+      desktop: ${{steps.list_dirs.outputs.desktop}}
     #runs-on: big
     steps:
 
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+#      - name: Runner prepare
+#        uses: armbian/actions/runner-prepare@main
 
       - name: Read values
         run: |
@@ -188,7 +188,7 @@ jobs:
           do
           environments=($([[ -d build/config/desktop/${i}/environments ]] && ls -1 build/config/desktop/${i}/environments))
           #
-          environments=(xfce,gnome)
+          environments=("xfce" "gnome")
             for j in ${environments[@]}
             do
               echo  "$i:$j"
