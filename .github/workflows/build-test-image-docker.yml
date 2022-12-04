@@ -90,7 +90,7 @@ jobs:
           repository: armbian/build
           path: build          
           ref:  ${{ env.REFERENCE }}
-          clean: true
+#          clean: true
 
       - name: Checkout support scripts
         if: ${{ env.SKIP != 'yes' }}
@@ -99,7 +99,7 @@ jobs:
           fetch-depth: 1
           repository: armbian/scripts
           path: scripts
-          clean: true
+ #         clean: true
 
       - name: Sync
         if: ${{ env.SKIP != 'yes' }}
