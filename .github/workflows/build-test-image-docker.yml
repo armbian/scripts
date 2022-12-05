@@ -178,7 +178,7 @@ jobs:
       runs-on: qemu
       timeout-minutes: 480
       strategy:
-        max-parallel: 16
+        max-parallel: 32
         fail-fast: false
         matrix: 
           node: ${{fromJson(needs.gradle.outputs.desktop)}}
