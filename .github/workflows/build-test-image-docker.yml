@@ -188,7 +188,7 @@ jobs:
         - name: Prepare
           run: |
     
-            #sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin dnsmasq gir1.2-spiceclientgtk-3.0 virt-viewer sshpass nmap
+            #sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin gir1.2-spiceclientgtk-3.0 virt-viewer sshpass nmap
             
         - name: Read
           run: |
