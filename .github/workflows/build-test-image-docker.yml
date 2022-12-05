@@ -224,7 +224,7 @@ jobs:
           run: |
 
             sudo virt-install --name "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
-            sleep 20s
+            sleep 2m
             sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}'
             MAC=$(sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}')
             sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}'
