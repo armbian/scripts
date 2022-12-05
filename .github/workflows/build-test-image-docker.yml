@@ -226,6 +226,8 @@ jobs:
             sudo virt-install --name "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
             sleep 20s
             sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}'
+            MAC=$(sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}')
+            sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}'
 
         - name: Get IP address
           run: |
@@ -239,9 +241,10 @@ jobs:
                    break
                 fi
             done
+            echo ${USER_HOST}
             [[ -f "$HOME/.ssh/known_hosts" ]] && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$USER_HOST" || true
             echo "USER_HOST=$USER_HOST" >> $GITHUB_ENV
-            echo $USER_HOST
+            
             
         - name: Login
           run: |
