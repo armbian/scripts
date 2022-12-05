@@ -244,6 +244,7 @@ jobs:
         - name: Login
           run: |
 
+            USER_HOST=${{ env.USER_HOST }}
             USER_ROOT=root
             PASS_ROOT=testpassword
             USER_NORMAL=guest
