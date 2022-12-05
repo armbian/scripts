@@ -15,22 +15,18 @@ on:
 jobs:  
 
   gradle:
-    if: ${{ github.repository_owner }}
+
     strategy:
       fail-fast: false
       max-parallel: 8
       matrix:
         board: [uefi-x86]
-        #target: ["debian:bullseye:10","debian:sid:12","ubuntu:focal:8","ubuntu:jammy:12"]
-        target: ["ubuntu:jammy:12"]
-        desktop: [xfce,gnome,mate,cinnamon,budgie,kde-plasma,i3-wm,xmonad]
-        #desktop: [xfce,gnome]
-    
+        release: ["bullseye","sid","jammy","kinetic"]
+        
     name: Make
     runs-on: ${{ inputs.runner }}
     outputs:
       desktop: ${{steps.list_dirs.outputs.desktop}}
-    #runs-on: big
     steps:
 
       - name: Runner prepare
@@ -70,39 +66,21 @@ jobs:
           echo "DOCKER_RELEASE=$DOCKER_RELEASE" >> $GITHUB_ENV
           echo "DOCKER_COMPILER=$DOCKER_COMPILER" >> $GITHUB_ENV
 
-#      - name: Handle exceptions
-#        run: |
-#        
-#          if [[ "${{ env.DISTRO }}" == "debian" && "${{ env.BOARD }}" == "rpi4b" ]]; then
-#          echo "SKIP=yes" >> $GITHUB_ENV
-#          fi
-
-      - run: |
-
-          REFERENCE=${{ inputs.reference }}          
-          echo "REFERENCE=${REFERENCE:-"nightly"}" >> $GITHUB_ENV
-
       - name: Checkout repository
-        if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 1
           repository: armbian/build
           path: build          
-          ref:  ${{ env.REFERENCE }}
-#          clean: true
 
       - name: Checkout support scripts
-        if: ${{ env.SKIP != 'yes' }}
         uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 1
           repository: armbian/scripts
           path: scripts
- #         clean: true
 
       - name: Sync
-        if: ${{ env.SKIP != 'yes' }}
         run: |
 
           mkdir -p build/userpatches
@@ -110,10 +88,9 @@ jobs:
           sudo cp scripts/configs/config-default.conf build/userpatches/
           
       - name: Pull Docker image
-        if: ${{ env.SKIP != 'yes' }}
         run: |
 
-          sudo docker pull ghcr.io/armbian/build:latest"-${{ env.DOCKER_RELEASE }}-$(dpkg --print-architecture)"
+          sudo docker pull ghcr.io/armbian/build:latest"-jammy-$(dpkg --print-architecture)"
 
       - name: Build test image
         if: ${{ env.SKIP != 'yes' }}
@@ -136,13 +113,13 @@ jobs:
          
           # change template
           sudo sed -i "s/^#DOCKER_FLAGS+=(--privileged)/DOCKER_FLAGS+=(--privileged)/" userpatches/config-docker.conf
-          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.DOCKER_COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
-          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DOCKER_DISTRO }}:${{ env.DOCKER_RELEASE }}/" userpatches/config-docker.conf
-          sudo sed -i "s/^VERSION=.*/VERSION=latest\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
+#          sudo sed -i "s/^ARM_GCC_COMPILER=.*/ARM_GCC_COMPILER=g++-${{ env.DOCKER_COMPILER }}-arm-linux-gnueabihf/" userpatches/config-docker.conf
+#          sudo sed -i "s/^BASE_IMAGE=.*/BASE_IMAGE=${{ env.DOCKER_DISTRO }}:${{ env.DOCKER_RELEASE }}/" userpatches/config-docker.conf
+#          sudo sed -i "s/^VERSION=.*/VERSION=latest\"-\$(echo \${BASE_IMAGE} \| cut -d\":\" -f2)-\$(dpkg --print-architecture)\"/" userpatches/config-docker.conf          
           sudo sed -i 's/armbian:/ghcr.io\/armbian\/build:/g' userpatches/config-docker.conf 
           sudo sed -i "s/ -it/ -i/" userpatches/config-docker.conf
           
-          export TERM=dumb         
+          export TERM=dumb
           touch .ignore_changes
           ./compile.sh docker \
           JUST_INIT="no" \
@@ -151,7 +128,7 @@ jobs:
           EXPERT=yes \
           BOARD=${{ matrix.board }} \
           BRANCH=current \
-          RELEASE=${{ env.RELEASE }} \
+          RELEASE=${{ matrix.release }} \
           BUILD_MINIMAL=no \
           BUILD_DESKTOP=no \
           KERNEL_CONFIGURE=prebuilt \
@@ -159,14 +136,11 @@ jobs:
           REPOSITORY_INSTALL="u-boot,kernel" \
           COMPRESS_OUTPUTIMAGE="yes" \
           SKIP_EXTERNAL_TOOLCHAINS=yes \
-          FORCED_MONTH_OFFSET=12 \
-          DESKTOP_APPGROUPS_SELECTED="3dsupport browsers" \
-          ROOTFSCACHE_VERSION="$(shuf -i 1-100000 -n 1)"
 
       - name: Upload artefacts        
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ matrix.board }}-${{ env.RELEASE }}-${{ env.DESKTOP }}"
+          name: "${{ matrix.board }}-${{ matrix.release }}"
           path: build/output/images/*
           if-no-files-found: error
           retention-days: 7
@@ -180,16 +154,16 @@ jobs:
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           MATRIX=$(
           set +e
-          releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
+          releases=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' | grep -v "focal\|buster" ))
           # 
-          releases=("jammy")          
+          # releases=("jammy")          
           
           for i in ${releases[@]}
           do
           environments=($([[ -d build/config/desktop/${i}/environments ]] && ls -1 build/config/desktop/${i}/environments))
           #
-          environments=("xfce" "gnome")
-          environmants=("xfce" "gnome" "mate" "cinnamon" "budgie" "kde-plasma" "i3-wm" "xmonad")
+          #environments=("xfce" "gnome")
+          #environmants=("xfce" "gnome" "mate" "cinnamon" "budgie" "kde-plasma" "i3-wm" "xmonad")
             for j in ${environments[@]}
             do
               echo  "$i:$j"
@@ -229,8 +203,8 @@ jobs:
         - name: Download artifacts
           uses: actions/download-artifact@v3
           with:
-            name: "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}"
-            path: "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}"
+            name: "uefi-x86-${{ env.RELEASE }}"
+            path: "uefi-x86-${{ env.RELEASE }}"
           
         - name: Remove previous if any
           run: |
