@@ -287,4 +287,8 @@ jobs:
             path: screenshot.png
             if-no-files-found: error
             retention-days: 7
-            
+
+        - name: Remove VMs
+          run: |
+            sudo virsh destroy "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" || true
+            sudo virsh undefine "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" || true
