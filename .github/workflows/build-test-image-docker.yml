@@ -263,7 +263,7 @@ jobs:
                    break
                 fi
             done
-            ssh-keygen -f "/home/$HOME/.ssh/known_hosts" -R "$USER_HOST"
+            ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$USER_HOST" || true
             echo "USER_HOST=$USER_HOST" >> $GITHUB_ENV
 
         - name: Login
