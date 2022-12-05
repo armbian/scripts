@@ -226,8 +226,6 @@ jobs:
             sudo virt-install --name "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
             sleep 2m
             sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}'
-            MAC=$(sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}')
-            sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}'
 
         - name: Get IP address
           run: |
@@ -236,15 +234,14 @@ jobs:
             for i in 1 2 3 4 5
             do
                 MAC=$(sudo virsh domiflist "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" | tail -2 | head -1 | awk '{print $NF}')
-                USER_HOST=$(sudo nmap -sP 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}')
+                USER_HOST=$(sudo nmap --max-parallelism 10 -sn 10.0.40.0/24 | grep -i "$MAC" -B 2 | head -1 | awk '{print $NF}')
                 if [[ "$USER_HOST" =~ ^(([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))$ ]]; then
                    break
                 fi
             done
-            echo ${USER_HOST}
+
             [[ -f "$HOME/.ssh/known_hosts" ]] && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$USER_HOST" || true
             echo "USER_HOST=$USER_HOST" >> $GITHUB_ENV
-            
             
         - name: Login
           run: |
@@ -280,7 +277,7 @@ jobs:
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y install maim"
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "apt-get -y upgrade"
             sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "git clone https://github.com/armbian/configng -b desktop"
-            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "cd configng/test; ./desktop_test.sh"
+            sshpass -p ${PASS_ROOT} ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "cd configng/test; ./desktop_test.sh ${{ env.DESKTOP }}"
             sleep 10
             sshpass -p ${PASS_NORMAL} ssh -o "StrictHostKeyChecking=accept-new" ${USER_NORMAL}@${USER_HOST} "export DISPLAY=:0;maim" > screenshot.png
             
