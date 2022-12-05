@@ -248,7 +248,7 @@ jobs:
         - name: Run image in QEMU
           run: |
 
-            virt-install --name "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br1 --noautoconsole
+            sudo virt-install --name "uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}" --memory 2048 --vcpus 4 --disk /var/lib/libvirt/images/"uefi-x86-${{ env.RELEASE }}-${{ env.DESKTOP }}".qcow2,bus=sata --import --os-variant ubuntu22.04 --network bridge=br0 --noautoconsole
             sleep 20s
 
         - name: Get IP address
