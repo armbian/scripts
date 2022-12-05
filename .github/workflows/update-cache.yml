@@ -60,66 +60,50 @@ jobs:
         id: list_dirs
         run: |
 
-          CHUNK=${{ inputs.variant }} # desktop uefi-x86
+          CHUNK=${{ inputs.variant }}
           VAR=$(echo $CHUNK | cut -d":" -f1)
           ARC=$(echo $CHUNK | cut -d":" -f2)
-          #echo ::set-output name=board::$(echo $ARC) || true
+
           echo "board=$(echo $ARC)" >> $GITHUB_OUTPUT
-        
+
           ROOTFSCACHE_VERSION=${{ inputs.rootfscache_version }}
           [[ -z "$ROOTFSCACHE_VERSION" ]] && ROOTFSCACHE_VERSION=$(date --utc +"%Y%m%d")
-          #echo ::set-output name=rootfscache_version::$(echo $rootfscache_version)
           echo "rootfscache_version=$ROOTFSCACHE_VERSION" >> $GITHUB_OUTPUT
 
           # list all but remove particular here
-          #echo ::set-output name=release::$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo "release=$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
           if [[ $ARC == uefi-riscv64 ]]; then
-          #echo ::set-output name=release::$(for value in jammy kinetic; do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo "release=$(for value in jammy kinetic; do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+              echo "release=$(for value in jammy kinetic; do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           fi
 
-          #echo ::set-output name=desktop::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo "desktop=$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
-          #echo ::set-output name=appgroup::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo "appgroup=$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           
           if [[ $VAR == desktop* ]]; then
-          #echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d | grep -v "_" | cut -d"/" -f6 | sort | uniq | sed '/deepin\|enlightenment\|i3-wm\|lxde\|xmonad\|budgie\|kde-plasma\|mate/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo "desktop=$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d | grep -v "_" | cut -d"/" -f6 | sort | uniq | sed '/deepin\|enlightenment\|i3-wm\|lxde\|xmonad\|budgie\|kde-plasma\|mate/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               if [[ $ARC == tinkerboard ]]; then
-              #echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-              echo "desktop=$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+                  echo "desktop=$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               fi
-              #echo ::set-output name=appgroup::$(for x in $(seq -w 01 04); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
               echo "appgroup=$(for x in $(seq -w 01 05); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               if [[ $ARC == uefi-riscv64 ]]; then
-                   #echo ::set-output name=desktop::$(echo "xfce" |jq -cnR '[inputs | select(length>0)]' | jq) || true
                    echo "desktop=$(echo "xfce" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
-                   #echo ::set-output name=appgroup::$(echo "05" |jq -cnR '[inputs | select(length>0)]' | jq) || true
-                   echo "appgroup=$(echo "04" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+                   echo "appgroup=$(echo "05" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               fi
           fi
           
           # passing minimal, server or desktop
-          #echo ::set-output name=variant::$(for x in $(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           echo "variant=$(for x in $(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           
           # Let's choose runners wisely
-          #echo ::set-output name=runner::$(echo 'ubuntu-latest') || true # default
           echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT || true
           
           # As we currently don't have many ARM runners and until signing is not done elsewhere, comment them
-          #[[ $VAR != desktop && ($ARC == tinkerboard || $ARC == uefi-arm64) ]] && echo ::set-output name=runner::$(echo 'aarch64') || true
           [[ $VAR != desktop && ($ARC == tinkerboard || $ARC == uefi-arm64) ]] && echo "runner=aarch64" >> $GITHUB_OUTPUT || true
-          #[[ $ARC == uefi-riscv64 ]] && echo ::set-output name=runner::$(echo 'small') || true
           [[ $ARC == uefi-riscv64 ]] && echo "runner=small" >> $GITHUB_OUTPUT || true
           
           # This later will become obsolete
-          #[[ $VAR == desktop && $ARC != uefi-x86 ]] && echo ::set-output name=runner::$(echo 'small') || true
           [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo "runner=small" >> $GITHUB_OUTPUT || true
-          #[[ $VAR == desktop && $ARC == uefi-x86 ]] && echo ::set-output name=runner::$(echo 'X64') || true
           [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo "runner=X64" >> $GITHUB_OUTPUT || true
 
   image:
@@ -374,7 +358,6 @@ jobs:
         run: |
 
           MATRIX=$(ls -1 ${{ env.UPLOAD }}/*.zst | awk -F/ '{print $NF}')
-          #echo ::set-output name=files::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
           echo "files=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
       - name: Unmount folders
