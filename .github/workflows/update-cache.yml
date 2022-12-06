@@ -168,7 +168,7 @@ jobs:
 
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
-          sudo apt-get -y -qq install sshfs
+          #sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
@@ -424,7 +424,7 @@ jobs:
 
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
-          sudo apt-get -y -qq install sshfs
+          #sudo apt-get -y -qq install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
@@ -450,7 +450,7 @@ jobs:
           # exit if keys were not loaded
           [[ -z $(gpg -K) ]] && exit 1
 
-          sudo apt-get -y -qq install jq buildtorrent
+          #sudo apt-get -y -qq install jq buildtorrent
           UPLOAD=${{ env.UPLOAD }}
           ROOTFSCACHE_VERSION=$(cat $UPLOAD/version)
           # cleaning
