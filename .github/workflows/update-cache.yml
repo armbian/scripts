@@ -199,9 +199,12 @@ jobs:
         run: |
 
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-             #CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"
-             CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
+             NO_APT_CACHER="no"
+             APT_PROXY_ADDR="10.0.10.77:3142"
+             CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"             
              else
+             NO_APT_CACHER="yes"
+             APT_PROXY_ADDR=""
              CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
           fi
 
@@ -257,6 +260,8 @@ jobs:
           BRANCH="current" \
           USE_TORRENT="yes" \
           CUSTOM_UBUNTU_MIRROR="${CUSTOM_UBUNTU_MIRROR}" \
+          NO_APT_CACHER="$NO_APT_CACHER" \
+          APT_PROXY_ADDR="$APT_PROXY_ADDR" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
           REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-desktop,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
