@@ -34,7 +34,7 @@ jobs:
 
   Prepare:
 
-    name: "Make build list"
+    name: "Make build list for ${{ inputs.rootfscache_version }}"
     runs-on: [Linux]
     outputs:
 
