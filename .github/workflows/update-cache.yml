@@ -297,6 +297,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
+          df
           sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
           [[ ! -d build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} ]] && sudo chown -R 1008.1002 build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
           # Do it twice, then you may fail
@@ -353,7 +354,7 @@ jobs:
           echo "Mounting SSH share"
           sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
           sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
-
+          sudo df
 
       - name: Signining and torrent creation
         id: sign-list
