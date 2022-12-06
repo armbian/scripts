@@ -166,7 +166,7 @@ jobs:
   
       needs: [ Distro ]
       name: "Install"
-      runs-on: qemu
+      runs-on: [qemu,igor]
       timeout-minutes: 480
       strategy:
         max-parallel: 16
