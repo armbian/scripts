@@ -57,6 +57,7 @@ jobs:
           fetch-depth: 10
           repository: armbian/build
           path: build
+igor
           clean: false
 
       - name: Prepare matrix
@@ -376,7 +377,7 @@ jobs:
     #if: ${{ needs.sign-list.outputs.matrix != '[]' && needs.sign-list.outputs.matrix != '' }}
     runs-on: [big,igor]
     strategy:
-      max-parallel: 16
+      max-parallel: 32
       fail-fast: false
       matrix: 
       
