@@ -194,14 +194,13 @@ jobs:
       - name: Generate rootfs
         run: |
 
+          NO_APT_CACHER="yes"
+          APT_PROXY_ADDR=""
+          CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-             NO_APT_CACHER="no"
-             APT_PROXY_ADDR="10.0.10.77:3142"
+             #NO_APT_CACHER="no"
+             #APT_PROXY_ADDR="10.0.10.77:3142"
              CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"             
-             else
-             NO_APT_CACHER="yes"
-             APT_PROXY_ADDR=""
-             CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
           fi
 
           DESKTOP_APPGROUPS=${{ matrix.appgroup }}
