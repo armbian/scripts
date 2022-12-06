@@ -385,6 +385,11 @@ jobs:
         
           echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
 
+          echo "root numb"${{ needs.Prepare.outputs.rootfscache_version }}
+          
+          cat $UPLOAD/version
+          
+
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
