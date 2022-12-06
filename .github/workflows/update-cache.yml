@@ -9,6 +9,9 @@ on:
       rootfscache_version:
        required: true
        type: string
+      runner:
+       required: true
+       type: string
     secrets:
       PAT1:
         required: true
@@ -34,7 +37,7 @@ jobs:
     name: "Make build list"
     runs-on: [Linux]
     outputs:
-    
+
       runner:                ${{steps.list_dirs.outputs.runner}}
       board:                 ${{steps.list_dirs.outputs.board}}
       release:               ${{steps.list_dirs.outputs.release}}
@@ -105,11 +108,8 @@ jobs:
           # This later will become obsolete
           [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo "runner=small" >> $GITHUB_OUTPUT || true
           [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo "runner=X64" >> $GITHUB_OUTPUT || true
-          echo 
           
-          INPUT_RUN="igor,small"
-          RUNNER=$(for value in $(echo $INPUT_RUN | sed "s/,/ /g"); do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)
-          echo "runner=$RUNNER" >> $GITHUB_OUTPUT || true
+          echo "runner=$(for value in $(echo ${{ inputs.runner }} | sed "s/,/ /g"); do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT || true
 
   image:
   
