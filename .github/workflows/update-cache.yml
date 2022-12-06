@@ -385,9 +385,9 @@ jobs:
         
           echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
 
-          echo "root numb"${{ needs.Prepare.outputs.rootfscache_version }}
+          echo {{ env.rootfscache_version }}
           
-          cat $UPLOAD/version
+          echo ${{ inputs.variant }} 
           
 
       - name: Runner prepare
