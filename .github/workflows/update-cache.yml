@@ -185,15 +185,10 @@ jobs:
           echo "Clean folder"
           sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
 
-#          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
-#              echo "Mounting NFS share"
-#              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload || true
-#          else
-              echo "Mounting SSH share"
-              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
-              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
-#          fi
-          # remove true when all runners are on jammy
+          echo "Mounting SSH share"
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+        
           sudo df          
 
       - name: Generate rootfs
