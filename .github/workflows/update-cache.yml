@@ -68,7 +68,7 @@ jobs:
 
           ROOTFSCACHE_VERSION=${{ inputs.rootfscache_version }}
           [[ -z "$ROOTFSCACHE_VERSION" ]] && ROOTFSCACHE_VERSION=$(date --utc +"%Y%m%d")
-          echo "rootfscache_version=$ROOTFSCACHE_VERSION" >> $GITHUB_OUTPUT
+          echo "rootfscache_version=$ROOTFSCACHE_VERSION" >> $GITHUB_ENV
 
           # list all but remove particular here
           echo "release=$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
