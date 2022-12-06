@@ -105,6 +105,11 @@ jobs:
           # This later will become obsolete
           [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo "runner=small" >> $GITHUB_OUTPUT || true
           [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo "runner=X64" >> $GITHUB_OUTPUT || true
+          echo 
+          
+          INPUT_RUN="ubuntu-latest,small"
+          RUNNER=$(for value in $(echo $INPUT_RUN | sed "s/,/ /g"); do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)
+          echo "runner=$RUNNER" >> $GITHUB_OUTPUT || true
 
   image:
   
@@ -119,7 +124,8 @@ jobs:
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
-    runs-on: ["${{ needs.Prepare.outputs.runner }}"]
+    #runs-on: ["${{ needs.Prepare.outputs.runner }}"]
+    runs-on: ${{ fromJSON(needs.Prepare.outputs.runner)}}
     steps:
 
       - name: Runner prepare
