@@ -107,7 +107,7 @@ jobs:
           [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo "runner=X64" >> $GITHUB_OUTPUT || true
           echo 
           
-          INPUT_RUN="ubuntu-latest,small"
+          INPUT_RUN="igor,small"
           RUNNER=$(for value in $(echo $INPUT_RUN | sed "s/,/ /g"); do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)
           echo "runner=$RUNNER" >> $GITHUB_OUTPUT || true
 
