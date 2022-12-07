@@ -2,16 +2,6 @@ name: Cleaning upload folder
 on:
   workflow_dispatch:
   workflow_call:
-    inputs:
-      runner:
-        required: true
-        type: string
-      reference:
-        required: true
-        type: string
-      packagesrepo:
-        required: false
-        type: string
     secrets:
       SSH_KEY_TORRENTS: 
         required: true
