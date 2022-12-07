@@ -220,8 +220,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+#      - name: Runner prepare
+#        uses: armbian/actions/runner-prepare@main
 
   clean:
     needs: [ gcc ]
