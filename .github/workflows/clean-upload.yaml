@@ -30,7 +30,7 @@ on:
         
 jobs
 
-Prepare:
+  Prepare:
     runs-on: Linux
     name: Source changes
     if: ${{ github.repository_owner == 'Armbian' }}
