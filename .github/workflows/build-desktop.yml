@@ -112,7 +112,8 @@ jobs:
 
       steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - run: |
 
@@ -154,7 +155,7 @@ jobs:
           ####if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
           # mount deploy target
           sudo apt-get -y update
-          sudo apt-get -y -qq install sshfs
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
           sudo mkdir -p build/output/debs || true
