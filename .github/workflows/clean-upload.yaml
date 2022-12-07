@@ -1,0 +1,71 @@
+name: Changes
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      reference:
+        required: true
+        type: string
+      packagesrepo:
+        required: false
+        type: string
+    secrets:
+      GPG_KEY1:
+        required: true
+      GPG_PASSPHRASE1:
+        required: true
+      GPG_KEY2:
+        required: true
+      GPG_PASSPHRASE2:
+        required: true
+      SCRIPTS_ACCESS_TOKEN:
+        required: true
+      SSH_KEY_TORRENTS: 
+        required: true
+      KNOWN_HOSTS_UPLOAD:
+        required: true
+        
+jobs
+
+Prepare:
+    runs-on: Linux
+    name: Source changes
+    if: ${{ github.repository_owner == 'Armbian' }}
+
+    steps:
+
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
+      - name: Checkout repository
+        uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 1
+          repository: armbian/build
+          path: build
+          clean: true
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Remove existing artefacts
+        run: |
+
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
+          sudo mkdir -p /root/.ssh/
+          sudo cp ~/.ssh/known_hosts /root/.ssh/
+          sudo mkdir -p build/output/debs || true
+          sudo mkdir -p build/output/debs-beta || true
+          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+          ls -l build/output/debs
+          ls -l build/output/debs-beta
