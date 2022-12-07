@@ -131,7 +131,7 @@ jobs:
           # use this only on our runners
           if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
           # mount deploy target
-          sudo apt-get -y -qq install sshfs
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
           sudo mkdir -p build/output/debs || true
