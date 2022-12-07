@@ -1,4 +1,4 @@
-name: Changes
+name: Cleaning upload folder
 on:
   workflow_dispatch:
   workflow_call:
@@ -13,16 +13,6 @@ on:
         required: false
         type: string
     secrets:
-      GPG_KEY1:
-        required: true
-      GPG_PASSPHRASE1:
-        required: true
-      GPG_KEY2:
-        required: true
-      GPG_PASSPHRASE2:
-        required: true
-      SCRIPTS_ACCESS_TOKEN:
-        required: true
       SSH_KEY_TORRENTS: 
         required: true
       KNOWN_HOSTS_UPLOAD:
@@ -39,14 +29,6 @@ jobs:
 
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
-
-      - name: Checkout repository
-        uses: actions/checkout@v3.1.0
-        with:
-          fetch-depth: 1
-          repository: armbian/build
-          path: build
-          clean: true
 
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2
