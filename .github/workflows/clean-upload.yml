@@ -12,7 +12,7 @@ jobs:
 
   Prepare:
     runs-on: Linux
-    name: Source changes
+    name: Clean output/debs and output/debs-beta
     if: ${{ github.repository_owner == 'Armbian' }}
 
     steps:
@@ -39,5 +39,5 @@ jobs:
           sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
           sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
           sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
-          ls -l build/output/debs
-          ls -l build/output/debs-beta
+          sudo rm -rf build/output/debs/*
+          sudo rm -rf build/output/debs-beta/*
