@@ -35,6 +35,28 @@ jobs:
           ref:  ${{ inputs.reference }}
           clean: true
 
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Remove existing artefacts
+        run: |
+
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
+          sudo mkdir -p /root/.ssh/
+          sudo cp ~/.ssh/known_hosts /root/.ssh/
+          sudo mkdir -p build/output/debs || true
+          sudo mkdir -p build/output/debs-beta || true
+          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+          sudo sshfs upload@users.armbian.com:/debs build/output/debs -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+          sudo sshfs upload@users.armbian.com:/debs-beta build/output/debs-beta -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+          ls -l build/output/debs
+          ls -l build/output/debs-beta
+
       - name: Checkout support scripts
         uses: actions/checkout@v3.1.0
         with:
