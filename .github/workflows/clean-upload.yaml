@@ -28,7 +28,7 @@ on:
       KNOWN_HOSTS_UPLOAD:
         required: true
         
-jobs
+jobs:
 
   Prepare:
     runs-on: Linux
