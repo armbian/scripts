@@ -33,6 +33,7 @@ jobs:
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
+          clean: false
 
       - name: Checkout support scripts
         uses: actions/checkout@v3.1.0
@@ -41,6 +42,7 @@ jobs:
           repository: armbian/scripts
           path: scripts
           ref: master
+          clean: false
 
       - name: Remove previous artefacts if any
         run: |
