@@ -8,7 +8,7 @@
 # NAME = name / keyword of this runner group
 
 
-PAT=ghp_**********************************
+PAT=
 START=005
 STOP=006
 NAME=qemu
