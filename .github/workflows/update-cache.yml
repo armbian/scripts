@@ -57,7 +57,6 @@ jobs:
           fetch-depth: 10
           repository: armbian/build
           path: build
-igor
           clean: false
 
       - name: Prepare matrix
