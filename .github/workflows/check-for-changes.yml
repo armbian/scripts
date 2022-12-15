@@ -27,7 +27,7 @@ jobs:
 
       # we are comparing hash on subdirs so we need full clone
       - name: Checkout repository
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 0 
           repository: armbian/build
@@ -36,7 +36,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 0
           repository: armbian/scripts

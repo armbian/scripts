@@ -23,14 +23,14 @@ jobs:
      - uses: igorpecovnik/freespace@main
 
      - name: Checkout repository
-       uses: actions/checkout@v3.1.0
+       uses: actions/checkout@v3.2.0
        with:
          repository: armbian/build
          path: build
          clean: false
 
      - name: Checkout support scripts
-       uses: actions/checkout@v3.1.0
+       uses: actions/checkout@v3.2.0
        with:
          repository: armbian/scripts
          path: scripts

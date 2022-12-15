@@ -98,7 +98,7 @@ jobs:
           INPUT_REFERENCE=${INPUT_REFERENCE:-"nightly"}
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           path: build
@@ -108,7 +108,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 0
           repository: armbian/scripts
