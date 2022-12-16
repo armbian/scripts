@@ -55,7 +55,7 @@ jobs:
           echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           path: build
@@ -110,7 +110,7 @@ jobs:
           INPUT_REFERENCE=${INPUT_REFERENCE:-"nightly"}   
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           path: build
@@ -119,7 +119,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: '100'
           repository: armbian/scripts
@@ -139,7 +139,7 @@ jobs:
           # use this only on our runners
           if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
           # mount deploy target
-          sudo apt-get -y -qq install sshfs
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
           sudo mkdir -p build/output/debs || true
@@ -181,9 +181,8 @@ jobs:
           # use local resources if possible
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
               sudo rm -rf cache/toolchain/*
-              sudo mkdir -p cache/toolchain build/cache/rootfs || true
+              sudo mkdir -p cache/toolchain || true
               ! sudo mountpoint -q cache/toolchain && sudo mount nas:/tank/armbian/toolchain.armbian.com cache/toolchain -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
-              ! sudo mountpoint -q cache/rootfs && sudo mount nas:/tank/armbian/dl.armbian.com/_rootfs cache/rootfs -o rsize=32768,wsize=32768,timeo=5,retrans=2,actimeo=60,retry=15 || true
           fi
          
           CHUNK="${{ matrix.node }}"

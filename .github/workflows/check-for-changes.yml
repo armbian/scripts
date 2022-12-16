@@ -27,22 +27,22 @@ jobs:
 
       # we are comparing hash on subdirs so we need full clone
       - name: Checkout repository
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 0 
           repository: armbian/build
           path: build
           ref:  ${{ inputs.reference }}
-          clean: true
+          clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 0
           repository: armbian/scripts
           path: scripts
           ref: master
-          clean: true
+          clean: false
 
       - name: Remove previous artefacts if any
         run: |
@@ -137,11 +137,11 @@ jobs:
                   [[ "$STORED_CONFIG" == "null" ]] && CALC_CONFIG="null"
                   # in bugfix rebuild, we rebuild all kernels (current branch only)
                   if [[ "$BETA" == no ]]; then
-                        echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
+                        echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${ARCH}"
                   elif [[ "$CALC_HASH" == "$STORED_HASH" && "$CALC_CONFIG" == "$STORED_CONFIG" && "$CALC_PATCHES" == "$STORED_PATCHES" ]];then
                       :
                   else
-                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}"
+                      echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${ARCH}"
                   fi
                   done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,3 )

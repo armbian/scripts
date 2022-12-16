@@ -9,6 +9,9 @@ on:
       rootfscache_version:
        required: true
        type: string
+      runner:
+       required: true
+       type: string
     secrets:
       PAT1:
         required: true
@@ -31,10 +34,10 @@ jobs:
 
   Prepare:
 
-    name: "Make build list"
+    name: "Make build list for ${{ inputs.rootfscache_version }}"
     runs-on: [Linux]
     outputs:
-    
+
       runner:                ${{steps.list_dirs.outputs.runner}}
       board:                 ${{steps.list_dirs.outputs.board}}
       release:               ${{steps.list_dirs.outputs.release}}
@@ -49,7 +52,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
           
       - name: Checkout build repository
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 10
           repository: armbian/build
@@ -60,60 +63,59 @@ jobs:
         id: list_dirs
         run: |
 
-          CHUNK=${{ inputs.variant }} # desktop uefi-x86
+          CHUNK=${{ inputs.variant }}
           VAR=$(echo $CHUNK | cut -d":" -f1)
           ARC=$(echo $CHUNK | cut -d":" -f2)
-          echo ::set-output name=board::$(echo $ARC) || true
-        
+
+          echo "board=$(echo $ARC)" >> $GITHUB_OUTPUT
+
           ROOTFSCACHE_VERSION=${{ inputs.rootfscache_version }}
           [[ -z "$ROOTFSCACHE_VERSION" ]] && ROOTFSCACHE_VERSION=$(date --utc +"%Y%m%d")
-          echo ::set-output name=rootfscache_version::$(echo $ROOTFSCACHE_VERSION) || true
-                    
-          echo "$VAR $ARC"
+          echo "rootfscache_version=$ROOTFSCACHE_VERSION" >> $GITHUB_OUTPUT
 
-          #echo ::set-output name=release::$(for x in $(grep -rw build/config/distributions/*/ -e 'supported' | cut -d"/" -f4 | sed '/buster\|sid/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
           # list all but remove particular here
-          echo ::set-output name=release::$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo "release=$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
           if [[ $ARC == uefi-riscv64 ]]; then
-          echo ::set-output name=release::$(for value in jammy kinetic; do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq) || true
+              echo "release=$(for value in jammy kinetic; do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           fi
 
-          echo ::set-output name=desktop::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=appgroup::$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo "desktop=$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+          echo "appgroup=$(for x in $(echo "none"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           
           if [[ $VAR == desktop* ]]; then
-          #echo ::set-output name=desktop::$(for x in $(grep -rw build/config/desktop/*/environments/*/support -e 'supported'  | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
-          echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d | grep -v "_" | cut -d"/" -f6 | sort | uniq | sed '/deepin\|enlightenment\|i3-wm\|lxde\|xmonad\|budgie\|kde-plasma\|mate/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+          echo "desktop=$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d | grep -v "_" | cut -d"/" -f6 | sort | uniq | sed '/deepin\|enlightenment\|i3-wm\|lxde\|xmonad\|budgie\|kde-plasma\|mate/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               if [[ $ARC == tinkerboard ]]; then
-              echo ::set-output name=desktop::$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+                  echo "desktop=$(for x in $(find build/config/desktop/*/environments/ -mindepth 1 -maxdepth 1 -type d '!' -exec test -e "{}/only_for" ';' -print | xargs -I{} grep -rw -e 'supported' {} | cut -d"/" -f6 | sort | uniq); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               fi
-              echo ::set-output name=appgroup::$(for x in $(seq -w 01 04); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true
+              echo "appgroup=$(for x in $(seq -w 01 05); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               if [[ $ARC == uefi-riscv64 ]]; then
-                   echo ::set-output name=desktop::$(echo "xfce" |jq -cnR '[inputs | select(length>0)]' | jq) || true
-                   echo ::set-output name=appgroup::$(echo "04" |jq -cnR '[inputs | select(length>0)]' | jq) || true
+                   echo "desktop=$(echo "xfce" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+                   echo "appgroup=$(echo "05" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
               fi
           fi
           
           # passing minimal, server or desktop
-          echo ::set-output name=variant::$(for x in $(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) || true          
+          echo "variant=$(for x in $(echo $VAR); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
           
           # Let's choose runners wisely
-          echo ::set-output name=runner::$(echo 'ubuntu-latest') || true # default
+          echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT || true
           
           # As we currently don't have many ARM runners and until signing is not done elsewhere, comment them
-          [[ $VAR != desktop && ($ARC == tinkerboard || $ARC == uefi-arm64) ]] && echo ::set-output name=runner::$(echo 'aarch64') || true
-          [[ $ARC == uefi-riscv64 ]] && echo ::set-output name=runner::$(echo 'small') || true
+          [[ $VAR != desktop && ($ARC == tinkerboard || $ARC == uefi-arm64) ]] && echo "runner=aarch64" >> $GITHUB_OUTPUT || true
+          [[ $ARC == uefi-riscv64 ]] && echo "runner=small" >> $GITHUB_OUTPUT || true
           
           # This later will become obsolete
-          [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo ::set-output name=runner::$(echo 'small') || true
-          [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo ::set-output name=runner::$(echo 'X64') || true
+          [[ $VAR == desktop && $ARC != uefi-x86 ]] && echo "runner=small" >> $GITHUB_OUTPUT || true
+          [[ $VAR == desktop && $ARC == uefi-x86 ]] && echo "runner=X64" >> $GITHUB_OUTPUT || true
+          
+          echo "runner=$(for value in $(echo ${{ inputs.runner }} | sed "s/,/ /g"); do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT || true
 
   image:
   
     needs: Prepare
     strategy:
-      max-parallel: 32
+      max-parallel: 64
       fail-fast: false
       matrix:
        
@@ -122,14 +124,15 @@ jobs:
         desktop: ${{fromJson(needs.Prepare.outputs.desktop)}}
         appgroup: ${{fromJson(needs.Prepare.outputs.appgroup)}}
 
-    runs-on: ["${{ needs.Prepare.outputs.runner }}"]
+    #runs-on: ["${{ needs.Prepare.outputs.runner }}"]
+    runs-on: ${{ fromJSON(needs.Prepare.outputs.runner)}}
     steps:
 
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
       - name: Checkout repository
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           fetch-depth: 1
@@ -137,7 +140,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/scripts
           fetch-depth: 1
@@ -148,14 +151,15 @@ jobs:
         run: |
 
           mkdir -p build/userpatches
-          sudo cp scripts/configs/* build/userpatches/
+          sudo cp scripts/configs/config-docker.conf build/userpatches/
+          sudo cp scripts/configs/config-default.conf build/userpatches/
 
       - name: Pull Docker image
         run: |
 
-          [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
-          sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
-          sudo docker image rm $(sudo docker images | grep -v latest"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
+          #[[ -z $(command -v docker) ]] && sudo apt-get -yy install docker containerd docker.io
+          #sudo docker kill $(sudo docker ps -q) 2>/dev/null || true          
+          #sudo docker image rm $(sudo docker images | grep -v latest"-$(dpkg --print-architecture)" | grep armbian | awk 'NR>1 {print $3}') 2> /dev/null || true 
           sudo docker pull ghcr.io/armbian/build:latest"-$(dpkg --print-architecture)"
 
       - name: Install SSH key for storage
@@ -164,14 +168,14 @@ jobs:
         
           key: ${{ secrets.SSH_KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
-          if_key_exists: replace
+          if_key_exists: ignore
 
       - name: Mount upload folders
         run: |
 
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
-          sudo apt-get -y -qq install sshfs
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
@@ -181,25 +185,22 @@ jobs:
           echo "Clean folder"
           sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
 
-          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
-              echo "Mounting NFS share"
-              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload || true
-          else
-              echo "Mounting SSH share"
-              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
-              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
-          fi
-          # remove true when all runners are on jammy
+          echo "Mounting SSH share"
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+        
           sudo df          
 
       - name: Generate rootfs
         run: |
 
+          NO_APT_CACHER="yes"
+          APT_PROXY_ADDR=""
+          CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
           if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" ]]; then
-             #CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"
-             CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
-             else
-             CUSTOM_UBUNTU_MIRROR="us.archive.ubuntu.com/ubuntu"
+             #NO_APT_CACHER="no"
+             #APT_PROXY_ADDR="10.0.10.77:3142"
+             CUSTOM_UBUNTU_MIRROR="si.archive.ubuntu.com/ubuntu"             
           fi
 
           DESKTOP_APPGROUPS=${{ matrix.appgroup }}
@@ -212,10 +213,11 @@ jobs:
               DESKTOP_APPGROUPS_SELECTED="3dsupport browsers"
           ;;
           "03")
-          
               DESKTOP_APPGROUPS_SELECTED="3dsupport browsers chat desktop_tools editors email internet multimedia office programming remote_desktop"
           ;;
-          
+          "04")
+              DESKTOP_APPGROUPS_SELECTED="browsers chat desktop_tools editors email internet multimedia office programming remote_desktop"
+          ;;
           *)
               DESKTOP_APPGROUPS_SELECTED=""
           ;;
@@ -253,6 +255,8 @@ jobs:
           BRANCH="current" \
           USE_TORRENT="yes" \
           CUSTOM_UBUNTU_MIRROR="${CUSTOM_UBUNTU_MIRROR}" \
+          NO_APT_CACHER="$NO_APT_CACHER" \
+          APT_PROXY_ADDR="$APT_PROXY_ADDR" \
           USE_MAINLINE_GOOGLE_MIRROR="yes" \
           REPOSITORY_INSTALL="u-boot,kernel,bsp,armbian-desktop,armbian-config,armbian-firmware" \
           DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
@@ -293,6 +297,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
 
+          df
           sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
           [[ ! -d build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} ]] && sudo chown -R 1008.1002 build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
           # Do it twice, then you may fail
@@ -335,7 +340,7 @@ jobs:
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           fetch-depth: 1
@@ -346,21 +351,18 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
           
-          if [[ $(curl -s http://ifconfig.me) == "93.103.15.56" || $(curl -s http://ifconfig.me) == "46.19.33.90" ]]; then
-              echo "Mounting NFS share"
-              sudo mount nas:/tank/armbian/users.armbian.com/upload/rootfs build/cache/rootfs.upload || true
-          else
-              echo "Mounting SSH share"
-              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
-              sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
-          fi
+          echo "Mounting SSH share"
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
+          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+          sudo df
 
       - name: Signining and torrent creation
         id: sign-list
         run: |
 
           MATRIX=$(ls -1 ${{ env.UPLOAD }}/*.zst | awk -F/ '{print $NF}')
-          echo ::set-output name=files::$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo "files=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
       - name: Unmount folders
         if: ${{ github.repository_owner == 'Armbian' }}
@@ -374,7 +376,7 @@ jobs:
     #if: ${{ needs.sign-list.outputs.matrix != '[]' && needs.sign-list.outputs.matrix != '' }}
     runs-on: [big,igor]
     strategy:
-      max-parallel: 16
+      max-parallel: 32
       fail-fast: false
       matrix: 
       
@@ -387,6 +389,11 @@ jobs:
         
           echo "UPLOAD=$(echo ${{ inputs.variant }} | sed "s/://" )" >> $GITHUB_ENV
 
+          echo {{ env.rootfscache_version }}
+          
+          echo ${{ inputs.variant }} 
+          
+
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
@@ -397,7 +404,7 @@ jobs:
           path: ${{ env.UPLOAD }}
 
       - name: Checkout tracker lists
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 1
           repository: ngosang/trackerslist
@@ -405,7 +412,7 @@ jobs:
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           fetch-depth: 1
@@ -426,7 +433,7 @@ jobs:
 
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
-          sudo apt-get -y -qq install sshfs
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/* /root/.ssh/    
           sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
@@ -445,6 +452,7 @@ jobs:
               sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
           fi
 
+
       - name: Signining and torrent creation
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
@@ -452,7 +460,7 @@ jobs:
           # exit if keys were not loaded
           [[ -z $(gpg -K) ]] && exit 1
 
-          sudo apt-get -y -qq install jq buildtorrent
+          #sudo apt-get -y -qq install jq buildtorrent
           UPLOAD=${{ env.UPLOAD }}
           ROOTFSCACHE_VERSION=$(cat $UPLOAD/version)
           # cleaning
@@ -473,6 +481,10 @@ jobs:
 
           echo "Verify"
           zstd -t ${FILE}
+          echo "Fix permissions"
+          sudo chown 1008:1002 ${FILE}
+          sudo chown 1008:1002 ${FILE}.asc
+          sudo chown 1008:1002 ${FILE}.torrent
           
           if [[ "$(cat ${FILE}.asc | gpg --list-packets --no-keyring | grep -oE '[0-9A-F]{40}')" == "DF00FAF1C577104B50BF1D0093D6889F9F0E78D5" ]]; then
             echo "Signature is O.K."
