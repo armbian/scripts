@@ -52,7 +52,7 @@ jobs:
           echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           path: build
@@ -61,7 +61,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: '100'
           repository: armbian/scripts
@@ -105,14 +105,15 @@ jobs:
       if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
       timeout-minutes: 480
       strategy:
-        max-parallel: 16
+        max-parallel: 32
         fail-fast: false
         matrix: 
           node: ${{fromJson(needs.Prepare.outputs.matrix)}}
 
       steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - run: |
 
@@ -122,7 +123,7 @@ jobs:
           echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           path: build
@@ -131,7 +132,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: '100'
           repository: armbian/scripts
@@ -154,7 +155,7 @@ jobs:
           ####if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
           # mount deploy target
           sudo apt-get -y update
-          sudo apt-get -y -qq install sshfs
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
           sudo mkdir -p build/output/debs || true

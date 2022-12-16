@@ -113,7 +113,7 @@ jobs:
           INPUT_REFERENCE=${INPUT_REFERENCE:-"nightly"}
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           repository: armbian/build
           path: build
@@ -123,7 +123,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 0
           repository: armbian/scripts
@@ -146,7 +146,7 @@ jobs:
           # use this only on our runners
           if [[ ${{ inputs.runner }} != "ubuntu-latest" ]]; then
           # mount deploy target
-          sudo apt-get -y -qq install sshfs
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
           sudo mkdir -p /root/.ssh/
           sudo cp ~/.ssh/known_hosts /root/.ssh/
           sudo mkdir -p build/output/debs || true
@@ -241,8 +241,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+#      - name: Runner prepare
+#        uses: armbian/actions/runner-prepare@main
 
   clean:
     needs: [ gcc ]
