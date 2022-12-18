@@ -1,0 +1,14 @@
+
+name: test
+on:
+  workflow_dispatch:
+        
+jobs:
+
+  Prepare:
+    runs-on: Linux
+    name: Clean output/debs and output/debs-beta
+    steps:
+
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
