@@ -7,7 +7,7 @@ jobs:
 
   Prepare:
     runs-on: [igor,qemu]
-    name: Clean output/debs and output/debs-beta
+    name: testx 
     steps:
 
       - name: Runner prepare
