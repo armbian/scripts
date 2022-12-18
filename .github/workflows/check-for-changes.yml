@@ -16,7 +16,7 @@ on:
 jobs:
 
   Prepare:
-    runs-on: Linux
+    runs-on: ubuntu-latest
     name: Source changes
     if: ${{ github.repository_owner == 'Armbian' }}
 
