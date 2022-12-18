@@ -6,7 +6,7 @@ on:
 jobs:
 
   Prepare:
-    runs-on: qemu
+    runs-on: [igor,qemu]
     name: Clean output/debs and output/debs-beta
     steps:
 
