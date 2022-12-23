@@ -30,7 +30,7 @@ jobs:
       - name: Update mirrors
         uses: armbian/actions/triggers@main
         with:
-          KEY: ${{ secrets.KEY_MIRRORS }}
+          KEY: ${{ secrets.KEY_SYNC_MIRRORS }}
           USER: ${{ secrets.USER_REPOSITORY }}
           HOST: ${{ secrets.HOST_REPOSITORY }}
           KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
@@ -38,7 +38,7 @@ jobs:
       - name: Sync images & recreate torrents
         uses: armbian/actions/triggers@main
         with:
-          KEY: ${{ secrets.KEY_RECREATE }}
+          KEY: ${{ secrets.KEY_RECREATE_TORRENT }}
           USER: ${{ secrets.USER_REPOSITORY }}
           HOST: ${{ secrets.HOST_REPOSITORY }}
           KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
