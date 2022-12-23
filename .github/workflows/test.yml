@@ -27,10 +27,10 @@ jobs:
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
-      - name: Power on
+      - name: Sync NAS
         uses: armbian/actions/triggers@main
         with:
-          KEY: ${{ secrets.KEY_POWER_ON }}
+          KEY: ${{ secrets.KEY_UPLOAD }}
           USER: ${{ secrets.USER_REPOSITORY }}
           HOST: ${{ secrets.HOST_REPOSITORY }}
           KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
