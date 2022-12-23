@@ -1,4 +1,4 @@
-name: Smoke tests
+name: Testing generic trigger
 on:
   workflow_dispatch:
   workflow_call:
