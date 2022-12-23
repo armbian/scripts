@@ -32,7 +32,7 @@ jobs:
         with:
           KEY: ${{ secrets.KEY_SYNC_MIRRORS }}
           USER: ${{ secrets.USER_REPOSITORY }}
-          HOST: ${{ secrets.HOST_REPOSITORY }}
+          HOST: ${{ secrets.HOST_REPO }}
           KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
 
       - name: Sync images & recreate torrents
