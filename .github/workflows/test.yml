@@ -27,22 +27,6 @@ jobs:
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
-      - name: Power on
-        uses: armbian/actions/triggers@main
-        with:
-          KEY: ${{ secrets.KEY_POWER_ON }}
-          USER: ${{ secrets.USER_REPOSITORY }}
-          HOST: ${{ secrets.HOST_REPOSITORY }}
-          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
-
-      - name: Power off
-        uses: armbian/actions/triggers@main
-        with:
-          KEY: ${{ secrets.KEY_POWER_OFF }}
-          USER: ${{ secrets.USER_REPOSITORY }}
-          HOST: ${{ secrets.HOST_REPOSITORY }}
-          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
-          
       - name: Update stable repository
         uses: armbian/actions/triggers@main
         with:
@@ -74,4 +58,21 @@ jobs:
           USER: ${{ secrets.USER_REPOSITORY }}
           HOST: ${{ secrets.HOST_REPOSITORY }}
           KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+
+      - name: Power on
+        uses: armbian/actions/triggers@main
+        with:
+          KEY: ${{ secrets.KEY_POWER_ON }}
+          USER: ${{ secrets.USER_REPOSITORY }}
+          HOST: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+
+      - name: Power off
+        uses: armbian/actions/triggers@main
+        with:
+          KEY: ${{ secrets.KEY_POWER_OFF }}
+          USER: ${{ secrets.USER_REPOSITORY }}
+          HOST: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+          
 
