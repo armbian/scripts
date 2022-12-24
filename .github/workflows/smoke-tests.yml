@@ -133,7 +133,7 @@ jobs:
           echo "Write u-boot to $root_partition_device with $root_uuid" "$(date  +%R:%S)" || true
           fi
 
-          timeout 2000 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y update; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade; apt-get -y dist-upgrade; apt-get -y autoremove" || true
+          timeout 2000 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y update; apt-get -y --fix-broken install; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade; apt-get -y dist-upgrade; apt-get -y autoremove" || true
 
       - name: Iperf
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
