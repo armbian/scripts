@@ -19,7 +19,8 @@ NAME=qemu
 # download runner app
 sudo apt-get -y install libxml2-utils
 LATEST=$(curl -sL https://github.com/actions/runner/releases/ | xmllint -html -xpath '//a[contains(@href, "release")]/text()' - 2> /dev/null | grep -P '^v' | head -n1 | sed "s/v//g")
-curl --create-dir --output-dir .tmp -o actions-runner-linux-x64-${LATEST}.tar.gz -L https://github.com/actions/runner/releases/download/v${LATEST}/actions-runner-linux-x64-${LATEST}.tar.gz
+[[ "$(dpkg --print-architecture)" == "amd64" ]] ARCH=x64 || ARCH=arm64
+curl --create-dir --output-dir .tmp -o actions-runner-linux-${ARCH}-${LATEST}.tar.gz -L https://github.com/actions/runner/releases/download/v${LATEST}/actions-runner-linux-${ARCH}-${LATEST}.tar.gz
 
 for i in $(seq -w $START $STOP)
 do
@@ -31,7 +32,7 @@ do
 	  https://api.github.com/orgs/armbian/actions/runners/registration-token | jq -r .token)
 
 	mkdir -p actions-runner-${i}
-	tar xzf .tmp/actions-runner-linux-x64-${LATEST}.tar.gz -C actions-runner-${i}
+	tar xzf .tmp/actions-runner-linux-${ARCH}-${LATEST}.tar.gz -C actions-runner-${i}
 	sh -c "cd actions-runner-${i} ; ./config.sh --url https://github.com/armbian --token ${TOKEN} --labels qemu,cache --name $NAME-${i} --unattended"
 	sh -c "cd actions-runner-${i} ; sudo ./svc.sh install ; sudo ./svc.sh start"
 done
