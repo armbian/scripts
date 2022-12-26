@@ -44,7 +44,7 @@ jobs:
           echo "matrix=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
           | jq '.results[] | .display, .primary_ip.address' | xargs -n2 -d'\n' | grep -v null | sed -e 's/ ([^()]*)//g' \
-          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" | head -1 |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
   Test:
     name: "DUT"
@@ -187,6 +187,7 @@ jobs:
           rm -rf status
           mkdir -p status
           echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.UBOOT }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
+          echo "| ${{ env.DUT_IP }} | ${{ env.DUT_NAME }} | ${{ env.UBOOT }} | ${{ env.KERNEL }} | ${{ env.IPERF }} | ${{ env.ONLINE }} | ${{ env.REBOOT }} |" status/${{ env.DUT_IP }}.md
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' &&  always() }}
@@ -219,6 +220,11 @@ jobs:
       - name: Calculate
         run: |
 
+          echo "|1|2|3|4|5|6|7|" > status.md
+          echo "|:--|:--|:--|:--|:--:|:--|:--|" >> status.md 
+          cat status/*.md >> status.md 
+          cat >> $GITHUB_STEP_SUMMARY
+          #
           ls -1 status | wc -l > status/total
           grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
           echo "scale=2 ; (100*($(cat status/total.txt)-$(cat status/failed.txt | wc -l))/$(cat status/total.txt))" | bc > status/success
