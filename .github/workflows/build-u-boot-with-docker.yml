@@ -45,7 +45,8 @@ jobs:
       matrix: ${{steps.list_dirs.outputs.matrix}}
     steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - run: |
 
@@ -94,7 +95,8 @@ jobs:
 
     steps:
 
-      - uses: igorpecovnik/freespace@main
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
 
       - run: |
 
