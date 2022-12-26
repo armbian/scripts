@@ -46,6 +46,9 @@ jobs:
 
 #          [ -s changes ] || echo "SKIP=yes" >> $GITHUB_ENV
  
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+ 
       - name: Checkout Armbian build script
         if: ${{ github.repository_owner == 'Armbian' && env.SKIP != 'yes' }}
         uses: actions/checkout@v3.2.0
