@@ -44,7 +44,7 @@ jobs:
           echo "matrix=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
           | jq '.results[] | .display, .primary_ip.address' | xargs -n2 -d'\n' | grep -v null | sed -e 's/ ([^()]*)//g' \
-          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" | head -2 |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
   Test:
     name: "DUT"
