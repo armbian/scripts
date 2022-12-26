@@ -187,7 +187,7 @@ jobs:
           rm -rf status
           mkdir -p status
           echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.UBOOT }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
-          echo "| ${{ env.DUT_IP }} | ${{ env.DUT_NAME }} | ${{ env.UBOOT }} | ${{ env.KERNEL }} | ${{ env.IPERF }} | ${{ env.ONLINE }} | ${{ env.REBOOT }} |" status/${{ env.DUT_IP }}.md
+          echo "| ${{ env.DUT_IP }} | ${{ env.DUT_NAME }} | ${{ env.UBOOT }} | ${{ env.KERNEL }} | ${{ env.IPERF }} | ${{ env.ONLINE }} | ${{ env.REBOOT }} |" >> status/${{ env.DUT_IP }}.md
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' &&  always() }}
