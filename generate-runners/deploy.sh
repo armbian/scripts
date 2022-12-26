@@ -19,7 +19,7 @@ NAME=qemu
 # download runner app
 sudo apt-get -y install libxml2-utils
 LATEST=$(curl -sL https://github.com/actions/runner/releases/ | xmllint -html -xpath '//a[contains(@href, "release")]/text()' - 2> /dev/null | grep -P '^v' | head -n1 | sed "s/v//g")
-[[ "$(dpkg --print-architecture)" == "amd64" ]] ARCH=x64 || ARCH=arm64
+[[ "$(dpkg --print-architecture)" == "amd64" ]] && ARCH=x64 || ARCH=arm64
 curl --create-dir --output-dir .tmp -o actions-runner-linux-${ARCH}-${LATEST}.tar.gz -L https://github.com/actions/runner/releases/download/v${LATEST}/actions-runner-linux-${ARCH}-${LATEST}.tar.gz
 
 for i in $(seq -w $START $STOP)
