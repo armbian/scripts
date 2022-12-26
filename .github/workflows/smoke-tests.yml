@@ -177,7 +177,7 @@ jobs:
               # read u-boot
               root_uuid=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -e 's/^.*root=//' -e 's/ .*$//' < /proc/cmdline" || true)
               root_partition_device=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "blkid | tr -d '\":' | grep \"${root_uuid}\" | awk '{print \$1}' | rev | cut -c3- | rev" || true)
-              echo "UBOOT=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dd status=none if=${root_partition_device} count=5000 | strings | grep armbian | grep U-Boot | tail -1 | grep -P \"[0-9]{4}.[0-9]{2}\" -o" >> $GITHUB_ENV
+              echo "UBOOT=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dd status=none if=${root_partition_device} count=5000 | strings | grep armbian | grep U-Boot | tail -1 | grep -P \"[0-9]{4}.[0-9]{2}\" -o")" >> $GITHUB_ENV
           fi
 
       - name: Assemble
