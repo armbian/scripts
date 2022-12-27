@@ -177,7 +177,7 @@ jobs:
               # read u-boot
               root_uuid=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -e 's/^.*root=//' -e 's/ .*$//' < /proc/cmdline" || true)
               root_partition_device=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "blkid | tr -d '\":' | grep \"${root_uuid}\" | awk '{print \$1}' | rev | cut -c3- | rev" || true)
-              echo "UBOOT=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dd status=none if=${root_partition_device} count=5000 | strings | grep armbian | grep U-Boot | tail -1 | cut -f1 -d\"(\"")" >> $GITHUB_ENV
+              echo "UBOOT=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dd status=none if=${root_partition_device} count=5000 | strings | grep armbian | grep U-Boot | tail -1 | grep -P \"[0-9]{4}.[0-9]{2}\" -o")" >> $GITHUB_ENV
           fi
 
       - name: Assemble
@@ -186,7 +186,10 @@ jobs:
 
           rm -rf status
           mkdir -p status
+          [[ "${{ env.ONLINE }}" == true ]] && ONLINE=":heavy_check_mark:" || ONLINE=":x:"
+          [[ "${{ env.REBOOT }}" == true ]] && REBOOT=":heavy_check_mark:" || REBOOT=":x:"
           echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.UBOOT }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
+          echo "| ${{ env.DUT_NAME }} | ${{ env.UBOOT }} | ${{ env.KERNEL }} | ${{ env.IPERF }} | ${ONLINE} | ${REBOOT} |" >> status/${{ env.DUT_IP }}.md
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' &&  always() }}
@@ -219,6 +222,11 @@ jobs:
       - name: Calculate
         run: |
 
+          echo "|DUT|U-boot|Kernel|Iperf|Online|Reboot|" > status.md
+          echo "|:--|:--|:--|:--:|:--|:--|" >> status.md 
+          cat status/*.md >> status.md 
+          cat status.md >> $GITHUB_STEP_SUMMARY
+          #
           ls -1 status | wc -l > status/total
           grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
           echo "scale=2 ; (100*($(cat status/total.txt)-$(cat status/failed.txt | wc -l))/$(cat status/total.txt))" | bc > status/success
