@@ -48,7 +48,7 @@ jobs:
 
   Test:
     name: "DUT"
-    runs-on: [igor]
+    runs-on: [igor,X64]
     needs: Prepare
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 60
