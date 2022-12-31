@@ -155,7 +155,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-            SEVENZIP=$(timeout 1000 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "7z b | grep 'Tot:' | awk '{print $NF}'")
+            SEVENZIP=$(timeout 1000 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "7z b | grep 'Tot:' | awk '{print \$NF}'")
             if [[ -n "${SEVENZIP}" ]] ; then
               echo "SEVENZIP=${SEVENZIP}" >> $GITHUB_ENV
             fi
