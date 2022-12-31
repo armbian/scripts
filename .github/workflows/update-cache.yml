@@ -397,6 +397,13 @@ jobs:
       - name: Runner prepare
         uses: armbian/actions/runner-prepare@main
 
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: ignore
+
       - name: Download changes
         uses: actions/download-artifact@v3
         with:
