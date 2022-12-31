@@ -199,7 +199,7 @@ jobs:
           [[ "${{ env.ONLINE }}" == true ]] && ONLINE=":heavy_check_mark:" || ONLINE=":x:"
           [[ "${{ env.REBOOT }}" == true ]] && REBOOT=":heavy_check_mark:" || REBOOT=":x:"
           echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.UBOOT }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
-          echo "| ${{ env.DUT_IP }} | ${{ env.DUT_NAME }} | ${{ env.UBOOT }} | ${{ env.KERNEL }} | ${{ env.IPERF }} | ${ONLINE} | ${REBOOT} |" >> status/${{ env.DUT_IP }}.md
+          echo "| ${{ env.DUT_IP }} | ${{ env.DUT_NAME }} | ${{ env.UBOOT }} | ${{ env.KERNEL }} | ${{ env.IPERF }} | ${{ env.SEVENZIP }} | ${ONLINE} | ${REBOOT} |" >> status/${{ env.DUT_IP }}.md
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' &&  always() }}
