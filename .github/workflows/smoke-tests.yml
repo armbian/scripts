@@ -142,7 +142,7 @@ jobs:
 
           while :
           do
-            IPERF=$(timeout 1000 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "iperf3 -c 10.0.40.2 -t 5 -J 2>/dev/null | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | cut -d"-" -f2" | LC_ALL=C awk '{$1/=1048576;printf "%.2f Mbit/s\n",$1}')
+            IPERF=$(timeout 1000 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "iperf3 -c 10.0.40.2 -t 5 -J 2>/dev/null | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | cut -d"-" -f2" | LC_ALL=C awk '{$1/=1048576;printf "%.0f\n",$1}')
             if [[ -n "${IPERF}" ]] ; then
               echo "IPERF=${IPERF}" >> $GITHUB_ENV
               break
@@ -232,7 +232,7 @@ jobs:
       - name: Calculate
         run: |
 
-          echo "|IP|DUT|U-boot|Kernel|Iperf|7Z bench|Online|Reboot|" > status.md
+          echo "|IP|DUT|U-boot|Kernel|Iperf Mbit/s|7Z bench|Online|Reboot|" > status.md
           echo "|:--|:--|:--|--:|--:|--:|:--:|:--:|" >> status.md 
           cat status/*.md >> status.md 
           cat status.md >> $GITHUB_STEP_SUMMARY
