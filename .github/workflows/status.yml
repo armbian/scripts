@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "*/30 * * * *"
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
 
   Prepare:
@@ -63,6 +66,12 @@ jobs:
           jq '.CURRENT += "'${{ env.CURRENT }}'"' runners_capacity.json > tmp_current.json
           jq '.EDGE += "'${{ env.EDGE }}'"' tmp_current.json > tmp_edge.json
           cp tmp_edge.json runners_capacity.json
+          cat runners_capacity.json
+
+          # add smoke test success
+          gh run download --name status --repo github.com/armbian/build
+          jq '.SMOKE += "'$(cat total)'"' runners_capacity.json > tmp.json          
+          cp tmp.json runners_capacity.json
           cat runners_capacity.json
 
           echo "|Donated by &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Virtual CPU cores |Memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|" > label.tmp
