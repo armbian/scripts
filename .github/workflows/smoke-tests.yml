@@ -237,7 +237,7 @@ jobs:
           cat status/*.md >> status.md 
           cat status.md >> $GITHUB_STEP_SUMMARY
           #
-          ls -1 status | wc -l > status/total
+          ls -1 status/*.txt | wc -l > status/total
           grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
           echo "scale=2 ; (100*($(cat status/total)-$(cat status/failed | wc -l))/$(cat status/total))" | bc > status/success
           rm -f status/*.*
