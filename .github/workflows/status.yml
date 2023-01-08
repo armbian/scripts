@@ -70,7 +70,7 @@ jobs:
 
           # add smoke test success
           gh run download --name status --repo github.com/armbian/build
-          jq '.SMOKE += "'$(cat total)'%"' runners_capacity.json > tmp.json          
+          jq '.SMOKE += "'$(cat success)'%"' runners_capacity.json > tmp.json          
           cp tmp.json runners_capacity.json
           cat runners_capacity.json
 
