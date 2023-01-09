@@ -333,7 +333,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
 
       - name: Download changes
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: ${{ env.UPLOAD }}
           path: ${{ env.UPLOAD }}
@@ -405,7 +405,7 @@ jobs:
           if_key_exists: ignore
 
       - name: Download changes
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: ${{ env.UPLOAD }}
           path: ${{ env.UPLOAD }}

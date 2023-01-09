@@ -28,7 +28,7 @@ jobs:
 
       - name: Download changes
         if: ${{ inputs.checking }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: changes
 
