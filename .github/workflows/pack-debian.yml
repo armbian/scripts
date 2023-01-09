@@ -69,7 +69,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:          
           path: source
 
@@ -152,7 +152,7 @@ jobs:
           path: output
 
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           path: repository
           ref: repository
