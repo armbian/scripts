@@ -83,7 +83,7 @@ jobs:
           echo "BETA=${PACKAGESREPO:-yes}" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 1
           repository: armbian/build
@@ -112,7 +112,7 @@ jobs:
           sudo rm -rf changes 2>/dev/null || true
 
       - name: Download changes
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: changes
 
@@ -182,7 +182,7 @@ jobs:
           echo ${{needs.Prepare.outputs.runner}}
 
       - name: Checkout repository
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 1
           repository: armbian/build
@@ -191,7 +191,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 1
           repository: armbian/scripts
@@ -207,7 +207,7 @@ jobs:
 
       - name: Download build list
         if: ${{ inputs.boardtype != '' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: targets
 

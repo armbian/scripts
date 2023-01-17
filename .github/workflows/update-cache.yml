@@ -52,7 +52,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
           
       - name: Checkout build repository
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 10
           repository: armbian/build
@@ -132,7 +132,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
 
       - name: Checkout repository
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           repository: armbian/build
           fetch-depth: 1
@@ -140,7 +140,7 @@ jobs:
           clean: false
 
       - name: Checkout support scripts
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           repository: armbian/scripts
           fetch-depth: 1
@@ -333,14 +333,14 @@ jobs:
         uses: armbian/actions/runner-prepare@main
 
       - name: Download changes
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: ${{ env.UPLOAD }}
           path: ${{ env.UPLOAD }}
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           repository: armbian/build
           fetch-depth: 1
@@ -405,13 +405,13 @@ jobs:
           if_key_exists: ignore
 
       - name: Download changes
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: ${{ env.UPLOAD }}
           path: ${{ env.UPLOAD }}
 
       - name: Checkout tracker lists
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 1
           repository: ngosang/trackerslist
@@ -419,7 +419,7 @@ jobs:
 
       - name: Checkout repository
         if: ${{ github.repository_owner == 'Armbian' }}
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           repository: armbian/build
           fetch-depth: 1
