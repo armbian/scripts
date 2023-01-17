@@ -1,0 +1,108 @@
+name: Build docker images
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      CR_PAT:
+        required: true
+jobs:
+
+  prepare:
+
+    name: "Prepare JSON"
+    if: ${{ github.repository_owner == 'armbian' }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{steps.json.outputs.JSON_CONTENT}}
+    steps:
+
+      - name: Checkout Armbian Framework
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/build
+          ref:  armbian-next
+          fetch-depth: 1
+
+      - name: Build desktops
+        id: json
+        run: |
+
+          # Make a list of valid pairs from our config
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          # cycle supported distributions
+          releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic"))
+          # extract release name from the distribution
+          for i in ${releases[@]}; do
+              echo "{\"os\":\"$(cat config/distributions/${i}/name | cut -d" " -f1 | sed -e 's/\(.*\)/\L\1/')\",\"release\":\"${i}\"}"
+              done | jq -s >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+  Docker:
+
+    runs-on: ubuntu-latest
+    name: "Docker image"
+    needs: [ prepare ]
+    strategy:
+      fail-fast: false # let other jobs try to complete if one fails
+      matrix:
+        include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+
+    env:
+      DOCKERFILE_OS: "${{ matrix.os }}"
+      DOCKERFILE_RELEASE: "${{ matrix.release }}"
+
+    steps:
+
+      - name: Checkout Armbian Framework
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/build
+          ref:  armbian-next
+          fetch-depth: 1
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Docker Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }} # github username or org
+          password: ${{ secrets.CR_PAT }} # github actions builtin token. repo has to have pkg access.
+
+      - name: Prepare
+        id: prep
+        run: echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+      - name: Generate Dockerfile for ${{env.DOCKERFILE_OS}}:${{env.DOCKERFILE_RELEASE}} via Armbian helper script
+        id: generate
+        env:
+          DOCKER_ARMBIAN_BASE_IMAGE: "${{env.DOCKERFILE_OS}}:${{env.DOCKERFILE_RELEASE}}" # Use this base image
+          DOCKERFILE_USE_ARMBIAN_IMAGE_AS_BASE: "no" # Do NOT use the Armbian image as base  image to speed up; we're creating it here
+        run: |
+          bash ./compile.sh generate-dockerfile
+      - name: Build and push ${{env.DOCKERFILE_OS}}:${{env.DOCKERFILE_RELEASE}}
+        id: docker_build
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64 # arm64 is done under qemu and is _very_ slow. Thanks, GitHub!
+          pull: true # Pull new version of base image, always; avoid bit-rot
+          push: true
+          labels: |
+            org.opencontainers.image.title=${{ github.repository }}
+            org.opencontainers.image.description=${{ github.event.repository.description }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
+          cache-from: type=gha # all-automatic Github Actions caching
+          cache-to: type=gha,mode=max
+          tags: ghcr.io/${{ github.repository }}:armbian-${{env.DOCKERFILE_OS}}-${{env.DOCKERFILE_RELEASE}}-latest
