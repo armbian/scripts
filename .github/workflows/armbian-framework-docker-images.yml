@@ -65,12 +65,18 @@ jobs:
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        id: buildx
+        id: buildx_1
+        continue-on-error: true # this process is prone to failure, lets repeat it again if fails
+        uses: docker/setup-buildx-action@v2
+
+      - name: Set up Docker Buildx
+        id: buildx_2
+        if: steps.buildx.outcome == 'failure'
         continue-on-error: true # this process is prone to failure, lets repeat it again if fails
         uses: docker/setup-buildx-action@v2
 
       - name: Set up Docker Buildx 
-        id: buildxretry
+        id: buildx_3
         if: steps.buildx.outcome == 'failure'
         uses: docker/setup-buildx-action@v2
 
