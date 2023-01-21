@@ -146,7 +146,7 @@ jobs:
 
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
           echo "Clean folder"
-          sudo build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
+          sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} + || true
 
       - name: Generate rootfs
         run: |
