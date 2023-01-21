@@ -141,42 +141,12 @@ jobs:
           path: build
           clean: false
 
-      - name: Checkout support scripts
-        uses: actions/checkout@v3.3.0
-        with:
-          repository: armbian/scripts
-          fetch-depth: 1
-          path: scripts
-          clean: false
-
-      - name: Install SSH key for storage
-        uses: shimataro/ssh-key-action@v2
-        with:
-        
-          key: ${{ secrets.SSH_KEY_TORRENTS }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
-          if_key_exists: ignore
-
-      - name: Mount upload folders
+      - name: Clean rootfs cache folder
         run: |
 
           sudo mountpoint -q build/cache/rootfs && sudo fusermount -u build/cache/rootfs || true
-          sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
-          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
-          sudo mkdir -p /root/.ssh/
-          sudo cp ~/.ssh/* /root/.ssh/    
-          sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
-          sudo mkdir -p build/cache/rootfs || true          
-
-          ls -l build/cache/rootfs/
           echo "Clean folder"
-          sudo find build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
-
-          echo "Mounting SSH share"
-          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o allow_other || true
-          sudo sshfs upload@users.armbian.com:/rootfs build/cache/rootfs.upload -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
-        
-          sudo df          
+          sudo build/cache/rootfs/ -maxdepth 1 -mindepth 1 -exec sudo rm -fr -- {} +
 
       - name: Generate rootfs
         run: |
@@ -231,6 +201,13 @@ jobs:
           mkdir -p $FOLDER
           echo ${{ needs.Prepare.outputs.rootfscache_version }} > $FOLDER/version
           touch $FOLDER/$(ls -1 build/cache/rootfs/*.zst | awk -F/ '{print $NF}')
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:       
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: ignore
 
       - name: Upload rootfs archive and packages list
         uses: ncipollo/release-action@v1
