@@ -232,8 +232,9 @@ jobs:
       - name: Deploy to server
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
-          sudo apt-get -y -qq install lftp
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/cache/rootfs/* rootfs/${{ needs.Prepare.outputs.rootfscache_version }} ;bye" sftp://users.armbian.com
+          #sudo apt-get -y -qq install lftp
+          pwd
+          #lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/cache/rootfs/* rootfs/${{ needs.Prepare.outputs.rootfscache_version }} ;bye" sftp://users.armbian.com
 
   sign-list:
   
