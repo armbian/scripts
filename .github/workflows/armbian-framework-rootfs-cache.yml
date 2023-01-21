@@ -229,22 +229,11 @@ jobs:
           name: ${{ env.UPLOAD }}
           if-no-files-found: ignore
 
-      - name: Upload to NAS
+      - name: Deploy to server
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
-
-          df
-          sudo mkdir -p build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
-          [[ ! -d build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} ]] && sudo chown -R 1008.1002 build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
-          # Do it twice, then you may fail
-          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }} || true
-          sudo rsync -ahv --no-o --no-g --no-perms --delete --progress build/cache/rootfs/* build/cache/rootfs.upload/${{ needs.Prepare.outputs.rootfscache_version }}
-
-      - name: Unmount folders
-        if: ${{ github.repository_owner == 'Armbian' }}
-        run: |
-
-          sudo mountpoint -q build/cache/rootfs.upload && sudo fusermount -u build/cache/rootfs.upload || true
+          sudo apt-get -y -qq install lftp
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms $(pwd)/build/cache/rootfs/* rootfs/${{ needs.Prepare.outputs.rootfscache_version }} ;bye" sftp://users.armbian.com
 
   sign-list:
   
