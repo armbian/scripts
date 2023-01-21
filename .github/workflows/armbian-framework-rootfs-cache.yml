@@ -210,15 +210,15 @@ jobs:
           [[ -n "$DESKTOP_ENVIRONMENT" ]] && BUILD_DESKTOP="yes"
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
           
-          ./compile.sh rootfs-cache
-          ROOT_FS_CREATE_VERSION=${{ needs.Prepare.outputs.rootfscache_version }} \
+          ./compile.sh rootfs-cache \
+          ROOT_FS_CREATE_VERSION="${{ needs.Prepare.outputs.rootfscache_version }}" \
           RELEASE="${{ matrix.release }}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
           BUILD_DESKTOP="$BUILD_DESKTOP" \
           BUILD_MINIMAL="$BUILD_MINIMAL" \
           DESKTOP_ENVIRONMENT="$DESKTOP_ENVIRONMENT" \
           BOARD="${{ needs.Prepare.outputs.board }}" \
-          DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
+          DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED"
 
           cd ..
           sudo chown -R $USER:$USER build/cache/rootfs || true
