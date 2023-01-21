@@ -181,6 +181,7 @@ jobs:
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
           
           ./compile.sh rootfs-cache \
+          BETA="yes" \
           ROOT_FS_CREATE_VERSION="${{ needs.Prepare.outputs.rootfscache_version }}" \
           RELEASE="${{ matrix.release }}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="config_base" \
