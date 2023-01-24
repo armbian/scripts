@@ -180,7 +180,7 @@ jobs:
           [[ -n "$DESKTOP_ENVIRONMENT" ]] && BUILD_DESKTOP="yes"
           [[ "${{ matrix.variant }}" == minimal ]] && BUILD_MINIMAL="yes"
           
-          ./compile.sh rootfs-cache \
+          ./compile.sh rootfs \
           BETA="yes" \
           ROOT_FS_CREATE_VERSION="${{ needs.Prepare.outputs.rootfscache_version }}" \
           RELEASE="${{ matrix.release }}" \
