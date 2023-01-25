@@ -15,6 +15,12 @@
 
 |Donated by &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Virtual CPU cores |Memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|
 |--|--:|--:|
+|Cats|12|15 Gb|
+|GitHub|40|136 Gb|
+|Igor|696|626 Gb|
+|JetHub|32|39 Gb|
+|Lane|96|93 Gb|
+|Xogium|14|7 Gb|
 ## Donating Virtual Machine to Armbian?
 
 Our CI engine is hungry for CPU and memory resources. In case you have spare resources and you would like to donate it to Armbian, you can do it this way:
