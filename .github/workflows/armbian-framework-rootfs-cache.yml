@@ -139,7 +139,7 @@ jobs:
           fetch-depth: 1
           ref: armbian-next
           path: build
-          clean: false
+          clean: true
 
       - name: Clean rootfs cache folder
         run: |
