@@ -74,7 +74,7 @@ jobs:
           echo "rootfscache_version=$ROOTFSCACHE_VERSION" >> $GITHUB_OUTPUT
 
           # list all but remove particular here
-          echo "release=$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+          echo "release=$(for x in $(find build/config/distributions -mindepth 1 -type d | cut -d"/" -f4 | sed '/buster\|focal\|kinetic/d'); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
           if [[ $ARC == uefi-riscv64 ]]; then
               echo "release=$(for value in jammy kinetic; do echo $value; done | jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
