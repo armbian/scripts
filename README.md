@@ -17,7 +17,7 @@
 |--|--:|--:|
 |Cats|12|15 Gb|
 |GitHub|40|136 Gb|
-|Hristov|16|0 Gb|
+|Hristov|16|15 Gb|
 |Igor|696|626 Gb|
 |JetHub|32|39 Gb|
 |Lane|96|93 Gb|
