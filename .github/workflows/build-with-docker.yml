@@ -275,8 +275,9 @@ jobs:
             MAKE_FOLDERS=nightly
           fi
           
+          INSTALL_HEADERS="no"
           # install headers on all images but minimal
-          [[ "${BUILD_MINIMAL}" != yes ]] && INSTALL_HEADERS="yes"
+          # [[ "${BUILD_MINIMAL}" != yes ]] && INSTALL_HEADERS="yes"
           
           # when making all from the list
           if [[ "${{ inputs.fromsources }}" == yes ]]; then
