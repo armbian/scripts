@@ -3,9 +3,9 @@ name: uboot-simple
 on:
   workflow_dispatch:
   workflow_call:
-    secrets:
-      token:
-        required: true
+#    secrets:
+#      token:
+#        required: true
     inputs:
       include:
         required: false
