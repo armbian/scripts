@@ -15,22 +15,40 @@ on:
        type: string
 jobs:
 
+  prepare:
+
+    name: "Prepare JSON"
+    if: ${{ github.repository_owner == 'armbian' }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{steps.json.outputs.JSON_CONTENT}}
+    steps:
+
+      - name: Checkout Armbian Framework
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/build
+          ref:  main
+          fetch-depth: 1
+
+      - name: Build JSON
+        id: json
+        run: |
+          # Make a list of valid pairs from our config
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          cat config/target*.conf | grep -v "^$" | grep -v "^#" | sed 's/\s\s*/ /g' | cut -d' ' -f1,2 | sed 's/ / /g' | sort | uniq | awk '{ printf "%s%s\n", "{\"board\":\""$1"\",", "\"release\":\""$2"\"}" }' | jq -s >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
   "u-boot":
     if: ${{ github.repository_owner == 'armbian' }}
+    needs: [ prepare ]
     strategy:
       fail-fast: false # let other jobs try to complete if one fails
       matrix:
-        include:
-          - board: "odroidn2"
-            branch: "edge"
-            runner_tags: ubuntu-latest #[ "self-hosted", "Linux", 'armbian', "artifact-uboot" ]
-            variant: "" # empty
-          - board: "khadas-vim3l"
-            branch: "edge"
-            runner_tags: ubuntu-latest #[[ "self-hosted", "Linux", 'armbian', "artifact-uboot" ]
-            variant: "" # empty
-    runs-on: "${{ matrix.runner_tags }}"
+        include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ubuntu-latest
     name: "${{ matrix.board }} ${{ matrix.branch }} (${{ matrix.variant }})"
+   
     env:
       BOARD: "${{ matrix.board }}"
       BRANCH: "${{ matrix.branch }}"
