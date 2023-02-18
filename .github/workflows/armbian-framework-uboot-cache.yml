@@ -36,7 +36,7 @@ jobs:
         run: |
           # Make a list of valid pairs from our config
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
-          cat config/target*.conf | grep -v "^$" | grep -v "^#" | sed 's/\s\s*/ /g' | cut -d' ' -f1,2 | sed 's/ / /g' | sort | uniq | awk '{ printf "%s%s\n", "{\"board\":\""$1"\",", "\"release\":\""$2"\"}" }' | jq -s >> $GITHUB_OUTPUT
+          cat config/target*.conf | grep -v "^$" | grep -v "^#" | ${{ inputs.include }} ${{ inputs.exclude }} sed 's/\s\s*/ /g' | cut -d' ' -f1,2 | sed 's/ / /g' | sort | uniq | awk '{ printf "%s%s\n", "{\"board\":\""$1"\",", "\"release\":\""$2"\"}" }' | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   "u-boot":
