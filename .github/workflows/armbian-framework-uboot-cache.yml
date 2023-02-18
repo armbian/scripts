@@ -20,7 +20,7 @@ jobs:
 
   prepare:
 
-    name: "Prepare JSON"
+    name: JSON
     if: ${{ github.repository_owner == 'armbian' }}
     runs-on: ubuntu-latest
     outputs:
