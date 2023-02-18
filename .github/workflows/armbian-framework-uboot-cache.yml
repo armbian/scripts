@@ -49,7 +49,7 @@ jobs:
       fail-fast: false # let other jobs try to complete if one fails
       matrix:
         include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: "${{ inputs.runner }}"
     name: "${{ matrix.board }} ${{ matrix.branch }} (${{ matrix.variant }})"
    
     env:
