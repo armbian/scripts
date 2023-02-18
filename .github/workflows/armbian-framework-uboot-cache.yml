@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      include:
+        required: false
+        type: string
       runner:
        required: true
        type: string
