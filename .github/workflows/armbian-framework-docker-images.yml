@@ -24,7 +24,7 @@ jobs:
           ref:  main
           fetch-depth: 1
 
-      - name: Build desktops
+      - name: Build JSON
         id: json
         run: |
 
@@ -32,7 +32,7 @@ jobs:
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           
           # cycle supported distributions and skip exotics
-          releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic|sid"))
+          releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic"))
           
           # extract release name from the distribution
           for i in ${releases[@]}; do
