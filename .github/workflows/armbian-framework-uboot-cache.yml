@@ -65,7 +65,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }} # GitHub username or org
-          password: ${{ inputs.token }}    # GitHub actions builtin token. repo has to have pkg access.
+          password: ${{ secrets.token }}    # GitHub actions builtin token. repo has to have pkg access.
 
       - name: Checkout build repo
         uses: actions/checkout@v3 # We don't need to clone git, really. A wget would suffice for GH-hosted runners. But using clone is better for Igor-hosted runners.
