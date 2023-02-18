@@ -3,7 +3,10 @@ name: uboot-simple
 on:
   workflow_dispatch:
   workflow_call:
-
+    inputs:
+      runner:
+       required: true
+       type: string
 jobs:
 
   "u-boot":
