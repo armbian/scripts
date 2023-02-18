@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v3.3.0
         with:
           repository: armbian/build
-          ref:  armbian-next
+          ref:  main
           fetch-depth: 1
 
       - name: Build desktops
@@ -30,8 +30,10 @@ jobs:
 
           # Make a list of valid pairs from our config
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
-          # cycle supported distributions
+          
+          # cycle supported distributions and skip exotics
           releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic|sid"))
+          
           # extract release name from the distribution
           for i in ${releases[@]}; do
               echo "{\"os\":\"$(cat config/distributions/${i}/name | cut -d" " -f1 | sed -e 's/\(.*\)/\L\1/')\",\"release\":\"${i}\"}"
@@ -58,7 +60,7 @@ jobs:
         uses: actions/checkout@v3.3.0
         with:
           repository: armbian/build
-          ref:  armbian-next
+          ref:  main
           fetch-depth: 1
 
       - name: Set up QEMU
