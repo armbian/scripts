@@ -50,7 +50,6 @@ jobs:
           echo 'EOF' >> $GITHUB_OUTPUT
   Docker:
 
-    runs-on: ${{ fromJSON(needs.prepare.outputs.matrix.runner_tags)}}
     name: "Docker image"
     needs: [ prepare ]
     strategy:
@@ -63,6 +62,8 @@ jobs:
       MINIMAL:         "${{ matrix.minimal }}"
       ARCH:            "${{ matrix.arch }}"
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
+
+    runs-on: ${{ matrix.runner_tag )}}
 
     steps:
 
