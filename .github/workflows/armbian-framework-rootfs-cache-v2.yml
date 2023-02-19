@@ -34,6 +34,22 @@ jobs:
       - name: Build JSON
         id: json
         run: |
+        
+          releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic"))
+          arch=("amd64" "armhf" "arm64" "riscv64")
+          for i in ${releases[@]}; do
+              for j in ${arch[@]}; do
+                 for k in ${minimal[@]}; do
+                 runner_tags="ubuntu_latest"
+                 [[ $j == arm64 ]] && runner_tags=aarch64
+                 #if ! grep -q $j config/distributions/${i}/arhitectures; then continue; fi
+                 echo "{\"release\":\"${i}\",\"minimal\":\"${{ inputs.minimal }}\",\"arch\":\"$j\",\"runner_tags\":\"$runner_tags\"}"
+                 done
+              done
+          done | jq -s 
+        
+        
+        
           # Make a list of valid pairs from our config
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT          
           releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic"))
