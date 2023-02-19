@@ -55,7 +55,6 @@ jobs:
                  # runners optimisations                 
                  [[ ${{ inputs.minimal }} == yes ]] && runner_tags=ubuntu-latest
                  [[ ${{ inputs.minimal }} == no ]]  && runner_tags=small
-                 [[ ${{ inputs.desktop }} == yes ]] && runner_tags=fast
                  [[ $j == arm64 ]]                  && runner_tags=aarch64
                  
                  
