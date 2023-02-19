@@ -1,0 +1,62 @@
+name: Build docker images
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      CR_PAT:
+        required: true
+jobs:
+
+  prepare:
+
+    name: "Prepare JSON"
+    if: ${{ github.repository_owner == 'armbian' }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{steps.json.outputs.JSON_CONTENT}}
+    steps:
+
+      - name: Checkout Armbian Framework
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/build
+          ref:  main
+          fetch-depth: 1
+
+      - name: Build JSON
+        id: json
+        run: |
+          # Make a list of valid pairs from our config
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          
+          # cycle supported distributions and skip exotics
+          releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic"))
+          
+          # extract release name from the distribution
+          for i in ${releases[@]}; do
+              echo "{\"os\":\"$(cat config/distributions/${i}/name | cut -d" " -f1 | sed -e 's/\(.*\)/\L\1/')\",\"release\":\"${i}\"}"
+              done | jq -s >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+  Docker:
+
+    runs-on: ubuntu-latest
+    name: "Docker image"
+    needs: [ prepare ]
+    strategy:
+      fail-fast: false # let other jobs try to complete if one fails
+      matrix:
+        include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+
+    env:
+      DOCKERFILE_OS: "${{ matrix.os }}"
+      DOCKERFILE_RELEASE: "${{ matrix.release }}"
+
+    steps:
+
+      - name: Checkout Armbian Framework
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/build
+          ref:  main
+          fetch-depth: 1
