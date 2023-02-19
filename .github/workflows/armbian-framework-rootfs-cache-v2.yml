@@ -10,6 +10,9 @@ on:
       desktop:
        required: true
        type: string
+      variant:
+       required: false
+       type: string
     secrets:
       token:
         required: true
@@ -61,6 +64,7 @@ jobs:
     env:
       RELEASE:         "${{ matrix.release }}"
       MINIMAL:         "${{ matrix.minimal }}"
+      VARIANT:         "${{ matrix.variant }}"
       ARCH:            "${{ matrix.arch }}"
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
 
