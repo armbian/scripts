@@ -51,7 +51,7 @@ jobs:
           echo 'EOF' >> $GITHUB_OUTPUT
   Docker:
 
-    name: "Docker image"
+    name: "B"
     needs: [ prepare ]
     strategy:
       fail-fast: false # let other jobs try to complete if one fails
