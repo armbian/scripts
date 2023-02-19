@@ -35,7 +35,7 @@ jobs:
         id: json
         run: |
         
-          releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic"))
+          releases=($(grep -rw config/distributions/*/support -ve 'eos' | rev | cut -d '/' -f 2 | rev | grep -Ev "focal|buster|kinetic"))
           arch=("amd64" "armhf" "arm64" "riscv64")
           for i in ${releases[@]}; do
               for j in ${arch[@]}; do
