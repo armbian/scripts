@@ -43,7 +43,7 @@ jobs:
                  for k in ${minimal[@]}; do
                  runner_tags="ubuntu_latest"
                  [[ $j == arm64 ]] && runner_tags=aarch64
-                 if ! grep -q $j config/distributions/${i}/arhitectures; then continue; fi
+                 #if ! grep -q $j config/distributions/${i}/arhitectures; then continue; fi
                  echo "{\"release\":\"${i}\",\"minimal\":\"${{ inputs.minimal }}\",\"arch\":\"$j\",\"runner_tags\":\"$runner_tags\"}"
                  done
               done
