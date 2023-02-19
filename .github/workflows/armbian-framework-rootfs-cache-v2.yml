@@ -64,7 +64,7 @@ jobs:
       ARCH:            "${{ matrix.arch }}"
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
 
-    runs-on: [ "${{ matrix.runner_tags }}" ]
+    runs-on: [ ${{ matrix.runner_tags }} ]
 
     steps:
 
