@@ -3,8 +3,18 @@ name: Build docker images
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      type:
+       required: true
+       type: string
+      arch:
+       required: true
+       type: string
+      runner:
+       required: true
+       type: string
     secrets:
-      CR_PAT:
+      token:
         required: true
 jobs:
 
