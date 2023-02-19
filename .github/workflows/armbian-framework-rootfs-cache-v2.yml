@@ -51,7 +51,14 @@ jobs:
 
               for j in ${arch[@]}; do
                  runner_tags=qemu
-                 [[ $j == arm64 ]] && runner_tags=aarch64
+                 
+                 # runners optimisations
+                 [[ $j == arm64 ]]                  && runner_tags=aarch64
+                 [[ ${{ inputs.minimal }} == yes ]] && runner_tags=ubuntu-latest
+                 [[ ${{ inputs.minimal }} == no ]]  && runner_tags=small
+                 [[ ${{ inputs.desktop }} == yes ]] && runner_tags=fast
+                 
+                 
                  for k in ${desktops[@]}; do
                  if ! grep -q $j config/distributions/${i}/arhitectures; then continue; fi
                  echo "{\"release\":\"${i}\",\"desktop\":\"$k\",\"minimal\":\"${{ inputs.minimal }}\",\"variant\":\"${{ inputs.variant }}\",\"arch\":\"$j\",\"runner_tags\":\"$runner_tags\"}"
