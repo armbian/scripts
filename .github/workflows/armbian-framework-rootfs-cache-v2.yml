@@ -47,7 +47,7 @@ jobs:
           for i in ${releases[@]}; do
           
               # Cycle desktops
-              [[ "${{ inputs.minimal }}" == yes ]] && desktops=($(find -L config/desktop/sid/environments/ -name support -exec grep -l 'supported' {} \; | rev | cut -d '/' -f 2 | rev))
+              [[ "${{ inputs.desktop }}" == yes ]] && desktops=($(find -L config/desktop/sid/environments/ -name support -exec grep -l 'supported' {} \; | rev | cut -d '/' -f 2 | rev))
 
               for j in ${arch[@]}; do
                  runner_tags=qemu
