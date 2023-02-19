@@ -43,7 +43,7 @@ jobs:
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT          
           releases=($(grep -rw config/distributions/*/support -ve 'eos' | cut -d"/" -f3 | grep -Ev "focal|buster|kinetic"))
           arch=("amd64" "armhf" "arm64" "riscv64")
-          desktops=()
+          desktops=("none")
           for i in ${releases[@]}; do
           
               # Cycle desktops
