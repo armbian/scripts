@@ -52,9 +52,9 @@ jobs:
               for j in ${arch[@]}; do
                  runner_tags=qemu
                  
-                 # runners optimisations                 
+                 # runners optimisations
+                 [[ ${{ inputs.desktop }} == no ]]  && runner_tags=small
                  [[ ${{ inputs.minimal }} == yes ]] && runner_tags=ubuntu-latest
-                 [[ ${{ inputs.minimal }} == no ]]  && runner_tags=small
                  [[ $j == arm64 ]]                  && runner_tags=aarch64
                  
                  
@@ -107,4 +107,4 @@ jobs:
         id: rootfs
         run: |
          
-          bash ./compile.sh rootfs "RELEASE=${{env.RELEASE}}" "ARCH=${{env.ARCH}}" BUILD_DESKTOP=${{ matrix.desktop }} DESKTOP_APPGROUPS_SELECTED=${{env.VARIANT}} DESKTOP_ENVIRONMENT=${{env.DESKTOP}} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base SKIP_ARMBIAN_REPO=yes
+          bash ./compile.sh rootfs RELEASE="${{env.RELEASE}}" ARCH="${{env.ARCH}}" BUILD_DESKTOP="${{ matrix.desktop }}" DESKTOP_APPGROUPS_SELECTED="${{env.VARIANT}}" DESKTOP_ENVIRONMENT="${{env.DESKTOP}}" DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base SKIP_ARMBIAN_REPO=yes
