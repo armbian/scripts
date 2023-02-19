@@ -30,6 +30,7 @@ jobs:
           repository: armbian/build
           ref:  main
           fetch-depth: 1
+          clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
 
       - name: "Make JSON"
         id: json
@@ -73,3 +74,4 @@ jobs:
           repository: armbian/build
           ref:  main
           fetch-depth: 1
+          clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
