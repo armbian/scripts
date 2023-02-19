@@ -42,8 +42,8 @@ jobs:
           arch=("amd64" "armhf" "arm64" "riscv64")
           for i in ${releases[@]}; do
               for j in ${arch[@]}; do
-                 runner_tags="[ \"ubuntu_latest\", \"igor\" ]"
-                 [[ $j == arm64 ]] && runner_tags=ARM64
+                 runner_tags=qemu
+                 [[ $j == arm64 ]] && runner_tags="ARM64, igor"
                  if ! grep -q $j config/distributions/${i}/arhitectures; then continue; fi
                  echo "{\"release\":\"${i}\",\"minimal\":\"${{ inputs.minimal }}\",\"arch\":\"$j\",\"runner_tags\":\"$runner_tags\"}"
               done
@@ -64,7 +64,7 @@ jobs:
       ARCH:            "${{ matrix.arch }}"
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
 
-    runs-on: "${{ matrix.runner_tags }}"
+    runs-on: [ "${{ matrix.runner_tags }}" ]
 
     steps:
 
