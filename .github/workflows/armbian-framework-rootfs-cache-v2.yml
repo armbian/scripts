@@ -60,7 +60,7 @@ jobs:
         include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
 
     env:
-      RELEASE: "${{ matrix.releases }}"
+      RELEASE: "${{ matrix.release }}"
       MINIMAL: "${{ matrix.minimal }}"
       ARCH: "${{ matrix.arch }}"
       RUNNER_TAG: "${{ matrix.runner_tag }}"
