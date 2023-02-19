@@ -75,20 +75,30 @@ jobs:
       VARIANT:         "${{ matrix.variant }}"
       ARCH:            "${{ matrix.arch }}"
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
-
+      OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
+      
     runs-on: [ "${{ matrix.runner_tags }}" ]
 
     steps:
 
-      - name: Checkout Armbian Framework
-        uses: actions/checkout@v3.3.0
+        # Login to ghcr.io, for later uploading rootfs to ghcr.io
+      - name: Docker Login to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          repository: armbian/build
-          ref:  main
+          registry: ghcr.io
+          username: ${{ github.repository_owner }} # GitHub username or org
+          password: ${{ secrets.token }}           # GitHub actions builtin token. repo has to have pkg access.
+
+      - name: Checkout build repo
+        uses: actions/checkout@v3 # We don't need to clone git, really. A wget would suffice for GH-hosted runners. But using clone is better for Igor-hosted runners.
+        with:
+          repository: armbian/build #${{ github.repository_owner }}/armbian-build
+          ref: main
           fetch-depth: 1
           clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
 
       - name: Create rootfs ${{env.RELEASE}}:${{env.ARCH}} (variant ${{env.VARIANT}}) (desktop ${{env.DESKTOP}})
         id: rootfs
         run: |
-          echo "yes"
+         
+          bash ./compile.sh rootfs "RELEASE=${{env.RELEASE}}" "ARCH=${{env.ARCH}}" BUILD_DESKTOP=${{ matrix.desktop }} DESKTOP_APPGROUPS_SELECTED=${{env.VARIANT}} DESKTOP_ENVIRONMENT=${{env.DESKTOP}} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base SKIP_ARMBIAN_REPO=yes
