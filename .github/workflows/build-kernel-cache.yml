@@ -66,7 +66,7 @@ jobs:
           done | sort | uniq | sort -u -t: -k1,3 | cut -d":" -f3,4,5 | sort | uniq | sed "s/:/ /g" | awk '{ printf "%s%s%s\n", "{\"board\":\""$2"\",", "\"branch\":\""$1"\",", "\"runner\":\""$3"\"}" }' | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
   kernel:
-    if: ${{ github.repository_owner == 'armbian' }}
+#    if: ${{ github.repository_owner == 'armbian' }}
     needs: [ prepare ]
     strategy:
       fail-fast: false # let other jobs try to complete if one fails
@@ -79,7 +79,7 @@ jobs:
     env:
       BRANCH: "${{ matrix.branch }}"
       BOARD: "${{ matrix.board }}"
-      OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
+ #     OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
     steps:
 
       # Login to ghcr.io, for later uploading rootfs to ghcr.io
