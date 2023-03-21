@@ -1,0 +1,26 @@
+name: Build with Docker
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      ACCESS_TOKEN:
+        required: true
+      KEY_TORRENTS:
+        required: false
+      KNOWN_HOSTS_UPLOAD:
+        required: false
+
+jobs:
+
+  Prepare:
+
+    if: ${{ github.repository_owner == 'Armbian' }}
+    name: targets
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Cancel active workflow"
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          all_but_latest: true
+          access_token: ${{ secrets.GITHUB_TOKEN }}
