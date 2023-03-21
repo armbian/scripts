@@ -86,7 +86,7 @@ jobs:
           # SHARE_LOG=yes to share logs to pastebin
           bash ./compile.sh uboot \
             "BRANCH=${{env.BRANCH}}" "BOARD=${{env.BOARD}}" ${{env.VARIANT}} \
-            SHARE_LOG=yes
+            SHARE_LOG=yes FORCE_ARTIFACTS_DOWNLOAD="yes"
 
       - name: "Generate key id" # We need this in case we run multiple runners on one machine
         run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
