@@ -101,7 +101,7 @@ jobs:
           if_key_exists: replace
 
       - name: Deploy to server
-        if: ${{ github.repository_owner == 'Armbian' }}
+#        if: ${{ github.repository_owner == 'Armbian' }}
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
