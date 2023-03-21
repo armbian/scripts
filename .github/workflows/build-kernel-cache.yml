@@ -1,4 +1,4 @@
-name: Build with Docker
+name: Build kernel cache
 on:
   workflow_dispatch:
   workflow_call:
@@ -28,7 +28,7 @@ jobs:
   prepare:
 
     name: "Make JSON"
-#    if: ${{ github.repository_owner == 'armbian' }}
+    if: ${{ github.repository_owner == 'armbian' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{steps.json.outputs.JSON_CONTENT}}
@@ -44,7 +44,7 @@ jobs:
           repository: armbian/build
           ref:  "${{ inputs.BUILD_BRANCH }}"
           fetch-depth: 1
-          clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
+          clean: false
           path: build
 
       - name: Checkout Armbian OS
@@ -82,21 +82,22 @@ jobs:
               done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,3 | cut -d":" -f3,4,5 | sort | uniq | sed "s/:/ /g" | awk '{ printf "%s%s%s\n", "{\"board\":\""$2"\",", "\"branch\":\""$1"\",", "\"runner\":\""$3"\"}" }' | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
+
   kernel:
-#    if: ${{ github.repository_owner == 'armbian' }}
+
+    if: ${{ github.repository_owner == 'armbian' }}
     needs: [ prepare ]
+    name: "${{ matrix.board }} ${{ matrix.branch }} ${{ matrix.runner }}"
+    runs-on: "${{ matrix.runner }}"
     strategy:
-      fail-fast: false # let other jobs try to complete if one fails
+      fail-fast: false
       matrix:
         include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
-
-    runs-on: "${{ matrix.runner }}"
-
-    name: "${{ matrix.board }} ${{ matrix.branch }} ${{ matrix.runner }}"
+    
     env:
       BRANCH: "${{ matrix.branch }}"
       BOARD: "${{ matrix.board }}"
- #     OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
+
     steps:
 
       - name: "Fix permissions"
@@ -108,7 +109,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ inputs.ACCESS_NAME }} # GitHub username or org
+          username: ${{ inputs.ACCESS_NAME }}      # GitHub username or org
           password: ${{ secrets.ACCESS_TOKEN }}    # GitHub actions builtin token. repo has to have pkg access.
 
       - name: Checkout build repo
@@ -117,7 +118,7 @@ jobs:
           repository: armbian/build #${{ github.repository_owner }}/armbian-build
           ref:  "${{ inputs.BUILD_BRANCH }}"
           fetch-depth: 1
-          clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
+          clean: false
 
       - name: Build Kernel ${{env.BOARD}}:${{env.BRANCH}}
         id: kernel
@@ -129,7 +130,7 @@ jobs:
           ls -l output/debs/
           du output
       - name: "Generate key id" # We need this in case we run multiple runners on one machine
-        run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
+        run: echo "RANDOM=ID_$((RANDOM%100000000))" >> $GITHUB_ENV
         shell: bash
 
       - name: Install SSH key for storage
