@@ -71,9 +71,9 @@ jobs:
               source build/config/sources/families/${BOARDFAMILY}.conf 2> /dev/null || true
               # runner management
               RUNNER=ubuntu-latest
-              #[[ "${ARCH}" == arm64 ]] && RUNNER=aarch64
-              #[[ "${BRANCH}" == current ]] && RUNNER=alfa
-              #[[ "${BRANCH}" == edge ]] && RUNNER=beta
+              [[ "${ARCH}" == arm64 ]] && RUNNER=aarch64
+              [[ "${BRANCH}" == current ]] && RUNNER=alfa
+              [[ "${BRANCH}" == edge ]] && RUNNER=beta
               echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${RUNNER}"
               done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,3 | cut -d":" -f3,4,5 | sort | uniq | sed "s/:/ /g" | awk '{ printf "%s%s%s\n", "{\"board\":\""$2"\",", "\"branch\":\""$1"\",", "\"runner\":\""$3"\"}" }' | jq -s >> $GITHUB_OUTPUT
