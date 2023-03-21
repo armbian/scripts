@@ -32,4 +32,4 @@ We divide runners by arhitecture (ARM64 or X86) and size (big/small).
 3. Core count = 4 for "small", 12 + for "big"
 4. Space = 64Gb
 
-https://www.armbian.com/#contact
+https://www.armbian.com/contact/
