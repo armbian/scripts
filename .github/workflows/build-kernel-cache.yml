@@ -11,6 +11,10 @@ on:
        required: false
        type: string
        default: 'main'
+      BUILD_RUNNER:
+       required: false
+       type: string
+       default: "ubuntu-latest"
     secrets:
       ACCESS_TOKEN:
         required: true
