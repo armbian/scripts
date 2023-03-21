@@ -12,15 +12,117 @@ on:
 
 jobs:
 
-  Prepare:
+  prepare:
 
-    if: ${{ github.repository_owner == 'Armbian' }}
-    name: targets
+    name: "Make JSON"
+#    if: ${{ github.repository_owner == 'armbian' }}
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{steps.json.outputs.JSON_CONTENT}}
     steps:
 
-      - name: "Cancel active workflow"
-        uses: styfle/cancel-workflow-action@0.11.0
+      - name: Checkout Armbian Framework
+        uses: actions/checkout@v3.3.0
         with:
-          all_but_latest: true
-          access_token: ${{ secrets.GITHUB_TOKEN }}
+          repository: armbian/build
+          ref:  main
+          fetch-depth: 1
+          clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
+          path: build
+
+      - name: Checkout Armbian OS
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/os
+          ref:  main
+          fetch-depth: 1
+          clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
+          path: os
+
+      - name: Build JSON
+        id: json
+        run: |
+          # Make a list of valid pairs from our config
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          for BRANCH in legacy current midstream edge; do
+              FILES=$(cat os/targets/*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
+              if [ -z "${FILES}" ]; then
+                continue
+              fi              
+              while IFS= read -r line; do
+              BOARDFAMILY=$(cat build/config/boards/$line.* | grep BOARDFAMILY | cut -d'"' -f2)
+              BOARD=$line
+              source build/config/boards/$line.conf 2> /dev/null || true
+              source build/config/boards/$line.wip 2> /dev/null || true
+              source build/config/boards/$line.tvb 2> /dev/null || true
+              source build/config/sources/families/${BOARDFAMILY}.conf 2> /dev/null || true
+              # runner management
+              RUNNER=ubuntu-latest
+              [[ "${ARCH}" == arm64 ]] && RUNNER=aarch64
+              [[ "${BRANCH}" == current ]] && RUNNER=alfa
+              [[ "${BRANCH}" == edge ]] && RUNNER=beta
+              echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${RUNNER}"
+              done <<< "$FILES"
+          done | sort | uniq | sort -u -t: -k1,3 | cut -d":" -f3,4,5 | sort | uniq | sed "s/:/ /g" | awk '{ printf "%s%s%s\n", "{\"board\":\""$2"\",", "\"branch\":\""$1"\",", "\"runner\":\""$3"\"}" }' | jq -s >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+  kernel:
+    if: ${{ github.repository_owner == 'armbian' }}
+    needs: [ prepare ]
+    strategy:
+      fail-fast: false # let other jobs try to complete if one fails
+      matrix:
+        include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+
+    runs-on: "${{ matrix.runner }}"
+
+    name: "${{ matrix.board }} ${{ matrix.branch }} ${{ matrix.runner }}"
+    env:
+      BRANCH: "${{ matrix.branch }}"
+      BOARD: "${{ matrix.board }}"
+      OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
+    steps:
+
+      # Login to ghcr.io, for later uploading rootfs to ghcr.io
+      - name: Docker Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }} # GitHub username or org
+          password: ${{ secrets.ACCESS_TOKEN }}    # GitHub actions builtin token. repo has to have pkg access.
+
+      - name: Checkout build repo
+        uses: actions/checkout@v3 # We don't need to clone git, really. A wget would suffice for GH-hosted runners. But using clone is better for Igor-hosted runners.
+        with:
+          repository: armbian/build #${{ github.repository_owner }}/armbian-build
+          ref: main
+          fetch-depth: 1
+          clean: false # true is default. it *will* delete the hosts /dev if mounted inside.
+
+      - name: Build Kernel ${{env.BOARD}}:${{env.BRANCH}}
+        id: kernel
+        run: |
+          # BRANCH and BOARD are in the env, but Docker doesn't know that; (sudo has --preserve-env). So we need to pass them as args.
+          # SHARE_LOG=yes to share logs to pastebin
+          sudo rm -rf output/debs/* || true
+          bash ./compile.sh kernel "BRANCH=${{env.BRANCH}}" "BOARD=${{env.BOARD}}" SHARE_LOG=yes CLEAN_LEVEL="alldebs" FORCE_ARTIFACTS_DOWNLOAD="yes"
+          ls -l output/debs/
+          du output
+      - name: "Generate key id" # We need this in case we run multiple runners on one machine
+        run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          name: ${{ env.RANDOM }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Deploy to server
+        if: ${{ github.repository_owner == 'Armbian' }}
+        run: |
+          if ! command -v "lftp" > /dev/null 2>&1; then
+             sudo apt-get -y -qq install lftp
+          fi
+          lftp -u upload, -e "set sftp:connect-program ssh -ax -i $HOME/.ssh/${{ env.RANDOM }}; set net:timeout 4;set net:max-retries 6;mirror -R --include-glob *.deb --no-empty-dirs --parallel=8 --no-perms output/debs/. debs-beta/ ;bye" sftp://users.armbian.com
