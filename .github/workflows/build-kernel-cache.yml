@@ -36,7 +36,7 @@ jobs:
 
       - name: "Fix permissions"
         run: |
-          sudo chown -R $USER.$USER 
+          sudo chown -R $USER.$USER .
 
       - name: Checkout Armbian Framework
         uses: actions/checkout@v3.3.0
@@ -101,7 +101,7 @@ jobs:
 
       - name: "Fix permissions"
         run: |
-          sudo chown -R $USER.$USER 
+          sudo chown -R $USER.$USER .
 
         # Login to ghcr.io, for later uploading rootfs to ghcr.io
       - name: Docker Login to GitHub Container Registry
