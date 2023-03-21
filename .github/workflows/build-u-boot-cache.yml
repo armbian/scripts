@@ -11,7 +11,7 @@ on:
        required: false
        type: string
        default: 'main'
-      runner:
+      BUILD_RUNNER:
        required: false
        type: string
        default: "ubuntu-latest"
@@ -56,7 +56,7 @@ jobs:
       fail-fast: false # let other jobs try to complete if one fails
       matrix:
         include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
-    runs-on: [ "${{ inputs.runner }}" ]
+    runs-on: [ "${{ inputs.BUILD_RUNNER }}" ]
     name: "${{ matrix.board }}"
    
     env:
