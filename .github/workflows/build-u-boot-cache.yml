@@ -34,6 +34,10 @@ jobs:
       matrix: ${{steps.json.outputs.JSON_CONTENT}}
     steps:
 
+      - name: "Fix permissions"
+        run: |
+          sudo chown -R $USER.$USER .
+
       - name: Checkout Armbian Framework
         uses: actions/checkout@v3.3.0
         with:
@@ -65,6 +69,10 @@ jobs:
       VARIANT: "${{ matrix.variant }}"
 #      OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
     steps:
+
+      - name: "Fix permissions"
+        run: |
+          sudo chown -R $USER.$USER .
 
       # Login to ghcr.io, for later uploading rootfs to ghcr.io
       - name: Docker Login to GitHub Container Registry
