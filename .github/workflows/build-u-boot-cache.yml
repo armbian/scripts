@@ -87,3 +87,23 @@ jobs:
           bash ./compile.sh uboot \
             "BRANCH=${{env.BRANCH}}" "BOARD=${{env.BOARD}}" ${{env.VARIANT}} \
             SHARE_LOG=yes
+
+      - name: "Generate key id" # We need this in case we run multiple runners on one machine
+        run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          name: ${{ env.RANDOM }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Deploy to server
+        if: ${{ github.repository_owner == 'Armbian' }}
+        run: |
+          if ! command -v "lftp" > /dev/null 2>&1; then
+             sudo apt-get -y -qq install lftp
+          fi
+          lftp -u upload, -e "set sftp:connect-program ssh -ax -i $HOME/.ssh/${{ env.RANDOM }}; set net:timeout 4;set net:max-retries 6;mirror -R --include-glob *.deb --no-empty-dirs --parallel=8 --no-perms output/debs/. debs-beta/ ;bye" sftp://users.armbian.com
