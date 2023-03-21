@@ -34,6 +34,14 @@ jobs:
       matrix: ${{steps.json.outputs.JSON_CONTENT}}
     steps:
 
+     - name: Cleanup
+        run: |
+          sudo rm -rf build/output/images/* || true
+          sudo rm -rf build/cache/rootfs/* || true
+          # remove other projects
+          PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
+          find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT} -exec sudo rm -rf {} + || true
+
       - name: Checkout Armbian Framework
         uses: actions/checkout@v3.3.0
         with:
@@ -95,7 +103,16 @@ jobs:
  #     OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
     steps:
 
-      # Login to ghcr.io, for later uploading rootfs to ghcr.io
+     - name: Cleanup
+        run: |
+          sudo rm -rf build/output/images/* || true
+          sudo rm -rf build/cache/rootfs/* || true
+          # remove other projects
+          PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
+          find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT} -exec sudo rm -rf {} + || true
+
+
+        # Login to ghcr.io, for later uploading rootfs to ghcr.io
       - name: Docker Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
