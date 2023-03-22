@@ -1,0 +1,192 @@
+name: Sync 3rd party packages
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ACCESS_NAME:
+       required: false
+       type: string
+       default: ${{ github.repository_owner }}
+      BUILD_BRANCH:
+       required: false
+       type: string
+       default: 'main'
+      BUILD_RUNNER:
+       required: false
+       type: string
+       default: "ubuntu-latest"
+    secrets:
+      GPG_KEY1:
+        required: true
+      GPG_PASSPHRASE1:
+        required: true
+      ACCESS_TOKEN:
+        required: true
+      KEY_TORRENTS:
+        required: false
+      KNOWN_HOSTS_UPLOAD:
+        required: false
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+
+  start:
+    runs-on: ubuntu-latest
+    name: "Start"
+    outputs:
+      matrix: ${{steps.lists.outputs.matrix}}
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          repository: armbian/os
+          path: os
+          fetch-depth: '1'
+          clean: false
+
+      - name: Build list
+        id: lists
+        run: |
+
+          MATRIX=$(
+          while IFS="," read -r rec_column1 rec_column2 rec_column3 rec_column4 rec_column5 rec_column6 rec_column7
+          do
+              echo "$rec_column1:$rec_column4"
+          done < <(tail -n +2 os/external/projects.csv | grep -v "^\s*[#;]")
+          )
+          echo "matrix=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+
+  download:
+    needs: [start]
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ${{fromJson(needs.start.outputs.matrix)}}
+
+    name: "Mirroring"
+    runs-on: [Ubuntu-latest]
+    steps:
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Import GPG key
+
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY1 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
+
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          repository: armbian/os
+          path: os
+          fetch-depth: '1'
+          clean: false
+
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v3.4.0
+        with:
+          repository: armbian/build
+          path: build
+          fetch-depth: '1'
+          clean: false
+
+      - name: Install Aptly
+        run: |
+
+          wget https://github.com/aptly-dev/aptly/releases/download/v1.5.0/aptly_1.5.0_amd64.deb
+          sudo dpkg -i aptly_1.5.0_amd64.deb
+          sudo rm aptly_1.5.0_amd64.deb
+
+      - name: Install keys
+        run: |
+
+          find os/external/keys/ -type f -name "*.gpg" -exec gpg --import --no-default-keyring --keyring trustedkeys.gpg "{}" \;
+          sudo apt-get -y install debian-keyring ubuntu-keyring
+          gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 0E98404D386FA1D9
+
+      - name: Download
+        run: |
+
+          PROJECT=$(echo ${{ matrix.node }} | cut -d":" -f1)
+          RELEASE=$(echo ${{ matrix.node }} | cut -d":" -f2)
+          URL=$(grep "$PROJECT,[^,]\+,[^,]\+,$RELEASE," os/external/projects.csv | cut -d"," -f2)
+          KEY=$(grep "$PROJECT,[^,]\+,[^,]\+,$RELEASE," os/external/projects.csv | cut -d"," -f3)
+          TARGET=$(grep "$PROJECT,[^,]\+,[^,]\+,$RELEASE," os/external/projects.csv | cut -d"," -f5)
+          METHOD=$(grep "$PROJECT,[^,]\+,[^,]\+,$RELEASE," os/external/projects.csv | cut -d"," -f6)
+          GLOB=$(grep "$PROJECT,[^,]\+,[^,]\+,$RELEASE," os/external/projects.csv | cut -d"," -f7)
+          ARCH=$(grep "$PROJECT,[^,]\+,[^,]\+,$RELEASE," os/external/projects.csv | cut -d"," -f8)
+
+          # read existing releases
+          ALL_RELEASES=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
+
+          # recreate folder structure as we are uploading to our system
+          for i in ${ALL_RELEASES[@]}; do
+              mkdir -p output/debs/${i}
+              mkdir -p output/debs/extra/${i}-utils
+              mkdir -p output/debs/extra/${i}-desktop
+          done
+
+          # we use different download metods (github, aplty)
+          if [[ ${METHOD} == gh ]]; then
+              # where we are copying from
+              SOURCE="temp/"
+              gh release download -p '*.deb' --repo ${URL} --dir temp
+
+          elif [[ ${METHOD} == direct ]]; then
+              # where we are copying from
+              SOURCE="temp/"
+              mkdir -p ${SOURCE}
+              wget -O ${SOURCE}/${PROJECT}.deb ${URL}
+          else
+              # where we are copying from
+              SOURCE="/home/runner/.aptly/public/"
+              COMPONENT="main"
+              [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
+              # generate mirror
+              aptly -filter='Name (% '$GLOB'*)' -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${PROJECT}-${RELEASE} ${URL} ${KEY} ${COMPONENT}
+              aptly -max-tries=3 mirror update ${PROJECT}-${RELEASE}
+              aptly snapshot create ${PROJECT}-${RELEASE} from mirror ${PROJECT}-${RELEASE}
+              # publish
+              aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${PROJECT}-${RELEASE}
+          fi
+          ls -l $SOURCE
+          # copy to location
+
+          find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box64-generic*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box64-rk3399_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box64-tegrax1_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box64-rpi3arm64*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box64-android*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "codium_*" | sort | head -n -3 | xargs sudo rm || true
+          find $SOURCE -type f -name "firefox-dev*" | xargs sudo rm || true
+          find $SOURCE -type f -name "firefox-dbg*" | xargs sudo rm || true
+          find $SOURCE -type f -name "nala_*" | sort | head -n -1 | xargs sudo rm || true
+          
+          if [[ ${TARGET} == main ]]; then
+              find $SOURCE -type f -name "*$GLOB*.deb" -exec cp {} output/debs/ \;
+          elif [[ ${RELEASE} == all ]]; then
+              for i in ${ALL_RELEASES[@]}; do
+                  find $SOURCE -type f -name "*$GLOB*.deb" -exec cp {} output/debs/extra/${i}-${TARGET} \;
+                  echo "Copy to all output/debs/extra/${i}-${TARGET}"
+              done
+          else
+              find $SOURCE -type f -name "*$GLOB*.deb" -exec cp {} output/debs/extra/${RELEASE}-${TARGET} \;
+          fi
+
+      - name: Deploy to server
+        run: |
+          sudo apt-get -y -qq install lftp
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs/ debs-beta/ ;bye" sftp://users.armbian.com
