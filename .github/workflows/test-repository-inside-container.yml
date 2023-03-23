@@ -37,6 +37,11 @@ jobs:
         image: "${{ matrix.image }}"
     steps:
 
+      - name: Show
+        run: |
+        
+          apt install sudo
+
       - name: Get more space
         uses: easimon/maximize-build-space@master
         with:
