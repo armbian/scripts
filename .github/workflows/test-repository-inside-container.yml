@@ -37,19 +37,6 @@ jobs:
         image: "${{ matrix.image }}"
     steps:
 
-      - name: Show
-        run: |
-        
-          apt -y install sudo
-
-      - name: Get more space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 30720
-          swap-size-mb: 1024
-          remove-dotnet: 'true'
-          remove-android: 'true'
-
       - name: Checkout Armbian OS Config
         uses: actions/checkout@v3.3.0
         with:
@@ -72,7 +59,5 @@ jobs:
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://${{ inputs.url }} $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | tee /etc/apt/sources.list.d/armbian.list
           apt update -y
           apt upgrade -y
-          apt install -y $(cat os/external/projects.csv | cut -d"," -f1,4,8 | sort | head -n -1 | grep "all\|${RELEASE}" | grep "amd64" | cut -d"," -f1 |paste -sd" " -) ${{ inputs.package }}
-
-
-
+          #
+          apt install -y $(cat os/external/projects.csv | grep -v howdy | cut -d"," -f1,4,8 | sort | head -n -1 | grep "all\|${RELEASE}" $EXCLUDE | grep "amd64" | cut -d"," -f1 |paste -sd" " -) ${{ inputs.package }}

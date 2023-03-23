@@ -153,7 +153,9 @@ jobs:
               COMPONENT="main"
               [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
               # generate mirror
-              aptly -filter='Name (% '$GLOB'*)' -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${PROJECT}-${RELEASE} ${URL} ${KEY} ${COMPONENT}
+              [[ $GLOB != Name* ]] && ADDITIONAL_FILTER="-filter-with-deps"
+
+              aptly -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${PROJECT}-${RELEASE} ${URL} ${KEY} ${COMPONENT}
               aptly -max-tries=3 mirror update ${PROJECT}-${RELEASE}
               aptly snapshot create ${PROJECT}-${RELEASE} from mirror ${PROJECT}-${RELEASE}
               # publish
@@ -163,30 +165,40 @@ jobs:
           # copy to location
 
           find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box64-generic*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box64-rk3399_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box64-tegrax1_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box64-rpi3arm64*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box64-android*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-rk3399_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-tegrax1_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-rpi3arm64*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-android*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "codium_*" | sort | head -n -3 | xargs sudo rm || true
           find $SOURCE -type f -name "firefox-dev*" | xargs sudo rm || true
           find $SOURCE -type f -name "firefox-dbg*" | xargs sudo rm || true
           find $SOURCE -type f -name "nala_*" | sort | head -n -1 | xargs sudo rm || true
-          
+          # zfs cleaning
+          find $SOURCE -type f -name "libudev*" | xargs sudo rm || true
+          find $SOURCE -type f -name "init*" | xargs sudo rm || true
+
           if [[ ${TARGET} == main ]]; then
-              find $SOURCE -type f -name "*$GLOB*.deb" -exec cp {} output/debs/ \;
+              find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/ \;
           elif [[ ${RELEASE} == all ]]; then
               for i in ${ALL_RELEASES[@]}; do
-                  find $SOURCE -type f -name "*$GLOB*.deb" -exec cp {} output/debs/extra/${i}-${TARGET} \;
+                  find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${i}-${TARGET} \;
                   echo "Copy to all output/debs/extra/${i}-${TARGET}"
               done
           else
-              find $SOURCE -type f -name "*$GLOB*.deb" -exec cp {} output/debs/extra/${RELEASE}-${TARGET} \;
+              find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${RELEASE}-${TARGET} \;
           fi
+
+          echo  "<details><summary>Show packages</summary><code>" >> $GITHUB_STEP_SUMMARY
+          find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</code></details>" >> $GITHUB_STEP_SUMMARY
+
 
       - name: Deploy to server
         run: |
+
           sudo apt-get -y -qq install lftp
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs/ debs-beta/ ;bye" sftp://users.armbian.com
