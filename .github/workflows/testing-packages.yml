@@ -28,9 +28,9 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        image: ["debian:buster","debian:bullseye","debian:sid","ubuntu:focal","ubuntu:jammy","ubuntu:kinetic"]
+        image: ["debian:buster","debian:bullseye","debian:bookworm","debian:sid","ubuntu:focal","ubuntu:jammy","ubuntu:lunar"]
 
-    name: Install packages
+    name: Test install
     timeout-minutes: 10
     runs-on: ubuntu-latest
     container:
@@ -53,11 +53,14 @@ jobs:
           RELEASE=$(echo "${{ matrix.image }}" | cut -d":" -f2)
           apt update
           apt -y install wget gpg
+
+          # add armbian repository
           wget https://${{ inputs.url }}/armbian.key -O key
           gpg --dearmor < key | tee /usr/share/keyrings/armbian.gpg > /dev/null
           chmod go+r /usr/share/keyrings/armbian.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://${{ inputs.url }} $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | tee /etc/apt/sources.list.d/armbian.list
           apt update -y
           apt upgrade -y
-          #
+
+          # install packages / except howdy as its too large
           apt install -y $(cat os/external/projects.csv | grep -v howdy | cut -d"," -f1,4,8 | sort | head -n -1 | grep "all\|${RELEASE}" $EXCLUDE | grep "amd64" | cut -d"," -f1 |paste -sd" " -) ${{ inputs.package }}
