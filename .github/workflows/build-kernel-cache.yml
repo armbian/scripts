@@ -97,6 +97,7 @@ jobs:
     env:
       BRANCH: "${{ matrix.branch }}"
       BOARD: "${{ matrix.board }}"
+      OCI_TARGET_BASE: "ghcr.io/armbian/cache-kernel/
 
     steps:
 
