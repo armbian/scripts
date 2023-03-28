@@ -129,15 +129,16 @@ jobs:
           METHOD=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f6)
           GLOB=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f7 | tr -d '"')
           ARCH=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f8)
+          REPOSITORY=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f9)
 
           # read existing releases
           ALL_RELEASES=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
 
           # recreate folder structure as we are uploading to our system
           for i in ${ALL_RELEASES[@]}; do
-              mkdir -p output/debs/${i}
-              mkdir -p output/debs/extra/${i}-utils
-              mkdir -p output/debs/extra/${i}-desktop
+              mkdir -p output/{debs,debs-beta}/${i}
+              mkdir -p output/{debs,debs-beta}/extra/${i}-utils
+              mkdir -p output/{debs,debs-beta}/extra/${i}-desktop
           done
 
           # we use different download metods (github, aplty)
@@ -189,14 +190,16 @@ jobs:
           find $SOURCE -type f -name "python3-debian" | xargs sudo rm || true
 
           if [[ ${TARGET} == main ]]; then
-              find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/ \;
+              if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs-beta/ \;; fi
+              if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/ \;; fi
           elif [[ ${RELEASE} == all ]]; then
               for i in ${ALL_RELEASES[@]}; do
-                  find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${i}-${TARGET} \;
-                  echo "Copy to all output/debs/extra/${i}-${TARGET}"
+                  if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs-beta/extra/${i}-${TARGET} \;; fi
+                  if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${i}-${TARGET} \;; fi
               done
           else
-              find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${RELEASE}-${TARGET} \;
+              if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs-beta/extra/${RELEASE}-${TARGET} \;; fi
+              if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${RELEASE}-${TARGET} \;; fi
           fi
 
           echo  "<details><summary>Show packages</summary><code>" >> $GITHUB_STEP_SUMMARY
@@ -209,4 +212,8 @@ jobs:
         run: |
 
           sudo apt-get -y -qq install lftp
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs/ debs-beta/ ;bye" sftp://users.armbian.com
+
+          # upload beta repository
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
+          # upload stable repository
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs/ debs/ ;bye" sftp://users.armbian.com
