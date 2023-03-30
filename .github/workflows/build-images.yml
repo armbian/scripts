@@ -1,4 +1,4 @@
-name: Reusable
+name: Build images
 
 on:
 
@@ -22,6 +22,12 @@ on:
       board:
        required: false
        type: string
+      part:
+        required: true
+        type: number
+      of:
+        required: true
+        type: number
     secrets:
       ACCESS_TOKEN:
         required: true
@@ -78,21 +84,22 @@ jobs:
         id: json
         run: |
 
-          # lets mix github runners and ours, 1:2
-          array=(ubuntu-latest ubuntu-latest ubuntu-latest)
-
-          #array=(ubuntu-latest ubuntu-latest) # need to resolve self-hosted runner problems
+          # lets mix GitHub runners and ours
+          array=("ubuntu-latest" "qemu" "qemu")
           echo runner=$(index=$(shuf -i 1-3 -n 1);echo ${array[$index]}) >> $GITHUB_OUTPUT
-
-          # Make a list of valid pairs from our config          
-          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          
+          # Prepare list
           cat os/targets/${{ inputs.config }} \
           | grep -v "^$\|^#" \
           | awk '$6 != "no"' \
           | grep " ${{ inputs.branch }} " \
           | grep "${{ inputs.release }} " \
           | grep "${{ inputs.variant }}" \
-          | grep "${{ inputs.board }}" \
+          | grep "${{ inputs.board }}" > targets.txt
+
+          # Split list into chunks and convert it JSON          
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat targets.txt \
           | awk '{print  "{\"board\":\""$1"\",\"branch\":\""$2"\",\"release\":\""$3"\",\"variant\":\""$4"\",\"desktop\":\""$7"\",\"app_group\":\""$9"\",\"runner_tags\":\"qemu\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
@@ -103,7 +110,7 @@ jobs:
     if: ${{ needs.prepare.outputs.matrix != '[]' && needs.prepare.outputs.matrix != '' }}
     timeout-minutes: 120
     strategy:
-      max-parallel: 16
+      max-parallel: 16 # we are running 6 chunks which comes to 96 parallel builds (could be too much)
       fail-fast: false # let other jobs try to complete if one fails
       matrix:
         include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
@@ -116,24 +123,14 @@ jobs:
       DESKTOP:         "${{ matrix.desktop }}"
       APP_GROUP:       "${{ matrix.app_group }}"
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
-#      OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
 
-    #runs-on:  [ "${{ needs.prepare.outputs.runner }}" ]
-    runs-on: ubuntu-latest
+    runs-on:  [ "${{ needs.prepare.outputs.runner || 'ubuntu-latest' }}" ]
 
     steps:
 
       - name: "Generate key id" # We need this in case we run multiple runners on one machine
         run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
         shell: bash
-
-        # Login to ghcr.io, for later uploading rootfs to ghcr.io
-#      - name: Docker Login to GitHub Container Registry
- #       uses: docker/login-action@v2
-  #      with:
-   #       registry: ghcr.io
-    #      username: ${{ github.repository_owner }} # GitHub username or org
-     #     password: ${{ secrets.GITHUB_TOKEN }}            # GitHub actions builtin token. repo has to have pkg access.
 
       - name: Checkout Armbian build repo
         uses: actions/checkout@v3 # We don't need to clone git, really. A wget would suffice for GH-hosted runners. But using clone is better for Igor-hosted runners.
