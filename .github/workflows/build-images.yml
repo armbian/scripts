@@ -125,7 +125,7 @@ jobs:
 
     #runs-on:  [ "${{ needs.prepare.outputs.runner }}" ]
     #runs-on: ubuntu-latest
-    runs-on: ${{ fromJSON(needs.prepare.outputs.matrix.runner_tag) }}
+    runs-on: ${{ fromJSON(needs.prepare.outputs.matrix).runner_tag }}
 
     steps:
 
