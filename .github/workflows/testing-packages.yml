@@ -62,5 +62,7 @@ jobs:
           apt update -y
           apt upgrade -y
 
+          sudo apt-get -y --install-recommends armbian-desktop-xfce
+
           # install packages / except howdy as its too large
           apt install -y $(cat os/external/projects.csv | grep -v howdy | cut -d"," -f1,4,8 | sort | head -n -1 | grep "all\|${RELEASE}" $EXCLUDE | grep "amd64" | cut -d"," -f1 |paste -sd" " -) ${{ inputs.package }}
