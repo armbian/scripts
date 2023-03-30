@@ -22,6 +22,12 @@ on:
       board:
        required: false
        type: string
+      part:
+        required: true
+        type: number
+      of:
+        required: true
+        type: number
     secrets:
       ACCESS_TOKEN:
         required: true
@@ -83,6 +89,8 @@ jobs:
 
           #array=(ubuntu-latest ubuntu-latest) # need to resolve self-hosted runner problems
           echo runner=$(index=$(shuf -i 1-3 -n 1);echo ${array[$index]}) >> $GITHUB_OUTPUT
+
+          echo split --number=l/${{ inputs.part }}/${{ inputs.of }} cat os/targets/${{ inputs.config }} | grep -v "^$\|^#"
 
           # Make a list of valid pairs from our config          
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
