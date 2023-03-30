@@ -85,7 +85,7 @@ jobs:
         run: |
 
           # lets mix github runners and ours
-          array=(ubuntu-latest ubuntu-latest qemu)
+          array=("ubuntu-latest" "ubuntu-latest" "qemu")
           echo runner=$(index=$(shuf -i 1-3 -n 1);echo ${array[$index]}) >> $GITHUB_OUTPUT
           cat os/targets/${{ inputs.config }} \
           | grep -v "^$\|^#" \
@@ -123,8 +123,8 @@ jobs:
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
 #      OCI_TARGET_BASE: "ghcr.io/${{ github.repository }}/" # This is picked up by the Docker launcher automatically
 
-    #runs-on:  [ "${{ needs.prepare.outputs.runner }}" ]
-    runs-on: ubuntu-latest
+    runs-on:  [ "${{ needs.prepare.outputs.runner }}" ]
+    #runs-on: ubuntu-latest
 
     steps:
 
