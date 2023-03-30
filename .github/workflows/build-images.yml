@@ -84,23 +84,20 @@ jobs:
         id: json
         run: |
 
-          # lets mix github runners and ours, 1:2
-          array=(ubuntu-latest ubuntu-latest ubuntu-latest)
-
-          #array=(ubuntu-latest ubuntu-latest) # need to resolve self-hosted runner problems
+          # lets mix github runners and ours
+          array=(ubuntu-latest ubuntu-latest qemu)
           echo runner=$(index=$(shuf -i 1-3 -n 1);echo ${array[$index]}) >> $GITHUB_OUTPUT
-
-          echo split --number=l/${{ inputs.part }}/${{ inputs.of }} cat os/targets/${{ inputs.config }} | grep -v "^$\|^#"
-
-          # Make a list of valid pairs from our config          
-          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           cat os/targets/${{ inputs.config }} \
           | grep -v "^$\|^#" \
           | awk '$6 != "no"' \
           | grep " ${{ inputs.branch }} " \
           | grep "${{ inputs.release }} " \
           | grep "${{ inputs.variant }}" \
-          | grep "${{ inputs.board }}" \
+          | grep "${{ inputs.board }}" > targets.txt
+
+          # Make a list of valid pairs from our config          
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat targets.txt \
           | awk '{print  "{\"board\":\""$1"\",\"branch\":\""$2"\",\"release\":\""$3"\",\"variant\":\""$4"\",\"desktop\":\""$7"\",\"app_group\":\""$9"\",\"runner_tags\":\"qemu\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
