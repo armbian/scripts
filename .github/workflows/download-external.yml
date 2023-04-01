@@ -63,9 +63,6 @@ jobs:
           done < <(tail -n +2 os/external/projects.csv | grep -v "^\s*[#;]")
           )
           echo "matrix=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
-          
-          cd os
-          git diff origin/main | grep -E "^\+[A-Za-z]"
 
   download:
     needs: [start]
