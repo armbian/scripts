@@ -15,7 +15,11 @@ on:
        required: false
        type: string
        default: "ubuntu-latest"
-    secrets:
+      REFERENCE:
+       required: false
+       type: string
+       default: "main"
+    secrets:    
       GPG_KEY1:
         required: true
       GPG_PASSPHRASE1:
@@ -44,6 +48,7 @@ jobs:
         with:
           repository: armbian/os
           path: os
+          ref: ${{ inputs.REFERENCE }} || main
           fetch-depth: '1'
           clean: false
 
