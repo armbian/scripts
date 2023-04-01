@@ -48,7 +48,7 @@ jobs:
         with:
           repository: armbian/os
           path: os
-          ref: ${{ inputs.REFERENCE }} || main
+          ref: ${{ inputs.REFERENCE }}
           fetch-depth: '1'
           clean: false
 
