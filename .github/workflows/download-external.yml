@@ -55,7 +55,9 @@ jobs:
       - name: Build list
         id: lists
         run: |
-
+        
+          git diff origin/main | grep -E "^\+[A-Za-z]"
+          
           MATRIX=$(
           while IFS="," read -r rec_column1 rec_column2 rec_column3 rec_column4 rec_column5 rec_column6 rec_column7
           do
