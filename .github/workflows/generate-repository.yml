@@ -1,0 +1,85 @@
+name: Generate Debian repository
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ACCESS_NAME:
+       required: false
+       type: string
+       default: ${{ github.repository_owner }}
+      BUILD_BRANCH:
+       required: false
+       type: string
+       default: 'main'
+      BUILD_RUNNER:
+       required: false
+       type: string
+       default: "ubuntu-latest"
+      REFERENCE:
+       required: false
+       type: string
+       default: "main"
+    secrets:
+      GPG_KEY1:
+        required: true
+      GPG_PASSPHRASE1:
+        required: true
+      ACCESS_TOKEN:
+        required: true
+      KEY_TORRENTS:
+        required: false
+      KNOWN_HOSTS_UPLOAD:
+        required: false
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  Repository:
+    name: "Aptly"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Import GPG key
+
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY1 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
+
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          repository: armbian/os
+          path: os
+          ref: ${{ inputs.REFERENCE }}
+          fetch-depth: '1'
+          clean: false
+
+      - name: Checkout Armbian build script
+        uses: actions/checkout@v3.4.0
+        with:
+          repository: armbian/build
+          path: build
+          fetch-depth: '1'
+          clean: false
+
+      - name: Install Aptly
+        run: |
+
+          wget https://github.com/aptly-dev/aptly/releases/download/v1.5.0/aptly_1.5.0_amd64.deb
+          sudo dpkg -i aptly_1.5.0_amd64.deb
+          sudo rm aptly_1.5.0_amd64.deb
+
+      - name: Mount remote folder
+        run: |
+          [[ -z $(command -v sshfs) ]] && sudo apt-get -yy install sshfs
+          sudo sshfs artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ inputs.REFERENCE }}" /mnt -o IdentityFile=~/.ssh/id_rsa -o reconnect -o nonempty,allow_other || true
+          df

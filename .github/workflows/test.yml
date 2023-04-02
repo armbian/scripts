@@ -1,0 +1,100 @@
+name: Testss
+
+on:
+
+  workflow_dispatch:
+    inputs:
+      url:
+        required: false
+        type: string
+        default: 'apt.armbian.com'
+      package:
+        required: false
+        type: string
+      REFERENCE:
+       required: false
+       type: string
+       default: "main"
+  workflow_call:
+    inputs:
+      url:
+        required: false
+        type: string
+        default: 'apt.armbian.com'
+      package:
+        required: false
+        type: string
+      REFERENCE:
+       required: false
+       type: string
+       default: "main"
+
+jobs:
+
+  prepare:
+
+    name: "JSON"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix:  ${{steps.json.outputs.JSON_CONTENT}}
+    steps:
+
+      - name: "Make JSON"
+        id: json
+        run: |
+
+          echo "REF: ${{ inputs.REFERENCE }}"
+
+
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          packages=("${{ inputs.package }}")
+          dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+          for i in ${packages[@]}; do
+              for j in ${dockerimages[@]}; do
+              echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
+              done
+          done | jq -s >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+  gradle:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        image: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+
+    name: Test install
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    container:
+        image: "${{ matrix.image.image }}"
+    steps:
+
+      - name: Checkout Armbian OS Config
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/os
+          ref:  main
+          clean: false
+          fetch-depth: 1
+          path: os
+
+      - name: Show
+        run: |
+
+          export DEBIAN_FRONTEND=noninteractive
+          RELEASE=$(echo "${{ matrix.image.image }}" | cut -d":" -f2)
+          apt update
+          apt -y install wget gpg
+
+          # add armbian repository
+          wget https://${{ inputs.url }}/armbian.key -O key
+          gpg --dearmor < key | tee /usr/share/keyrings/armbian.gpg > /dev/null
+          chmod go+r /usr/share/keyrings/armbian.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://${{ inputs.url }} $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | tee /etc/apt/sources.list.d/armbian.list
+          apt update -y
+          apt upgrade -y
+
+          # install packages / except howdy as its too large
+          apt install -y ${{ inputs.package }}

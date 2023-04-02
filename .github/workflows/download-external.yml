@@ -19,7 +19,7 @@ on:
        required: false
        type: string
        default: "main"
-    secrets:    
+    secrets:
       GPG_KEY1:
         required: true
       GPG_PASSPHRASE1:
@@ -33,6 +33,7 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PR_NUMBER: ${{ github.event.number }}
 
 jobs:
 
@@ -55,7 +56,7 @@ jobs:
       - name: Build list
         id: lists
         run: |
-        
+
           MATRIX=$(
           while IFS="," read -r rec_column1 rec_column2 rec_column3 rec_column4 rec_column5 rec_column6 rec_column7
           do
@@ -66,6 +67,9 @@ jobs:
 
   download:
     needs: [start]
+    outputs:
+      url: ${{steps.make.outputs.url}}
+      package: ${{steps.make.outputs.package}}
     strategy:
       fail-fast: false
       matrix:
@@ -94,6 +98,7 @@ jobs:
         with:
           repository: armbian/os
           path: os
+          ref: ${{ inputs.REFERENCE }}
           fetch-depth: '1'
           clean: false
 
@@ -132,9 +137,13 @@ jobs:
           KEY=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f3)
           TARGET=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f5)
           METHOD=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f6)
-          GLOB=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f7 | tr -d '"')
-          ARCH=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f8)
-          REPOSITORY=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f9)
+          INSTALL=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f7)
+          GLOB=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f8 | tr -d '"')
+          ARCH=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f9)
+          REPOSITORY=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f10)
+
+          echo "URL = $URL KEY = $KEY TARGET = $TARGET METHOD =$METHOD $GLOB $REPOSITORY"
+
 
           # read existing releases
           ALL_RELEASES=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
@@ -189,10 +198,10 @@ jobs:
           find $SOURCE -type f -name "code_*arm64*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "code_*amd64*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "code_*armhf*" | sort | head -n -1 | xargs sudo rm || true
-          # zfs cleaning
-          find $SOURCE -type f -name "libudev*" | xargs sudo rm || true
-          find $SOURCE -type f -name "init*" | xargs sudo rm || true
-          find $SOURCE -type f -name "python3-debian" | xargs sudo rm || true
+
+          # zulu cleaning
+          find $SOURCE -type f -name "zulu*-demo*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "zulu*-src*" | sort | head -n -1 | xargs sudo rm || true
 
           if [[ ${TARGET} == main ]]; then
               if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs-beta/ \;; fi
@@ -207,18 +216,132 @@ jobs:
               if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${RELEASE}-${TARGET} \;; fi
           fi
 
-          echo  "<details><summary>Show packages</summary><code>" >> $GITHUB_STEP_SUMMARY
+          echo "<details><summary>Show packages</summary><p><code>" >> $GITHUB_STEP_SUMMARY
           find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "</code></details>" >> $GITHUB_STEP_SUMMARY
 
+          cd build/tools/repository
+          sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' aptly.conf
+          ./repo -c update -i ../../../output/debs-beta -o ../../../output/repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
+          cd ..
+          cd ..
+          cd ..
+          tree
+          rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${PROJECT} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${PROJECT}"
 
       - name: Deploy to server
+        if: inputs.REFERENCE == 'main'
         run: |
 
           sudo apt-get -y -qq install lftp
 
           # upload beta repository
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
+
           # upload stable repository
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs/ debs/ ;bye" sftp://users.armbian.com
+
+      - name: Create a temporary artifact folder
+        run: mkdir downloads
+
+      - name: Add artifacts
+        run: |
+
+          cd downloads
+          echo "armbian.tnahosting.net/artifacts/${{ env.PR_NUMBER }}/" > url.txt
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets-for-download
+          path: downloads
+          retention-days: 5
+
+  test:
+
+    name: "Test"
+    needs: download
+    runs-on: ubuntu-latest
+    outputs:
+      matrix:  ${{steps.json.outputs.JSON_CONTENT}}
+    steps:
+
+      - name: Checkout Armbian OS Config
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/os
+          ref: ${{ inputs.REFERENCE }}
+          clean: false
+          fetch-depth: 1
+          path: os
+
+
+      - name: "Make JSON"
+        id: json
+        run: |
+
+          echo $url
+
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          packages=$(
+          while IFS="," read -r rec_column1 rec_column2 rec_column3 rec_column4 rec_column5 rec_column6 rec_column7 rec_column8
+          do
+              echo "$rec_column1:$rec_column7"
+          done < <(tail -n +2 os/external/projects.csv | grep -v "^\s*[#;]")
+          )
+          dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+          for i in ${packages[@]}; do
+              for j in ${dockerimages[@]}; do
+              echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
+              done
+          done | jq -s >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+  gradle:
+    needs: test
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        image: ${{ fromJSON(needs.test.outputs.matrix) }}
+
+    name: Test install
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    container:
+        image: "${{ matrix.image.image }}"
+    steps:
+
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: assets-for-download
+          path: downloads
+
+      - name: Install
+        run: |
+
+          URL=$(cat downloads/url.txt)$(echo "${{ matrix.image.package }}" | cut -d":" -f1)
+
+          #ls -l
+          #ls -l url || true
+
+          export DEBIAN_FRONTEND=noninteractive
+          RELEASE=$(echo "${{ matrix.image.image }}" | cut -d":" -f2)
+          apt update
+          apt -y install wget gpg
+
+          # add armbian repository
+          wget https://${URL}/armbian.key -O key
+          gpg --dearmor < key | tee /usr/share/keyrings/armbian.gpg > /dev/null
+          chmod go+r /usr/share/keyrings/armbian.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://${URL} $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | tee /etc/apt/sources.list.d/armbian.list
+          apt update -y
+          apt upgrade -y
+
+          # install packages / except howdy as its too large
+          apt install -y $(echo "${{ matrix.image.package }}" | cut -d":" -f2)
+
+          # cleanup
+          [[ -n "${URL}" ]] && ssh artifacts@armbian.tnahosting.net rm -r ${URL}
