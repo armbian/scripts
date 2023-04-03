@@ -39,7 +39,7 @@ jobs:
 
   start:
     runs-on: ubuntu-latest
-    name: "Start"
+    name: "Mirror"
     outputs:
       matrix: ${{steps.lists.outputs.matrix}}
     steps:
@@ -49,33 +49,38 @@ jobs:
         with:
           repository: armbian/os
           path: os
-          ref: ${{ inputs.REFERENCE }}
-          fetch-depth: '1'
+#          ref: ${{ inputs.REFERENCE }}
+          fetch-depth: '2'
           clean: false
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          path: os
+          files: |
+            external/*.conf
 
       - name: Build list
         id: lists
         run: |
 
-          MATRIX=$(
-          while IFS="," read -r rec_column1 rec_column2 rec_column3 rec_column4 rec_column5 rec_column6 rec_column7
-          do
-              echo "$rec_column1:$rec_column4"
-          done < <(tail -n +2 os/external/projects.csv | grep -v "^\s*[#;]")
-          )
+          MATRIX=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
+          #MATRIX=$(
+          #find os/external/*.conf -printf '%f\n' | cut -d"." -f1
+          #)
           echo "matrix=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
   download:
     needs: [start]
     outputs:
-      url: ${{steps.make.outputs.url}}
-      package: ${{steps.make.outputs.package}}
+      project: ${{steps.make.outputs.project}}
     strategy:
       fail-fast: false
       matrix:
         node: ${{fromJson(needs.start.outputs.matrix)}}
 
-    name: "Mirroring"
+    name: "M"
     runs-on: [Ubuntu-latest]
     steps:
 
@@ -86,14 +91,14 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
-      - name: Import GPG key
+      - name: Import GPG key we need to sign repository
 
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.GPG_KEY1 }}
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
 
-      - name: Checkout
+      - name: Checkout Armbian OS scripts
         uses: actions/checkout@v3.4.0
         with:
           repository: armbian/os
@@ -127,108 +132,79 @@ jobs:
       - name: Download
         run: |
 
-          # this conversion is needed to support comma inside cell
-          tmpfile=$(mktemp)
-          cat os/external/projects.csv | awk -F\" 'BEGIN{OFS=FS;} {for(i=1;i<=NF;i=i+2){gsub(/,/,"~",$i);} print $0;}' > "${tmpfile}"
+          # default download folder
+          SOURCE="temp/"
+          mkdir -p ${SOURCE}
 
-          PROJECT=$(echo ${{ matrix.node }} | cut -d":" -f1)
-          RELEASE=$(echo ${{ matrix.node }} | cut -d":" -f2)
-          URL=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f2)
-          KEY=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f3)
-          TARGET=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f5)
-          METHOD=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f6)
-          INSTALL=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f7)
-          GLOB=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f8 | tr -d '"')
-          ARCH=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f9)
-          REPOSITORY=$(grep "$PROJECT~[^~]\+~[^~]\+~$RELEASE~" ${tmpfile} | cut -d"~" -f10)
-
-          echo "URL = $URL KEY = $KEY TARGET = $TARGET METHOD =$METHOD $GLOB $REPOSITORY"
-
+          # read config
+          . os/external/${{ matrix.node }}.conf
 
           # read existing releases
           ALL_RELEASES=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
 
           # recreate folder structure as we are uploading to our system
           for i in ${ALL_RELEASES[@]}; do
-              mkdir -p output/{debs,debs-beta}/${i}
-              mkdir -p output/{debs,debs-beta}/extra/${i}-utils
-              mkdir -p output/{debs,debs-beta}/extra/${i}-desktop
+              mkdir -p build/output/{debs,debs-beta}/${i}
+              mkdir -p build/output/{debs,debs-beta}/extra/${i}-utils
+              mkdir -p build/output/{debs,debs-beta}/extra/${i}-desktop
           done
 
           # we use different download metods (github, aplty)
           if [[ ${METHOD} == gh ]]; then
-              # where we are copying from
-              SOURCE="temp/"
+
               gh release download -p '*.deb' --repo ${URL} --dir temp
 
           elif [[ ${METHOD} == direct ]]; then
-              # where we are copying from
-              SOURCE="temp/"
-              mkdir -p ${SOURCE}
-              wget -O ${SOURCE}/${PROJECT}.deb ${URL}
+
+              wget -O ${SOURCE}/${{ matrix.node }}.deb ${URL}
+
           else
-              # where we are copying from
+              
               SOURCE="/home/runner/.aptly/public/"
               COMPONENT="main"
               [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
-              # generate mirror
               [[ $GLOB != Name* ]] && ADDITIONAL_FILTER="-filter-with-deps"
+              aptly -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${{ matrix.node }}-${RELEASE} ${URL} ${KEY} ${COMPONENT}
+              aptly -max-tries=3 mirror update ${{ matrix.node }}-${RELEASE}
+              aptly snapshot create ${{ matrix.node }}-${RELEASE} from mirror ${{ matrix.node }}-${RELEASE}
+              aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${{ matrix.node }}-${RELEASE}
 
-              aptly -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${PROJECT}-${RELEASE} ${URL} ${KEY} ${COMPONENT}
-              aptly -max-tries=3 mirror update ${PROJECT}-${RELEASE}
-              aptly snapshot create ${PROJECT}-${RELEASE} from mirror ${PROJECT}-${RELEASE}
-              # publish
-              aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${PROJECT}-${RELEASE}
           fi
-          ls -l $SOURCE
-          # copy to location
-
-          find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-rk3399_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-tegrax1_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-rpi3arm64*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-android*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "codium_*" | sort | head -n -3 | xargs sudo rm || true
-          find $SOURCE -type f -name "firefox-dev*" | xargs sudo rm || true
-          find $SOURCE -type f -name "firefox-dbg*" | xargs sudo rm || true
-          find $SOURCE -type f -name "nala_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "code_*arm64*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "code_*amd64*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "code_*armhf*" | sort | head -n -1 | xargs sudo rm || true
-
-          # zulu cleaning
-          find $SOURCE -type f -name "zulu*-demo*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "zulu*-src*" | sort | head -n -1 | xargs sudo rm || true
 
           if [[ ${TARGET} == main ]]; then
-              if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs-beta/ \;; fi
-              if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/ \;; fi
+                  if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
+                  if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/ \;; fi
           elif [[ ${RELEASE} == all ]]; then
               for i in ${ALL_RELEASES[@]}; do
-                  if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs-beta/extra/${i}-${TARGET} \;; fi
-                  if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${i}-${TARGET} \;; fi
+                  if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/extra/${i}-${TARGET} \;; fi
+                  if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/extra/${i}-${TARGET} \;; fi
               done
           else
-              if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs-beta/extra/${RELEASE}-${TARGET} \;; fi
-              if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} output/debs/extra/${RELEASE}-${TARGET} \;; fi
+              if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/extra/${RELEASE}-${TARGET} \;; fi
+              if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/extra/${RELEASE}-${TARGET} \;; fi
           fi
 
-          echo "<details><summary>Show packages</summary><p><code>" >> $GITHUB_STEP_SUMMARY
-          find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev >> $GITHUB_STEP_SUMMARY
+          #tree build/output
+
+          # store infor to GitHub Actions
+          echo "<details><summary>Show packages</summary><p>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "</code></details>" >> $GITHUB_STEP_SUMMARY
+          find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev | sed -e 's/^/- /;'>> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
 
           cd build/tools/repository
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' aptly.conf
-          ./repo -c update -i ../../../output/debs-beta -o ../../../output/repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
-          cd ..
-          cd ..
-          cd ..
-          tree
-          rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${PROJECT} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${PROJECT}"
+
+          #sed 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' build/tools/repository/aptly.conf > aptly.conf
+          #sed 's|"rootDir": ".*"|"rootDir": "build/output"|g' aptly.conf
+
+          # we check beta as there it goes always
+          ./repo -c update -i ../../output/debs-beta -o repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
+          #cd ..; cd ..
+          #tree
+          #build/tools/repository/repo -c update -i build/output/debs-beta -o build/output/repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
+          rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
       - name: Deploy to server
         if: inputs.REFERENCE == 'main'
@@ -249,7 +225,8 @@ jobs:
         run: |
 
           cd downloads
-          echo "armbian.tnahosting.net/artifacts/${{ env.PR_NUMBER }}/" > url.txt
+          echo "armbian.tnahosting.net/" > url.txt
+          echo "artifacts/${{ env.PR_NUMBER }}/" > path.txt
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
@@ -281,17 +258,22 @@ jobs:
         id: json
         run: |
 
-          echo $url
-
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
-          packages=$(
-          while IFS="," read -r rec_column1 rec_column2 rec_column3 rec_column4 rec_column5 rec_column6 rec_column7 rec_column8
-          do
-              echo "$rec_column1:$rec_column7"
-          done < <(tail -n +2 os/external/projects.csv | grep -v "^\s*[#;]")
-          )
-          dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+          #packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))          
+          #dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+          #for i in ${packages[@]}; do
+          #    for j in ${dockerimages[@]}; do
+          #    echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
+          #    done
+          #done | jq -s >> $GITHUB_OUTPUT
+          packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))
           for i in ${packages[@]}; do
+              . os/external/${i}.conf
+              if [[ $RELEASE != all ]]; then
+                  dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$RELEASE"))
+                else
+                  dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+              fi
               for j in ${dockerimages[@]}; do
               echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
               done
@@ -306,12 +288,19 @@ jobs:
       matrix:
         image: ${{ fromJSON(needs.test.outputs.matrix) }}
 
-    name: Test install
+    name: "I"
     timeout-minutes: 10
     runs-on: ubuntu-latest
     container:
         image: "${{ matrix.image.image }}"
     steps:
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
 
       - name: Download a single artifact
         uses: actions/download-artifact@v3
@@ -319,13 +308,22 @@ jobs:
           name: assets-for-download
           path: downloads
 
+      - name: Checkout Armbian OS Config
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/os
+          ref: ${{ inputs.REFERENCE }}
+          clean: false
+          fetch-depth: 1
+          path: os
+
       - name: Install
         run: |
 
-          URL=$(cat downloads/url.txt)$(echo "${{ matrix.image.package }}" | cut -d":" -f1)
+          # source vars
+          . "os/external/${{ matrix.image.package }}.conf"
 
-          #ls -l
-          #ls -l url || true
+          URL=$(cat downloads/url.txt)$(cat downloads/path.txt)$(echo "${{ matrix.image.package }}" | cut -d":" -f1)
 
           export DEBIAN_FRONTEND=noninteractive
           RELEASE=$(echo "${{ matrix.image.image }}" | cut -d":" -f2)
@@ -341,7 +339,56 @@ jobs:
           apt upgrade -y
 
           # install packages / except howdy as its too large
-          apt install -y $(echo "${{ matrix.image.package }}" | cut -d":" -f2)
+          export DEBIAN_FRONTEND=noninteractive
+          for i in ${INSTALL}; do
+          apt-get install -y $i
+          done
 
-          # cleanup
-          [[ -n "${URL}" ]] && ssh artifacts@armbian.tnahosting.net rm -r ${URL}
+
+
+  clean:
+
+    name: "Clean"
+    needs: gradle
+    runs-on: ubuntu-latest
+    outputs:
+      matrix:  ${{steps.json.outputs.JSON_CONTENT}}
+    steps:
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: assets-for-download
+          path: downloads
+
+      - name: Checkout Armbian OS Config
+        uses: actions/checkout@v3.3.0
+        with:
+          repository: armbian/os
+          ref: ${{ inputs.REFERENCE }}
+          clean: false
+          fetch-depth: 1
+          path: os
+
+
+      - name: "Make JSON"
+        id: json
+        run: |
+
+          packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))
+          for i in ${packages[@]}; do
+              ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "rm -r $(cat downloads/path.txt)/${i}"
+          done
+
+      - name: "Lets clean artifacts that are useless"
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: assets-for-download
+          failOnError: false
