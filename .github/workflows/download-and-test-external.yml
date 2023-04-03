@@ -49,7 +49,6 @@ jobs:
         with:
           repository: armbian/os
           path: os
-#          ref: ${{ inputs.REFERENCE }}
           fetch-depth: '2'
           clean: false
 
@@ -66,9 +65,7 @@ jobs:
         run: |
 
           MATRIX=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
-          #MATRIX=$(
-          #find os/external/*.conf -printf '%f\n' | cut -d"." -f1
-          #)
+          [[ -z "${{ steps.changed-files.outputs.all_changed_files }}" ]] && MATRIX=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
           echo "matrix=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
   download:
@@ -163,13 +160,27 @@ jobs:
               SOURCE="/home/runner/.aptly/public/"
               COMPONENT="main"
               [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
-              [[ $GLOB != Name* ]] && ADDITIONAL_FILTER="-filter-with-deps"
-              aptly -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${{ matrix.node }}-${RELEASE} ${URL} ${KEY} ${COMPONENT}
+              [[ $GLOB != *Name* && $GLOB != *Version* ]] && ADDITIONAL_FILTER="-filter-with-deps"
+              aptly -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${{ matrix.node }}-${RELEASE} $(echo ${URL}) $(echo ${KEY}) $(echo ${COMPONENT})
               aptly -max-tries=3 mirror update ${{ matrix.node }}-${RELEASE}
               aptly snapshot create ${{ matrix.node }}-${RELEASE} from mirror ${{ matrix.node }}-${RELEASE}
               aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${{ matrix.node }}-${RELEASE}
 
           fi
+
+          # clean workaround
+          find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-rk3399_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-tegrax1_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-rpi3arm64*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-rpi4arm64*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box*-android*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "chromium-browser_*" | sort | head -n -3 | xargs sudo rm || true
+          find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true  
+          find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
 
           if [[ ${TARGET} == main ]]; then
                   if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
@@ -206,6 +217,8 @@ jobs:
           #build/tools/repository/repo -c update -i build/output/debs-beta -o build/output/repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
           rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
+          pwd
+
       - name: Deploy to server
         if: inputs.REFERENCE == 'main'
         run: |
@@ -213,10 +226,10 @@ jobs:
           sudo apt-get -y -qq install lftp
 
           # upload beta repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
 
           # upload stable repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms output/debs/ debs/ ;bye" sftp://users.armbian.com
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs/ debs/ ;bye" sftp://users.armbian.com
 
       - name: Create a temporary artifact folder
         run: mkdir downloads
@@ -244,32 +257,40 @@ jobs:
       matrix:  ${{steps.json.outputs.JSON_CONTENT}}
     steps:
 
-      - name: Checkout Armbian OS Config
-        uses: actions/checkout@v3.3.0
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
         with:
           repository: armbian/os
-          ref: ${{ inputs.REFERENCE }}
-          clean: false
-          fetch-depth: 1
           path: os
+          fetch-depth: '2'
+          clean: false
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          path: os
+          files: |
+            external/*.conf
 
       - name: "Make JSON"
         id: json
         run: |
 
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
-          #packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))          
-          #dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+          #packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))                    
           #for i in ${packages[@]}; do
           #    for j in ${dockerimages[@]}; do
           #    echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
           #    done
           #done | jq -s >> $GITHUB_OUTPUT
-          packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))
+          packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
+          [[ -z "${{ steps.changed-files.outputs.all_changed_files }}" ]] && packages=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
           for i in ${packages[@]}; do
               . os/external/${i}.conf
+              [[ -z $INSTALL ]] && continue
               if [[ $RELEASE != all ]]; then
+                  dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
                   dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$RELEASE"))
                 else
                   dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
@@ -368,21 +389,29 @@ jobs:
           name: assets-for-download
           path: downloads
 
-      - name: Checkout Armbian OS Config
-        uses: actions/checkout@v3.3.0
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
         with:
           repository: armbian/os
-          ref: ${{ inputs.REFERENCE }}
-          clean: false
-          fetch-depth: 1
           path: os
+          fetch-depth: '2'
+          clean: false
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          path: os
+          files: |
+            external/*.conf
 
       - name: "Make JSON"
         id: json
         run: |
 
-          packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))
+          #packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))
+          packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
+          [[ -z "${{ steps.changed-files.outputs.all_changed_files }}" ]] && packages=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
           for i in ${packages[@]}; do
               ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "rm -r $(cat downloads/path.txt)/${i}"
           done
