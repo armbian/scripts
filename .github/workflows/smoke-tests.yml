@@ -53,7 +53,7 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 60
     strategy:
-      #max-parallel: 16
+      max-parallel: 1
       fail-fast: false
       matrix:
 
@@ -76,9 +76,6 @@ jobs:
           known_hosts: github.com ssh-rsa AAAAB3Nz
           if_key_exists: replace
           
-      - name: Copy SSH keys
-        run: ls -l ~/.ssh/
-
       - name: Read values
         run: |
 
@@ -214,9 +211,6 @@ jobs:
         with:
           name: status
           path: status
-
-      - name: remove SSH keys
-        run: rm -f ~/.ssh/${{ env.RANDOM }}
 
   Stop:
     name: "Test"
