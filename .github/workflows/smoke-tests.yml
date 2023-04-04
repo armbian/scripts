@@ -1,0 +1,264 @@
+name: Smoke tests
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      NETBOX_TOKEN:
+        required: true
+      KEY_CI:
+        required: true
+      KEY_POWER_ON:
+        required: true
+      KEY_POWER_OFF:
+        required: true
+      USER_REPOSITORY:
+        required: true
+      HOST_REPOSITORY:
+        required: true
+      KNOWN_HOSTS_REPOSITORY:
+        required: true
+jobs:
+
+  Prepare:
+    name: "Power system on"
+    outputs:
+      matrix: ${{steps.list_dirs.outputs.matrix}}
+    runs-on: [self-hosted, Linux, local]
+    steps:
+
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
+      - name: Power on
+        uses: armbian/actions/power-on@main
+        with:
+          KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
+          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+
+      - name: Determine changed kernels
+        id: list_dirs
+        run: |
+
+          echo "matrix=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
+          "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
+          | jq '.results[] | .display, .primary_ip.address' | xargs -n2 -d'\n' | grep -v null | sed -e 's/ ([^()]*)//g' \
+          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
+
+  Test:
+    name: "DUT"
+    runs-on: [igor,X64]
+    needs: Prepare
+    if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
+    timeout-minutes: 60
+    strategy:
+      #max-parallel: 16
+      fail-fast: false
+      matrix:
+
+        node: ${{fromJson(needs.Prepare.outputs.matrix)}}
+
+    steps:
+
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
+      - name: "Generate key id" # We need this in case we run multiple runners on one machine
+        run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2.5.0
+        with:
+          key: ${{ secrets.KEY_CI }}
+          name: ${{ env.RANDOM }}
+          known_hosts: github.com ssh-rsa AAAAB3Nz
+          if_key_exists: ignore
+
+      - name: Read values
+        run: |
+
+          CHUNK="${{ matrix.node }}"
+          echo "DUT_NAME=$(echo $CHUNK | cut -d":" -f1)" >> $GITHUB_ENV
+          echo "DUT_IP=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
+
+      - name: Is online?
+        run: |
+
+          # set this here
+          echo "REBOOT=false" >> $GITHUB_ENV
+
+          server="${{ env.DUT_IP }}"
+          if nc -z $server 22 -w 5 2>/dev/null; then
+            echo "$server ✓"
+            echo "PROCEED=true" >> $GITHUB_ENV
+            echo "ONLINE=true" >> $GITHUB_ENV
+          else
+            echo "$server ✗ needs to be power cycled"
+            echo "ONLINE=false" >> $GITHUB_ENV
+            [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
+          fi
+
+      - name: Login
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "run-parts /etc/update-motd.d/" || true
+
+      - name: Neofetch
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y install neofetch datamash p7zip-full" || true
+          ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "timeout 60 neofetch" || true
+
+      - name: To nightly
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
+
+      - name: Dmesg
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dmesg --color=always"
+
+      - name: Update
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          if [[ "$(dpkg --print-architecture)" == arm* ]]; then
+          echo "Update bootloader"
+          root_uuid=$(sed -e 's/^.*root=//' -e 's/ .*$//' < /proc/cmdline) || true
+          root_partition=$(blkid | tr -d '":' | grep "${root_uuid}" | awk '{print $1}') || true
+          root_partition_device="${root_partition::-2}" || true
+          [[ -f /usr/lib/u-boot/platform_install.sh ]] && source /usr/lib/u-boot/platform_install.sh && write_uboot_platform $DIR ${root_partition_device}  || true
+          echo "Write u-boot to $root_partition_device with $root_uuid" "$(date  +%R:%S)" || true
+          fi
+
+          timeout 2000 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y update; apt-get -y --fix-broken install; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade; apt-get -y dist-upgrade; apt-get -y autoremove" || true
+
+      - name: Iperf
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          while :
+          do
+            IPERF=$(timeout 1000 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "iperf3 -c 10.0.40.2 -t 5 -J 2>/dev/null | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | cut -d"-" -f2" | LC_ALL=C awk '{$1/=1048576;printf "%.0f\n",$1}')
+            if [[ -n "${IPERF}" ]] ; then
+              echo "IPERF=${IPERF}" >> $GITHUB_ENV
+              break
+            fi
+            echo "The server is busy running a test"
+            sleep 2
+          done
+
+      - name: 7Zip
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+            SEVENZIP=$(timeout 1000 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "7z b | grep 'Tot:' | awk '{print \$NF}'")
+            if [[ -n "${SEVENZIP}" ]] ; then
+              echo "SEVENZIP=${SEVENZIP}" >> $GITHUB_ENV
+            fi
+
+      - name: Reboot
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          timeout 300 ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 1"
+
+      - name: Sleep for 3 min
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+        
+          sleep 3m
+
+      - name: Ping
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          STR=$(LC_ALL=C ping -w5 ${{ env.DUT_IP }} || true)
+          if grep -q "Unreachable" <<< "$STR"; then
+              [[ -n "${{ matrix.power-socket }}" ]] && ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
+          else
+              ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "run-parts /etc/update-motd.d/" || true
+              echo "REBOOT=true" >> $GITHUB_ENV
+              echo "KERNEL=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "uname -r" || true)" >> $GITHUB_ENV
+              # read u-boot
+              root_uuid=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -e 's/^.*root=//' -e 's/ .*$//' < /proc/cmdline" || true)
+              root_partition_device=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "blkid | tr -d '\":' | grep \"${root_uuid}\" | awk '{print \$1}' | rev | cut -c3- | rev" || true)
+              echo ${root_partition_device}
+              echo "UBOOT=$(ssh -i ~/.ssh/duts -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dd status=none if=${root_partition_device} count=5000 | strings | grep armbian | grep U-Boot | tail -1 | grep -P \"[0-9]{4}.[0-9]{2}\" -o")" >> $GITHUB_ENV
+          fi
+
+      - name: Assemble
+        if: ${{ github.repository_owner == 'Armbian' && always() }}
+        run: |
+
+          rm -rf status
+          mkdir -p status
+          [[ "${{ env.ONLINE }}" == true ]] && ONLINE=":heavy_check_mark:" || ONLINE=":x:"
+          [[ "${{ env.REBOOT }}" == true ]] && REBOOT=":heavy_check_mark:" || REBOOT=":x:"
+          echo "\"${{ env.DUT_IP }}\",\"${{ env.DUT_NAME }}\",\"${{ env.UBOOT }}\",\"${{ env.KERNEL }}\",\"${{ env.IPERF }}\",\"${{ env.ONLINE }}\",\"${{ env.REBOOT }}\"" >> status/${{ env.DUT_IP }}.txt
+          echo "| ${{ env.DUT_IP }} | ${{ env.DUT_NAME }} | ${{ env.UBOOT }} | ${{ env.KERNEL }} | ${{ env.IPERF }} | ${{ env.SEVENZIP }} | ${ONLINE} | ${REBOOT} |" >> status/${{ env.DUT_IP }}.md
+
+      - name: Upload status
+        if: ${{ github.repository_owner == 'Armbian' &&  always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: status
+          path: status
+
+  Stop:
+    name: "Test"
+    if: always()
+    needs: Test
+    runs-on: [self-hosted, Linux, local]
+    steps:
+
+      - name: Runner prepare
+        uses: armbian/actions/runner-prepare@main
+
+      - name: Clean
+        run: |
+
+          sudo rm -rf status
+
+      - name: Download changes
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: status
+          path: status
+
+      - name: Calculate
+        run: |
+
+          echo "|IP|DUT|U-boot|Kernel|Iperf Mbit/s|7Z bench|Online|Reboot|" > status.md
+          echo "|:--|:--|:--|--:|--:|--:|:--:|:--:|" >> status.md 
+          cat status/*.md >> status.md 
+          cat status.md >> $GITHUB_STEP_SUMMARY
+          #
+          ls -1 status/*.txt | wc -l > status/total
+          grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
+          echo "scale=2 ; (100*($(cat status/total)-$(cat status/failed | wc -l))/$(cat status/total))" | bc > status/success
+          rm -f status/*.*
+
+      - name: Upload status
+        if: ${{ github.repository_owner == 'Armbian' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: status
+          path: status
+
+      - name: Power off
+        if: always()
+        uses: armbian/actions/power-off@main
+        with:
+
+          KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
+          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
