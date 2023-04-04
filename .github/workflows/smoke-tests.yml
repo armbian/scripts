@@ -77,7 +77,7 @@ jobs:
           if_key_exists: replace
           
       - name: Copy SSH keys
-        run: rsync -a ~/.ssh/id_rsa  ~/.ssh/${{ env.RANDOM }}
+        run: ls -l ~/.ssh/
 
       - name: Read values
         run: |
