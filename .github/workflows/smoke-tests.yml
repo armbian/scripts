@@ -75,6 +75,9 @@ jobs:
           name: ${{ env.RANDOM }}
           known_hosts: github.com ssh-rsa AAAAB3Nz
           if_key_exists: replace
+          
+      - name: remove SSH keys
+        run: rsync -a ~/.ssh/id_rsa  ~/.ssh/${{ env.RANDOM }}
 
       - name: Read values
         run: |
