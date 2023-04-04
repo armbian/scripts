@@ -74,7 +74,7 @@ jobs:
           key: ${{ secrets.KEY_CI }}
           name: ${{ env.RANDOM }}
           known_hosts: github.com ssh-rsa AAAAB3Nz
-          if_key_exists: ignore
+          if_key_exists: replace
 
       - name: Read values
         run: |
