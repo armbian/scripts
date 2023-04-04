@@ -65,7 +65,7 @@ jobs:
         run: |
 
           MATRIX=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
-          [[ ${{ inputs.REFERENCE }} == main ]] && MATRIX=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
+          [[ "${{ inputs.REFERENCE }}" == main || -n  "${{ inputs.REFERENCE }}" ]] && MATRIX=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
           echo "matrix=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
   download:
