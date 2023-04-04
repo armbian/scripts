@@ -53,7 +53,7 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 60
     strategy:
-      max-parallel: 32
+      # max-parallel: 32
       fail-fast: false
       matrix:
 
