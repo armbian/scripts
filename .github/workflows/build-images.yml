@@ -158,6 +158,9 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
+      - name: Copy SSH keys
+        run: rsync -a ~/.ssh/${{ env.RANDOM }}  /tmp/${{ env.RANDOM }} # need to copy it outside as action deletes them all
+
       - name: Cleanup
         run: |
           sudo rm -rf build/output/images/* || true
@@ -228,7 +231,7 @@ jobs:
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
-          lftp -u upload, -e "set sftp:connect-program ssh -ax -i $HOME/.ssh/${{ env.RANDOM }}; set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ images/ ;bye" sftp://users.armbian.com
+          lftp -u upload, -e "set sftp:connect-program ssh -ax -i /tmp/${{ env.RANDOM }}; set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ images/ ;bye" sftp://users.armbian.com
 
       - name: Cleanup
         run: |
@@ -238,3 +241,6 @@ jobs:
           # remove other projects
           PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
           find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT} -exec sudo rm -rf {} + || true
+
+      - name: Remove SSH keys
+        run: rm -f /tmp/${{ env.RANDOM }}
