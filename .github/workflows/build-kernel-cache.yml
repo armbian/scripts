@@ -142,6 +142,9 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
+      - name: Copy SSH keys
+        run: rsync -a ~/.ssh/${{ env.RANDOM }}  /tmp/${{ env.RANDOM }} # need to copy it outside as action deletes them all
+
       - name: Deploy to server
         if: ${{ github.repository_owner == 'Armbian' }}
         run: |
@@ -149,3 +152,6 @@ jobs:
              sudo apt-get -y -qq install lftp
           fi
           lftp -u upload, -e "set sftp:connect-program ssh -ax -i $HOME/.ssh/${{ env.RANDOM }}; set net:timeout 4;set net:max-retries 6;mirror -R --include-glob *.deb --no-empty-dirs --parallel=8 --no-perms output/debs/. debs-beta/ ;bye" sftp://users.armbian.com
+
+      - name: Remove SSH keys
+        run: rm -f /tmp/${{ env.RANDOM }}
