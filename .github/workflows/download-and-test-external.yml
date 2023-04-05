@@ -156,7 +156,7 @@ jobs:
               wget -O ${SOURCE}/${{ matrix.node }}.deb ${URL}
 
           else
-              
+
               SOURCE="/home/runner/.aptly/public/"
               COMPONENT="main"
               [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
@@ -179,7 +179,7 @@ jobs:
           find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-browser_*" | sort | head -n -3 | xargs sudo rm || true
-          find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true  
+          find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
 
           if [[ ${TARGET} == main ]]; then
@@ -195,6 +195,23 @@ jobs:
               if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/extra/${RELEASE}-${TARGET} \;; fi
           fi
 
+
+      - name: Deploy to server
+        if: inputs.REFERENCE == 'main'
+        run: |
+
+          sudo apt-get -y -qq install lftp
+
+          # upload beta repository
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
+
+          # upload stable repository
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs/ debs/ ;bye" sftp://users.armbian.com
+
+
+      - name: Build testing repository
+        run: |
+
           #tree build/output
 
           # store infor to GitHub Actions
@@ -205,6 +222,7 @@ jobs:
           echo "</details>" >> $GITHUB_STEP_SUMMARY
 
           cd build/tools/repository
+          mkdir -p repository/public # this needs to be moved to the repo generation
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' aptly.conf
 
           #sed 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' build/tools/repository/aptly.conf > aptly.conf
@@ -218,18 +236,6 @@ jobs:
           rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
           pwd
-
-      - name: Deploy to server
-        if: inputs.REFERENCE == 'main'
-        run: |
-
-          sudo apt-get -y -qq install lftp
-
-          # upload beta repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
-
-          # upload stable repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs/ debs/ ;bye" sftp://users.armbian.com
 
       - name: Create a temporary artifact folder
         run: mkdir downloads
