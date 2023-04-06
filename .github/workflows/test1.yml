@@ -1,0 +1,21 @@
+name: Rebuild kernels and repository
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize, review_requested]
+    paths:
+      - 'external/*.conf'
+  workflow_dispatch:
+
+jobs:
+
+  Cancel:
+    name: "Execute workflow"
+    if: ${{ github.repository_owner == 'Armbian' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          repository: username/my-repo
+          event-type: my-event
