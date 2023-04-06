@@ -18,4 +18,4 @@ jobs:
         with:
           token: ${{ secrets.TEST }}
           repository: armbian/os
-          event-type: update
+          event-type: "Repository update"
