@@ -17,5 +17,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
-          repository: username/my-repo
-          event-type: my-event
+          repository: armbian/os
+          event-type: update
