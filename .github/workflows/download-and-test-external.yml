@@ -203,10 +203,10 @@ jobs:
           sudo apt-get -y -qq install lftp
 
           # upload beta repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
 
           # upload stable repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror --Remove-source-files -R --no-empty-dirs --parallel=8 --no-perms build/output/debs/ debs/ ;bye" sftp://users.armbian.com
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/debs/ debs/ ;bye" sftp://users.armbian.com
 
 
       - name: Build testing repository
