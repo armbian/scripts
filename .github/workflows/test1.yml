@@ -16,6 +16,6 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.TEST }}
+          token: ${{ secrets.ACCESS_TOKEN }}
           repository: armbian/os
           event-type: "Repository update"
