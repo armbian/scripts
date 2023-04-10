@@ -114,7 +114,7 @@ jobs:
     if: ${{ needs.prepare.outputs.matrix != '[]' && needs.prepare.outputs.matrix != '' }}
     timeout-minutes: 120
     strategy:
-      max-parallel: "${{ needs.prepare.outputs.parallel || '16' }}" # we are running 6 chunks which comes to 96 parallel builds (could be too much)
+      max-parallel: "${{ needs.prepare.outputs.parallel || 16 }}" # we are running 6 chunks which comes to 96 parallel builds (could be too much)
       fail-fast: false # let other jobs try to complete if one fails
       matrix:
         include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
