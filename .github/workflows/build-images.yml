@@ -45,7 +45,7 @@ jobs:
   prepare:
 
     name: "JSON"
-    if: ${{ github.repository_owner == 'armbian' }}
+    #if: ${{ github.repository_owner == 'armbian' }}
     runs-on: ubuntu-latest
     outputs:
       matrix:  ${{steps.json.outputs.JSON_CONTENT}}
@@ -176,7 +176,7 @@ jobs:
           rsync -av os/userpatches/. build/userpatches/
 
       - name: Create images BOARD="${{env.BOARD}}" BRANCH="${{env.BRANCH}}" RELEASE="${{env.RELEASE}}"
-        if: ${{ github.repository_owner == 'Armbian' }}
+        #if: ${{ github.repository_owner == 'Armbian' }}
         id: rootfs
         run: |
 
@@ -214,7 +214,8 @@ jobs:
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes build/output/images/${{env.BOARD}}/archive/*.img.xz
 
       - name: "Upload artefacts"
-        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.release != 'stable' }}
+        #if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.release != 'stable' }}
+        if: ${{ github.event.inputs.release != 'stable' }}
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/output/images/*/*/Armbian_${{ inputs.version }}*.*"
@@ -228,7 +229,8 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Deploy to server
-        if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.release == 'stable' }}
+        #if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.release != 'stable' }}
+        if: ${{ github.event.inputs.release == 'stable' }}
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
