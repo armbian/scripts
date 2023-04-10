@@ -222,7 +222,7 @@ jobs:
           omitBody: true
           replacesArtifacts: true
           omitName: true
-          omitDraftDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
           allowUpdates: true
           artifactErrorsFailBuild: false
           token: ${{ secrets.ACCESS_TOKEN }}
