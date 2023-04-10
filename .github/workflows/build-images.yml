@@ -241,8 +241,9 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Deploy to server
-        #if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.release != 'stable' }}
-        if: ${{ github.event.inputs.release == 'stable' && github.event.secrets.SSH_KEY_TORRENTS != '' }}
+        env:
+          SSH_KEY_TORRENTS: ${{ secrets.SSH_KEY_TORRENTS }}
+        if: env.SSH_KEY_TORRENTS != null && github.event.inputs.release == 'stable'
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
