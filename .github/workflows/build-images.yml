@@ -152,6 +152,7 @@ jobs:
           path: os
 
       - name: Install SSH key for storage
+        if: ${{ secrets.SSH_KEY_TORRENTS != '' }} 
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_KEY_TORRENTS }}
@@ -160,6 +161,7 @@ jobs:
           if_key_exists: replace
 
       - name: Copy SSH keys
+        if: ${{ secrets.SSH_KEY_TORRENTS != '' }} 
         run: rsync -a ~/.ssh/${{ env.RANDOM }}  /tmp/${{ env.RANDOM }} # need to copy it outside as action deletes them all
 
       - name: Cleanup
@@ -203,12 +205,14 @@ jobs:
            DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base
 
       - name: Import GPG key
+        if: ${{ secrets.GPG_KEY1 != '' }} 
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.GPG_KEY1 }}
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
 
       - name: Sign
+        if: ${{ secrets.GPG_KEY1 != '' }} 
         run: |
 
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes build/output/images/${{env.BOARD}}/archive/*.img.xz
@@ -230,7 +234,7 @@ jobs:
 
       - name: Deploy to server
         #if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.release != 'stable' }}
-        if: ${{ github.event.inputs.release == 'stable' }}
+        if: ${{ github.event.inputs.release == 'stable' && secrets.SSH_KEY_TORRENTS != '' }}
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
