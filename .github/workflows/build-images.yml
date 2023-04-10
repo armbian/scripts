@@ -212,7 +212,9 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
 
       - name: Sign
-        if: ${{ github.event.secrets.GPG_KEY1 != '' }} 
+        env:
+          MY_SECRET: ${{ secrets.GPG_KEY1 }}
+        if: env.GPG_KEY1 != null
         run: |
 
           echo ${{ secrets.GPG_PASSPHRASE1 }} | gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes build/output/images/${{env.BOARD}}/archive/*.img.xz
