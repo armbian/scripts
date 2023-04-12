@@ -230,7 +230,7 @@ jobs:
 
       - name: "Upload artefacts"
         #if: ${{ github.repository_owner == 'Armbian' && github.event.inputs.release != 'stable' }}
-        if: ${{ github.event.inputs.release != 'stable' }}
+        if: ${{ inputs.release != 'stable' }}
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/output/images/*/*/Armbian_${{ inputs.version }}*.*"
@@ -246,7 +246,7 @@ jobs:
       - name: Deploy to server
         env:
           SSH_KEY_TORRENTS: ${{ secrets.SSH_KEY_TORRENTS }}
-        if: env.SSH_KEY_TORRENTS != null && github.event.inputs.release == 'stable'
+        if: env.SSH_KEY_TORRENTS != null && inputs.release == 'stable'
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
