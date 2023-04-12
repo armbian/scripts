@@ -33,7 +33,7 @@ do
 
 	mkdir -p actions-runner-${i}
 	tar xzf .tmp/actions-runner-linux-${ARCH}-${LATEST}.tar.gz -C actions-runner-${i}
-	sh -c "cd actions-runner-${i} ; ./config.sh --url https://github.com/armbian --token ${TOKEN} --labels qemu,cache --name $NAME-${i} --unattended"
+	sh -c "cd actions-runner-${i} ; ./config.sh --url https://github.com/armbian --token ${TOKEN} --labels qemu --name $NAME-${i} --unattended"
 	sh -c "cd actions-runner-${i} ; sudo ./svc.sh install ; sudo ./svc.sh start"
 done
 rm -rf .tmp
