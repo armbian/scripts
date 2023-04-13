@@ -62,7 +62,8 @@ jobs:
         
           # Make a list of valid pairs from our config
           array=("alfa" "beta" "gama")
-          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
+          i=0
+          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT          
           for BRANCH in legacy current midstream edge; do
               FILES=$(cat os/targets/*.conf | grep $BRANCH | grep -v "^$" | grep -v "^#" | sed -n $LINE'p' | cut -d " " -f1 | uniq)
               if [ -z "${FILES}" ]; then
@@ -75,8 +76,11 @@ jobs:
               source build/config/boards/$line.wip 2> /dev/null || true
               source build/config/boards/$line.tvb 2> /dev/null || true
               source build/config/sources/families/${BOARDFAMILY}.conf 2> /dev/null || true
+              
               # runners are getting random tags from the pool
-              RUNNER=$(index=$(shuf -i 1-3 -n 1);echo ${array[$index]})
+              RUNNER=$(echo ${RUNNERS[$i]})
+              i=$((i+1))
+              [[ $i -eq 3 ]] && i=0
               echo "${LINUXFAMILY}:${BOARDFAMILY}:${BRANCH}:${line}:${RUNNER}"
               done <<< "$FILES"
           done | sort | uniq | sort -u -t: -k1,3 | cut -d":" -f3,4,5 | sort | uniq | sed "s/:/ /g" | awk '{ printf "%s%s%s\n", "{\"board\":\""$2"\",", "\"branch\":\""$1"\",", "\"runner\":\""$3"\"}" }' | jq -s >> $GITHUB_OUTPUT
