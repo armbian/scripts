@@ -22,6 +22,7 @@
 |JetHub|32|39 Gb|
 |Lane|96|93 Gb|
 |Xogium|14|7 Gb|
+|null|16|32 Gb|
 ## Donating Virtual Machine to Armbian?
 
 Our CI engine is hungry for CPU and memory resources. In case you have spare resources and you would like to donate it to Armbian, you can do it this way:
