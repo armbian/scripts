@@ -61,7 +61,7 @@ jobs:
         run: |
         
           # Make a list of valid pairs from our config
-          array=("alfa" "beta" "gama")
+          RUNNERS=("alfa" "beta" "gama")
           i=0
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT          
           for BRANCH in legacy current midstream edge; do
