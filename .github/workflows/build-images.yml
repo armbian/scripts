@@ -87,11 +87,25 @@ jobs:
         id: json
         run: |
 
-          # lets mix GitHub runners and ours
-          #array=("ubuntu-latest" "qemu" "qemu")
-          array=("ubuntu-latest" "ubuntu-latest" "ubuntu-latest")
-          echo runner=$(index=$(shuf -i 1-3 -n 1);echo ${array[$index]}) >> $GITHUB_OUTPUT
-          
+          FILES=$(cat os/targets/default.conf | grep -v "^$" | grep -v "^#" | sed -n $LINE'p')
+          while IFS= read -r line; do
+
+              BOARD=$(echo $line | cut -d " " -f1)
+              BOARDFAMILY=$(cat build/config/boards/${BOARD}.* | grep BOARDFAMILY | cut -d'"' -f2)
+              source build/config/boards/$line.conf 2> /dev/null || true
+              source build/config/boards/$line.wip 2> /dev/null || true
+              source build/config/boards/$line.tvb 2> /dev/null || true
+              source build/config/sources/families/${BOARDFAMILY}.conf 2> /dev/null || true
+
+              # pick runner tags
+              [[ $ARCH == arm* ]] && runner="ARM64"
+              [[ $ARCH == riscv64 ]] && runner="X64"
+
+              # add runner id as prefix
+              echo "$runner $line"
+
+          done <<< $FILES > targets.txt
+         
           # Prepare list
           cat os/targets/${{ inputs.config }} \
           | grep -v "^$\|^#" \
@@ -104,7 +118,7 @@ jobs:
           # Split list into chunks and convert it JSON          
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat targets.txt \
-          | awk '{print  "{\"board\":\""$1"\",\"branch\":\""$2"\",\"release\":\""$3"\",\"variant\":\""$4"\",\"desktop\":\""$7"\",\"app_group\":\""$9"\",\"runner_tags\":\"qemu\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
+          | awk '{print  "{\"runner_tags\":\""$1"\",\"board\":\""$2"\",\"branch\":\""$3"\",\"release\":\""$4"\",\"variant\":\""$5"\",\"desktop\":\""$6"\",\"app_group\":\""$10"\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   Docker:
@@ -128,7 +142,8 @@ jobs:
       APP_GROUP:       "${{ matrix.app_group }}"
       RUNNER_TAG:      "${{ matrix.runner_tag }}"
 
-    runs-on:  [ "${{ needs.prepare.outputs.runner || 'ubuntu-latest' }}" ]
+    #runs-on:  [ "${{ needs.prepare.outputs.runner || 'ubuntu-latest' }}" ]
+    runs-on: "${{ matrix.runner }}"
 
     steps:
 
