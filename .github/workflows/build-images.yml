@@ -107,6 +107,9 @@ jobs:
               # pick runner tags
               [[ $ARCH == arm* ]] && runner="ARM64"
               [[ $ARCH == riscv64 ]] && runner="X64"
+              
+              # OVERRIDE until we implement in clients
+              runner="ubuntu-latest"
 
               # add runner id as prefix
               echo "$runner $line"
