@@ -87,7 +87,14 @@ jobs:
         id: json
         run: |
 
-          FILES=$(cat os/targets/default.conf | grep -v "^$" | grep -v "^#" | sed -n $LINE'p')
+          # Prepare list
+          FILES=$(cat os/targets/${{ inputs.config }} \
+          | grep -v "^$\|^#" \
+          | awk '$6 != "no"' \
+          | grep " ${{ inputs.branch }} " \
+          | grep "${{ inputs.release }} " \
+          | grep "${{ inputs.variant }}" \
+          | grep "${{ inputs.board }}")
           while IFS= read -r line; do
 
               BOARD=$(echo $line | cut -d " " -f1)
@@ -105,16 +112,7 @@ jobs:
               echo "$runner $line"
 
           done <<< $FILES > targets.txt
-         
-          # Prepare list
-          cat os/targets/${{ inputs.config }} \
-          | grep -v "^$\|^#" \
-          | awk '$6 != "no"' \
-          | grep " ${{ inputs.branch }} " \
-          | grep "${{ inputs.release }} " \
-          | grep "${{ inputs.variant }}" \
-          | grep "${{ inputs.board }}" > targets.txt
-
+          
           # Split list into chunks and convert it JSON          
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat targets.txt \
