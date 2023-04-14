@@ -116,7 +116,7 @@ jobs:
           # Split list into chunks and convert it JSON          
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat targets.txt \
-          | awk '{print  "{\"runner_tags\":\""$1"\",\"board\":\""$2"\",\"branch\":\""$3"\",\"release\":\""$4"\",\"variant\":\""$5"\",\"desktop\":\""$6"\",\"app_group\":\""$10"\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
+          | awk '{print  "{\"runner\":\""$1"\",\"board\":\""$2"\",\"branch\":\""$3"\",\"release\":\""$4"\",\"variant\":\""$5"\",\"desktop\":\""$6"\",\"app_group\":\""$10"\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   Docker:
