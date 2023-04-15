@@ -254,6 +254,7 @@ jobs:
           omitBody: true
           replacesArtifacts: true
           omitName: true
+          makeLatest: false
           omitPrereleaseDuringUpdate: true
           allowUpdates: true
           artifactErrorsFailBuild: false
