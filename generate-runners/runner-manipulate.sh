@@ -7,7 +7,7 @@ ORG=armbian
 #NAME=ubuntu-latest
 DELETE=thx
 x=1
-while [ $x -le 9 ]
+while [ $x -le 9 ] # need to do it different as it can be more then 9 pages
 do
 RUNNER=$(
 curl -L \
