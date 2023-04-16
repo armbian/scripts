@@ -134,7 +134,7 @@ jobs:
           bash ./compile.sh kernel "BRANCH=${{env.BRANCH}}" "BOARD=${{env.BOARD}}" SHARE_LOG=yes CLEAN_LEVEL="alldebs" FORCE_ARTIFACTS_DOWNLOAD="yes"
 
       - name: Install SSH key for storage
-        if: env.SSH_KEY_TORRENTS != null && github.repository_owner == 'Armbian'
+        if: ${{ env.SSH_KEY_TORRENTS != null }}
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_TORRENTS }}
@@ -143,7 +143,7 @@ jobs:
           if_key_exists: replace
 
       - name: Deploy to server
-        if: env.SSH_KEY_TORRENTS != null && github.repository_owner == 'Armbian'
+        if: ${{ env.SSH_KEY_TORRENTS != null }}
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
