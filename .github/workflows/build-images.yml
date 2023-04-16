@@ -104,22 +104,23 @@ jobs:
               source build/config/boards/$line.tvb 2> /dev/null || true
               source build/config/sources/families/${BOARDFAMILY}.conf 2> /dev/null || true
 
-              runner="ubuntu-latest"
+              runner_1="ubuntu-latest"
+              runner_2="ubuntu-latest"
               # pick runner tags
               if [[ "${{ inputs.runner }}" == private ]]; then
-              [[ $ARCH == arm* ]] && runner="ARM64"
-              [[ $ARCH == riscv64 || $ARCH == amd64 ]] && runner="X64"
+                  [[ $ARCH == arm* ]] && runner_1="ARM64" && runner_2="fast"
+                  [[ $ARCH == riscv64 || $ARCH == amd64 ]] && runner_1="X64" && runner_2="fast"
               fi
 
               # add runner id as prefix
-              echo "$runner $line"
+              echo "$runner_1 $runner_2 $line"
 
           done <<< $FILES > targets.txt
           
           # Split list into chunks and convert it JSON          
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           split --number=l/${{ inputs.part }}/${{ inputs.of }} <<< cat targets.txt \
-          | awk '{print  "{\"board\":\""$2"\",\"branch\":\""$3"\",\"release\":\""$4"\",\"variant\":\""$5"\",\"desktop\":\""$8"\",\"app_group\":\""$10"\",\"runner\":\""$1"\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
+          |  awk '{print  "{\"board\":\""$3"\",\"branch\":\""$4"\",\"release\":\""$5"\",\"variant\":\""$6"\",\"desktop\":\""$9"\",\"app_group\":\""$11"\",\"runner_1\":\""$1"\",\"runner_2\":\""$2"\"}"}' | jq $FILTER | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   Docker:
@@ -141,10 +142,14 @@ jobs:
       VARIANT:         "${{ matrix.variant }}"
       DESKTOP:         "${{ matrix.desktop }}"
       APP_GROUP:       "${{ matrix.app_group }}"
-      RUNNER_TAG:      "${{ matrix.runner_tag }}"
 
     #runs-on:  [ "${{ needs.prepare.outputs.runner || 'ubuntu-latest' }}" ]
-    runs-on: "${{ matrix.runner }}"
+    #runs-on: [ ${{ matrix.runner }} ]    
+    #runs-on: [ '${{ matrix.runner }}' ]
+    #runs-on: [ARM64,fast]
+    runs-on:
+      - ${{ matrix.runner_1 }}
+      - ${{ matrix.runner_2 }}
 
     steps:
 
