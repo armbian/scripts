@@ -16,7 +16,11 @@ jobs:
         
       - name: Display
         run: |
-          
+          gh api \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /orgs/armbian/actions/runners/downloads
+
           # go up
           cd ../..
           # find out which this project is
