@@ -15,21 +15,11 @@ jobs:
         run: |
         
           sudo docker system prune -a --force
-        
+
       - name: Remove Other projects
         run: |
         
           cd ../..
-          # find out which this project is
-          PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
           # remove all
           sudo find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) \
-          -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT} -exec sudo rm -rf {} + || true
-
-      - name: Update runner
-        run: |
-        
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq upgrade
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq autoremove
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq clean
+          -mindepth 1 -maxdepth 1 ! -name "_*" -exec sudo rm -rf {} + || true
