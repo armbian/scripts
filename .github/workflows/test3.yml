@@ -29,7 +29,7 @@ jobs:
       - name: Update runner
         run: |
         
-          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq update
-          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq upgrade
-          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq autoremove
-          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq clean
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq upgrade
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq autoremove
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq clean
