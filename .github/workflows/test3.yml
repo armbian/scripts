@@ -1,6 +1,7 @@
 name: Maintain Runners
 on:
   workflow_dispatch:
+  push:
 
 jobs:
 
@@ -16,4 +17,5 @@ jobs:
       - name: Display
         run: |
           
-          env
+          PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
+          echo $PROJECT
