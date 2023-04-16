@@ -104,12 +104,12 @@ jobs:
               source build/config/boards/$line.tvb 2> /dev/null || true
               source build/config/sources/families/${BOARDFAMILY}.conf 2> /dev/null || true
 
-              # pick runner tags
-              [[ $ARCH == arm* ]] && runner="ARM64"
-              [[ $ARCH == riscv64 ]] && runner="X64"
-              
-              # OVERRIDE until we implement in clients
               runner="ubuntu-latest"
+              # pick runner tags
+              if [[ "${{ inputs.runner }}" == private ]]; then
+              [[ $ARCH == arm* ]] && runner="ARM64"
+              [[ $ARCH == riscv64 || $ARCH == amd64 ]] && runner="X64"
+              fi
 
               # add runner id as prefix
               echo "$runner $line"
