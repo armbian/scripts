@@ -17,7 +17,10 @@ jobs:
       - name: Display
         run: |
           
-          cd ..
-          cd ..
+          # go up
+          cd ../..
+          # find out which this project is
           PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
+          # remove all
           sudo find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT}
+          env
