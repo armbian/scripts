@@ -7,32 +7,13 @@ jobs:
   Prepare:
 
     name: Prepare
-    runs-on: Linux
-    if: ${{ github.repository_owner == 'armbian' }}
-    outputs:
-      matrix: ${{steps.list_dirs.outputs.matrix}}
+    runs-on: self-hosted
     steps:
 
       - name: Checkout repository
         uses: actions/checkout@v3.3.0
         
-      - name: Prepare matrix
-        id: list_dirs
+      - name: Display
         run: |
           
-          MATRIX="seq -w 01 10"
-          echo "matrix=$(echo for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)" >> $GITHUB_OUTPUT
-          
-  Purge:
-  
-    needs: [ Prepare ]
-    runs-on: [Linux]
-    timeout-minutes: 480
-    strategy:
-      fail-fast: false
-      matrix: 
-        node: ${{fromJson(needs.Prepare.outputs.matrix)}}
-    steps:
-   
-      - name: Runner prepare
-        run: echo "Test"
+          env
