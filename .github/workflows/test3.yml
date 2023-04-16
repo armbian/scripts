@@ -20,10 +20,8 @@ jobs:
         id: list_dirs
         run: |
           
-          echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           MATRIX="seq -w 01 10"
-          echo "matrix=$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -s) >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          echo "matrix=$(echo for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)" >> $GITHUB_OUTPUT
           
   Purge:
   
