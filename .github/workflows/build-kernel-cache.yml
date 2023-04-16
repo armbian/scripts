@@ -117,9 +117,9 @@ jobs:
           password: ${{ secrets.ACCESS_TOKEN }}    # GitHub actions builtin token. repo has to have pkg access.
 
       - name: Checkout build repo
-        uses: actions/checkout@v3 # We don't need to clone git, really. A wget would suffice for GH-hosted runners. But using clone is better for Igor-hosted runners.
+        uses: actions/checkout@v3
         with:
-          repository: armbian/build #${{ github.repository_owner }}/armbian-build
+          repository: ${{ github.repository_owner }}/build
           ref:  "${{ inputs.BUILD_BRANCH }}"
           fetch-depth: 1
           clean: false
@@ -127,17 +127,14 @@ jobs:
       - name: Build Kernel ${{env.BOARD}}:${{env.BRANCH}}
         id: kernel
         run: |
+
           # BRANCH and BOARD are in the env, but Docker doesn't know that; (sudo has --preserve-env). So we need to pass them as args.
           # SHARE_LOG=yes to share logs to pastebin
           sudo rm -rf output/debs/* || true
           bash ./compile.sh kernel "BRANCH=${{env.BRANCH}}" "BOARD=${{env.BOARD}}" SHARE_LOG=yes CLEAN_LEVEL="alldebs" FORCE_ARTIFACTS_DOWNLOAD="yes"
-          ls -l output/debs/
-          du output
-      - name: "Generate key id" # We need this in case we run multiple runners on one machine
-        run: echo "RANDOM=ID_$((RANDOM%100000000))" >> $GITHUB_ENV
-        shell: bash
 
       - name: Install SSH key for storage
+        if: env.SSH_KEY_TORRENTS != null && github.repository_owner == 'Armbian'
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_TORRENTS }}
@@ -145,16 +142,10 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
-      - name: Copy SSH keys
-        run: rsync -a ~/.ssh/${{ env.RANDOM }}  /tmp/${{ env.RANDOM }} # need to copy it outside as action deletes them all
-
       - name: Deploy to server
-        if: ${{ github.repository_owner == 'Armbian' }}
+        if: env.SSH_KEY_TORRENTS != null && github.repository_owner == 'Armbian'
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
-          lftp -u upload, -e "set sftp:connect-program ssh -ax -i /tmp/${{ env.RANDOM }}; set net:timeout 4;set net:max-retries 6;mirror -R --include-glob *.deb --no-empty-dirs --parallel=8 --no-perms output/debs/. debs-beta/ ;bye" sftp://users.armbian.com
-
-      - name: Remove SSH keys
-        run: rm -f /tmp/${{ env.RANDOM }}
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --include-glob *.deb --no-empty-dirs --parallel=8 --no-perms output/debs/. debs-beta/ ;bye" sftp://users.armbian.com
