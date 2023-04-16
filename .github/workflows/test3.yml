@@ -20,8 +20,7 @@ jobs:
         id: list_dirs
         run: |
           MATRIX="seq -w 01 10"
-          [[ -s changes ]] || unset MATRIX
-          echo ::set-output name=matrix::$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq)
+          echo "matrix=$(for x in $(eval $MATRIX); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq) >> $GITHUB_OUTPUT
   Purge:
   
     needs: [ Prepare ]
