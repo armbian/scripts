@@ -61,7 +61,7 @@ jobs:
 
     steps:
 
-      - name: Runner prepare
+      - name: Runner clean
         uses: armbian/actions/runner-clean@main
 
       - name: "Generate key id" # We need this in case we run multiple runners on one machine
@@ -225,8 +225,8 @@ jobs:
     runs-on: [self-hosted, Linux, local]
     steps:
 
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+      - name: Runner clean
+        uses: armbian/actions/runner-clean@main
 
       - name: Clean
         run: |
