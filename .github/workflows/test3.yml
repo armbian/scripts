@@ -11,10 +11,10 @@ jobs:
     runs-on: clean
     steps:
 
-      - name: Remove Docker images
+      - name: Remove dangling Docker images
         run: |
         
-          sudo docker system prune -a --force
+          sudo docker image prune -a --force
 
       - name: Remove Other projects
         run: |
