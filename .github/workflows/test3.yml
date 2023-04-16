@@ -16,6 +16,12 @@ jobs:
         
           sudo docker image prune -a --force
 
+      - name: Upgrade
+        run: |
+        
+          # install package aptdaemon
+          sudo aptdcon --safe-upgrade
+
       - name: Remove Other projects
         run: |
         
