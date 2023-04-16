@@ -17,5 +17,7 @@ jobs:
       - name: Display
         run: |
           
+          cd ..
+          cd ..
           PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
-          echo $PROJECT
+          sudo find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT}
