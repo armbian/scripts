@@ -8,25 +8,28 @@ jobs:
   Prepare:
 
     name: Prepare
-    runs-on: self-hosted
+    runs-on: clean
     steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v3.3.0
+      - name: Remove Docker images
+        run: |
         
-      - name: Display
-        run: |        
-          gh api \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          /orgs/armbian/actions/runners/downloads
-
-          # go up
+          sudo docker system prune -a --force
+        
+      - name: Remove Other projects
+        run: |
+        
           cd ../..
           # find out which this project is
           PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
           # remove all
-          sudo find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT}
-          env
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          sudo find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) \
+          -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT} -exec sudo rm -rf {} + || true
+
+      - name: Update runner
+        run: |
+        
+          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq update
+          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq upgrade
+          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq autoremove
+          yes | sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq clean
