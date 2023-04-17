@@ -18,9 +18,9 @@
 |Cats|12|15 Gb|
 |GitHub|40|136 Gb|
 |Hristov|16|15 Gb|
-|Igor|104|59 Gb|
+|Igor|56|90 Gb|
 |JetHub|32|39 Gb|
-|Lane|48|46 Gb|
+|Lane|32|31 Gb|
 ## Donating Virtual Machine to Armbian?
 
 Our CI engine is hungry for CPU and memory resources. In case you have spare resources and you would like to donate it to Armbian, you can do it this way:
