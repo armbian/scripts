@@ -25,4 +25,5 @@ jobs:
       - name: Show machines
         run: |
         
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           hcloud server list
