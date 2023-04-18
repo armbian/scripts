@@ -103,9 +103,8 @@ jobs:
 
     steps:
 
-      - name: "Fix permissions"
-        run: |
-          sudo chown -R $USER.$USER .
+      - name: Runner clean
+        uses: armbian/actions/runner-clean@main
 
         # Login to ghcr.io, for later uploading rootfs to ghcr.io
       - name: Docker Login to GitHub Container Registry
