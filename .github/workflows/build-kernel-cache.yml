@@ -34,9 +34,8 @@ jobs:
       matrix: ${{steps.json.outputs.JSON_CONTENT}}
     steps:
 
-      - name: "Fix permissions"
-        run: |
-          sudo chown -R $USER.$USER .
+      - name: Runner clean
+        uses: armbian/actions/runner-clean@main
 
       - name: Checkout Armbian Framework
         uses: actions/checkout@v3.3.0
