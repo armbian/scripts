@@ -9,15 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version:
-         - Faerie
-         - November
-         - Raven
-         - Hammer
-         - Foxtrot
-         - Papa
-         - Chimera
-         - Panther
+        version: ["Faerie","November"]
+#         - Raven
+#         - Hammer
+#         - Foxtrot
+#         - Papa
+#         - Chimera
+#         - Panther
     steps:
      
       - name: Install Homebrew
@@ -40,7 +38,7 @@ jobs:
     steps:
      
       - name: Install Homebrew
-        run: echo
+        run: sleep 1m
  
   stop:
     name: "Power Off"
@@ -48,15 +46,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version:
-         - Faerie
-         - November
-         - Raven
-         - Hammer
-         - Foxtrot
-         - Papa
-         - Chimera
-         - Panther
+        version: ["Faerie","November"]
+#         - Raven
+#         - Hammer
+#         - Foxtrot
+#         - Papa
+#         - Chimera
+#         - Panther
     steps:
      
       - name: Install Homebrew
