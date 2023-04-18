@@ -41,7 +41,7 @@ jobs:
           for i in $SERVERS
           do
             ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$i"
-            ssh -o StrictHostKeyChecking=no root@$i "export ${{ env.GH_TOKEN }}; $COMMAND"
+            ssh -o StrictHostKeyChecking=no root@$i "export GH_TOKEN=${{ env.GH_TOKEN }}; $COMMAND"
           done
 
       - name: Show runners
