@@ -39,13 +39,6 @@ curl --create-dir --output-dir .tmp -o actions-runner-linux-${ARCH}-${LATEST}.ta
 for i in $(seq -w $START $STOP)
 do
 
-curl -s \
-	  -X POST \
-	  -H "Accept: application/vnd.github+json" \
-	  -H "Authorization: Bearer $GH_TOKEN"\
-	  -H "X-GitHub-Api-Version: 2022-11-28" \
-	  https://api.github.com/${PREFIX}/${REGISTRATION_URL}/actions/runners/registration-token
-
 	TOKEN=$(curl -s \
 	  -X POST \
 	  -H "Accept: application/vnd.github+json" \
