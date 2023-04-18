@@ -77,6 +77,8 @@ jobs:
     steps:
      
       - name: Delete runners
+        env:        
+          GH_TOKEN: ${{ secrets.TEST }}
         run: |
         
           RUNNERS=$(gh api \
