@@ -59,7 +59,7 @@ jobs:
         run: echo
         
       - name: Enable Hetzner Virtual Machines
-        uses: armbian/actions/hetzner_on@main
+        uses: armbian/actions/hetzner_off@main
         with:
           machine-name: ${{ matrix.version }}
           machine-type: cax11          
