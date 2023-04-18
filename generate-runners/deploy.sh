@@ -9,14 +9,23 @@
 
 
 #PAT=
-START=001
-STOP=002
-NAME=runner
-LABEL=big,test,arm64
+START=01
+STOP=16
+NAME=temporally
+LABEL_PRIMARY="alfa,beta,gama"
+LABEL_SECONDARY="fast,temp"
 ORG=armbian
+#OWNER=armbian
+#REPO=os
 
 # don't edit below
 # -------------------------------------------------------------
+
+# we can generate per org or per repo
+REGISTRATION_URL=https://api.github.com/orgs/${ORG}/actions/runners/registration-token
+if [[ -n "${OWNER}" && -n "${REPO}" ]]; then
+    REGISTRATION_URL=https://api.github.com/repos/${OWNER}/${REPO}/actions/runners/registration-token
+fi
 
 # download runner app
 sudo apt-get update
@@ -32,7 +41,7 @@ do
 	  -H "Accept: application/vnd.github+json" \
 	  -H "Authorization: Bearer $PAT"\
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
-	  https://api.github.com/orgs/${ORG}/actions/runners/registration-token | jq -r .token)
+	  ${REGISTRATION_URL} | jq -r .token)
 
 	sudo userdel -r -f actions-runner-${i}
 	sudo groupdel actions-runner-${i}
@@ -41,6 +50,13 @@ do
 	sudo usermod -aG docker actions-runner-${i}
 	sudo tar xzf .tmp/actions-runner-linux-${ARCH}-${LATEST}.tar.gz -C /home/actions-runner-${i}
 	sudo chown -R actions-runner-${i}.actions-runner-${i} /home/actions-runner-${i}
+
+        # 1st runner has different labels
+        LABEL=$LABEL_SECONDARY
+        if [[ "$i" == "${START}" ]]; then
+	LABEL=$LABEL_PRIMARY
+	fi
+	
 	sudo runuser -l actions-runner-${i} -c "./config.sh --url https://github.com/${ORG} --token ${TOKEN} --labels ${LABEL} --name $NAME-${i} --unattended"
 	sh -c "cd /home/actions-runner-${i} ; sudo ./svc.sh install actions-runner-${i}; sudo ./svc.sh start actions-runner-${i}"
 done
