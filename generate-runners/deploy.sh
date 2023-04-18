@@ -8,15 +8,15 @@
 # NAME = name / keyword of this runner group
 
 
-#PAT=
+#GH_TOKEN=
 START=01
 STOP=16
 NAME=temporally
 LABEL_PRIMARY="alfa,beta,gama"
 LABEL_SECONDARY="fast,temp"
 ORG=armbian
-#OWNER=armbian
-#REPO=os
+OWNER=armbian
+REPO=os
 
 # don't edit below
 # -------------------------------------------------------------
@@ -39,7 +39,7 @@ do
 	TOKEN=$(curl -s \
 	  -X POST \
 	  -H "Accept: application/vnd.github+json" \
-	  -H "Authorization: Bearer $PAT"\
+	  -H "Authorization: Bearer $GH_TOKEN"\
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  ${REGISTRATION_URL} | jq -r .token)
 
