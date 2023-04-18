@@ -1,0 +1,12 @@
+name: Run them all
+on:
+  workflow_dispatch:
+ 
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        version: [10, 12, 14]
+    steps:
+      - name: Install Homebrew
+        run: echo ${{ matrix.version }}
