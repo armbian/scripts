@@ -17,8 +17,10 @@ jobs:
         run: |
         
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          
-          /home/linuxbrew/.linuxbrew/bin/brew install hcloud
+          (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ${HOME}/.bash_profile
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install hcloud
+          hcloud server list
           
       - name: Show machines
         run: |
