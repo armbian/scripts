@@ -24,7 +24,7 @@ jobs:
       - name: Install Homebrew
         run: |
 
-          sudo apt-get -y install cracklib-runtime
+          sudo apt-get -y install wamerican
 
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ${HOME}/.bash_profile
@@ -32,7 +32,8 @@ jobs:
           brew install hcloud
           
           # generate machine
-          hcloud server create --name $(shuf -n1 /usr/share/dict/cracklib-small) --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
+          MACHINE_NAME=$(shuf -n1 /usr/share/dict/american-english | sed "s/[^[:alnum:]-]//g" | sed 's/./\L&/g')
+          hcloud server create --name ${MACHINE_NAME} --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
           sleep 30
           hcloud server list
 
