@@ -19,4 +19,8 @@ jobs:
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           
           /home/linuxbrew/.linuxbrew/bin/brew install hcloud
+          
+      - name: Show machines
+        run: |
+        
           hcloud server list
