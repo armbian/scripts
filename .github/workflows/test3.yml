@@ -30,8 +30,8 @@ jobs:
           brew install hcloud
           
           # generate machine
-          #hcloud server create --name Runner --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
-          #sleep 30
+          hcloud server create --name Runner --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
+          sleep 30
           hcloud server list
 
       - name: Show machines
@@ -54,4 +54,4 @@ jobs:
           gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository_owner }}/os/actions/runners
+            /repos/${{ github.repository_owner }}/os/actions/runners | jq -r '.runners[] | .id, .name' | xargs -n2 -d'\n' | sed -e 's/ /,/g'
