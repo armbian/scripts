@@ -9,11 +9,11 @@ jobs:
 
     name: Prepare
     runs-on: ubuntu-latest
+    env:
+      HCLOUD_TOKEN: ${{ secrets.HETZNER_ONE }}
     steps:
 
       - name: Install Homebrew
-        env:
-          HCLOUD_TOKEN: ${{ secrets.HETZNER_ONE }}
         run: |
 
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
