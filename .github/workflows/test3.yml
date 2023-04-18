@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HCLOUD_TOKEN: ${{ secrets.HETZNER_ONE }}
-      GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      GH_TOKEN: ${{ secrets.TEST }}
     steps:
 
       - name: Install SSH key for storage
@@ -34,14 +34,14 @@ jobs:
         run: |
         
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          COMMAND="git clone https://github.com/armbian/scripts; export ${GH_TOKEN} ; cd scripts/generate-runners; ./deploy.sh"
+          COMMAND="git clone https://github.com/armbian/scripts; cd scripts/generate-runners; ./deploy.sh"
           hcloud server list
           
           SERVERS=($(hcloud server list --output columns=ipv4 | tail -1))
           for i in $SERVERS
           do
             ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$i"
-            ssh -o StrictHostKeyChecking=no root@$i "export $PAT; $COMMAND"
+            ssh -o StrictHostKeyChecking=no root@$i "export $GH_TOKEN; $COMMAND"
           done
 
       - name: Show runners
