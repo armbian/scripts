@@ -24,7 +24,7 @@ jobs:
       - name: Install Homebrew
         run: |
 
-          apt-get -y install cracklib-runtime
+          sudo apt-get -y install cracklib-runtime
 
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ${HOME}/.bash_profile
