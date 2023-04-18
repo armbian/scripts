@@ -24,13 +24,15 @@ jobs:
       - name: Install Homebrew
         run: |
 
+          apt-get -y install cracklib-runtime
+
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ${HOME}/.bash_profile
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install hcloud
           
           # generate machine
-          hcloud server create --name Runner_01 --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
+          hcloud server create --name $(shuf -n1 /usr/share/dict/cracklib-small) --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
           sleep 30
           hcloud server list
 
