@@ -15,15 +15,23 @@ jobs:
         env:
           HCLOUD_TOKEN: ${{ secrets.HETZNER_ONE }}
         run: |
-        
+
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ${HOME}/.bash_profile
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install hcloud
           hcloud server list
-          
+
       - name: Show machines
         run: |
         
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           hcloud server list
+
+      - name: Show runners
+        run: |
+        
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /orgs/${{ github.repository_owner }}/actions/runners
