@@ -1,4 +1,4 @@
-name: Maintain Runners
+name: VPS manipulation
 on:
   workflow_dispatch:
   push:
@@ -8,24 +8,10 @@ jobs:
   Prepare:
 
     name: Prepare
-    runs-on: clean
+    runs-on: ubuntu-latest
     steps:
 
-      - name: Remove dangling Docker images
+      - name: Install Homebrew
         run: |
         
-          sudo docker image prune -a --force
-
-      - name: Upgrade
-        run: |
-        
-          # install package aptdaemon
-          sudo aptdcon --safe-upgrade
-
-      - name: Remove Other projects
-        run: |
-        
-          cd ../..
-          # remove all
-          sudo find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) \
-          -mindepth 1 -maxdepth 1 ! -name "_*" -exec sudo rm -rf {} + || true
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
