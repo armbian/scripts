@@ -11,7 +11,7 @@
 #GH_TOKEN=
 START=01
 STOP=02
-NAME=temporally
+#NAME=temporally
 LABEL_PRIMARY="alfa,beta,gama"
 LABEL_SECONDARY="fast,temp"
 #ORG=armbian
