@@ -10,11 +10,11 @@
 
 #GH_TOKEN=
 START=01
-STOP=16
+STOP=02
 NAME=temporally
 LABEL_PRIMARY="alfa,beta,gama"
 LABEL_SECONDARY="fast,temp"
-ORG=armbian
+#ORG=armbian
 OWNER=armbian
 REPO=os
 
