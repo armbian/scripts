@@ -1,7 +1,7 @@
 name: VPS manipulation
 on:
   workflow_dispatch:
-  push:
+ # push:
 
 jobs:
 
