@@ -48,10 +48,19 @@ jobs:
             ssh -o StrictHostKeyChecking=no root@$i "export GH_TOKEN=${{ env.GH_TOKEN }}; $COMMAND"
           done
 
-      - name: Show runners
+      - name: Delete runners
         run: |
         
-          gh api \
+          RUNNERS=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository_owner }}/os/actions/runners | jq -r '.runners[] | .id, .name' | xargs -n2 -d'\n' | sed -e 's/ /,/g'
+            /repos/${{ github.repository_owner }}/os/actions/runners \
+            | jq -r '.runners[] | .id' | xargs -n2 -d'\n' | sed -e 's/ /,/g')
+
+          while IFS= read -r id; do
+          gh api \
+          --method DELETE \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/OWNER/REPO/actions/runners/${id}
+          done <<< $RUNNERS
