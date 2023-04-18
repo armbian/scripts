@@ -28,6 +28,10 @@ jobs:
           (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ${HOME}/.bash_profile
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install hcloud
+          
+          # generate machine
+          hcloud server create --name Runner --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
+          
           hcloud server list
 
       - name: Show machines
