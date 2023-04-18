@@ -29,7 +29,8 @@ jobs:
 
     name: "Make JSON"
     if: ${{ github.repository_owner == 'armbian' }}
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
+    runs-on: fast
     outputs:
       matrix: ${{steps.json.outputs.JSON_CONTENT}}
     steps:
