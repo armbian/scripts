@@ -22,9 +22,11 @@ REPO=os
 # -------------------------------------------------------------
 
 # we can generate per org or per repo
-REGISTRATION_URL=https://api.github.com/orgs/${ORG}/actions/runners/registration-token
+REGISTRATION_URL="${ORG}"
+PREFIX="orgs"
 if [[ -n "${OWNER}" && -n "${REPO}" ]]; then
-    REGISTRATION_URL=https://api.github.com/repos/${OWNER}/${REPO}/actions/runners/registration-token
+    REGISTRATION_URL="${OWNER}/${REPO}"
+    PREFIX=repos
 fi
 
 # download runner app
@@ -41,7 +43,7 @@ do
 	  -H "Accept: application/vnd.github+json" \
 	  -H "Authorization: Bearer $GH_TOKEN"\
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
-	  ${REGISTRATION_URL} | jq -r .token)
+	  https://api.github.com/${PREFIX}/${REGISTRATION_URL}/actions/runners/registration-token | jq -r .token)
 
 	sudo userdel -r -f actions-runner-${i}
 	sudo groupdel actions-runner-${i}
@@ -57,7 +59,7 @@ do
 	LABEL=$LABEL_PRIMARY
 	fi
 	
-	sudo runuser -l actions-runner-${i} -c "./config.sh --url https://github.com/${ORG} --token ${TOKEN} --labels ${LABEL} --name $NAME-${i} --unattended"
+	sudo runuser -l actions-runner-${i} -c "./config.sh --url https://github.com/${REGISTRATION_URL} --token ${TOKEN} --labels ${LABEL} --name $NAME-${i} --unattended"
 	sh -c "cd /home/actions-runner-${i} ; sudo ./svc.sh install actions-runner-${i}; sudo ./svc.sh start actions-runner-${i}"
 done
 rm -rf .tmp
