@@ -12,6 +12,11 @@ jobs:
     steps:
 
       - name: Install Homebrew
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HETZNER_ONE }}
         run: |
         
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          
+          /home/linuxbrew/.linuxbrew/bin/brew install hcloud
+          hcloud server list
