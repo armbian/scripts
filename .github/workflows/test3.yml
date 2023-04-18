@@ -14,6 +14,16 @@ jobs:
       GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     steps:
 
+      - name: Install SSH key for storage
+        env:
+          SSH_KEY_TORRENTS: ${{ secrets.SSH_KEY_TORRENTS }}
+        if: env.SSH_KEY_TORRENTS != null
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY_TORRENTS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          if_key_exists: replace
+
       - name: Install Homebrew
         run: |
 
@@ -27,7 +37,15 @@ jobs:
         run: |
         
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          COMMAND="git clone https://github.com/armbian/scripts; export ${GH_TOKEN} ; cd scripts/generate-runners; ./deploy.sh"
           hcloud server list
+          
+          SERVERS=($(hcloud server list --output columns=ipv4 | tail -1))
+          for i in $SERVERS
+          do
+            ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$i"
+            ssh -o StrictHostKeyChecking=no root@$i "export $PAT; $COMMAND"
+          done
 
       - name: Show runners
         run: |
