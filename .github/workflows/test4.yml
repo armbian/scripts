@@ -18,4 +18,10 @@ jobs:
          - Panther
     steps:
       - name: Install Homebrew
-        run: echo ${{ matrix.version }}
+        run: echo
+        
+      - name: Enable Hetzner Virtual Machines
+        uses: armbian/actions/hetzner_on@main
+        with:
+          machine-name: ${{ matrix.version }}
+          machine-type: cax11          
