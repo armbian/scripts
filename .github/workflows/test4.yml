@@ -18,6 +18,7 @@ jobs:
          - Chimera
          - Panther
     steps:
+     
       - name: Install Homebrew
         run: echo
         
@@ -28,3 +29,5 @@ jobs:
           machine-type: cax11          
           key: ${{ secrets.KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_TORRENTS }}
+          hetzner_id: ${{ secrets.HETZNER_ONE }}
+          github_token: ${{ secrets.TEST }}
