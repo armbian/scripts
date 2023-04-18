@@ -3,7 +3,8 @@ on:
   workflow_dispatch:
  
 jobs:
-  example_matrix:
+  matrix:
+    name: "Powering"
     runs-on: ubuntu-latest
     strategy:
       matrix:
