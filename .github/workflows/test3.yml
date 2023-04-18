@@ -30,8 +30,8 @@ jobs:
           brew install hcloud
           
           # generate machine
-          #hcloud server create --name Runner --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
-          #sleep 30
+          hcloud server create --name Runner_01 --image ubuntu-22.04 --type cax11 --ssh-key TORRENT
+          sleep 30
           hcloud server list
 
       - name: Show machines
