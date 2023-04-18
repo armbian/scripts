@@ -8,7 +8,7 @@
 # NAME = name / keyword of this runner group
 
 
-PAT=
+#PAT=
 START=001
 STOP=002
 NAME=runner
@@ -19,6 +19,7 @@ ORG=armbian
 # -------------------------------------------------------------
 
 # download runner app
+sudo apt-get update
 sudo apt-get -y install libxml2-utils jq docker.io
 LATEST=$(curl -sL https://github.com/actions/runner/releases/ | xmllint -html -xpath '//a[contains(@href, "release")]/text()' - 2> /dev/null | grep -P '^v' | head -n1 | sed "s/v//g")
 [[ "$(dpkg --print-architecture)" == "amd64" ]] && ARCH=x64 || ARCH=arm64
