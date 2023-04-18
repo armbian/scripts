@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HCLOUD_TOKEN: ${{ secrets.HETZNER_ONE }}
+      GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     steps:
 
       - name: Install Homebrew
