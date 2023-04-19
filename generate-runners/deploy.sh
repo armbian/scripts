@@ -9,7 +9,7 @@
 
 
 #GH_TOKEN=
-START=01
+START=1
 #STOP=02
 #NAME=temporally
 LABEL_PRIMARY="alfa,beta,gama"
