@@ -347,6 +347,9 @@ jobs:
       - name: Install
         run: |
 
+          # lets make some space
+          sudo docker image prune -a --force || true
+
           # source vars
           . "os/external/${{ matrix.image.package }}.conf"
 
