@@ -14,9 +14,9 @@ START=1
 #NAME=temporally
 LABEL_PRIMARY="alfa,beta,gama"
 LABEL_SECONDARY="fast,temp"
-ORG=armbian
-#OWNER=armbian
-#REPO=os
+#ORG=armbian
+OWNER=armbian
+REPO=os
 
 # don't edit below
 # -------------------------------------------------------------
