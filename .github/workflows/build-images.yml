@@ -87,6 +87,10 @@ jobs:
         id: json
         run: |
 
+          # to cover if "all" is selected in the menu
+          SELECTED_BOARD="${{ inputs.board }}"
+          [[ "${SELECTED_BOARD}" == all ]] && unset SELECTED_BOARD
+          
           # Prepare list
           FILES=$(cat os/targets/${{ inputs.config }} \
           | grep -v "^$\|^#" \
@@ -94,7 +98,7 @@ jobs:
           | grep " ${{ inputs.branch }} " \
           | grep "${{ inputs.release }} " \
           | grep "${{ inputs.variant }}" \
-          | grep "${{ inputs.board }}")
+          | grep "${SELECTED_BOARD}")
           while IFS= read -r line; do
 
               BOARD=$(echo $line | cut -d " " -f1)
