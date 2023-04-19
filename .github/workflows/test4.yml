@@ -14,7 +14,7 @@ jobs:
         with:
           machine-type: cax11
           runners-count: 3
-          machine-count: 8
+          machine-count: 2
           key: ${{ secrets.KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_TORRENTS }}
           hetzner_id: ${{ secrets.HETZNER_ONE }}
@@ -40,7 +40,7 @@ jobs:
         with:
           machine-type: cax11
           runners-count: 3
-          machine-count: 8
+          machine-count: 2
           key: ${{ secrets.KEY_TORRENTS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_TORRENTS }}
           hetzner_id: ${{ secrets.HETZNER_ONE }}
