@@ -12,7 +12,7 @@
 START=1
 #STOP=02
 #NAME=temporally
-LABEL_PRIMARY="alfa,beta,gama"
+LABEL_PRIMARY="alfa,beta,gama,temp"
 LABEL_SECONDARY="fast,temp"
 #ORG=armbian
 OWNER=armbian
