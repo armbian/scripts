@@ -57,10 +57,8 @@ jobs:
       runner:  ${{steps.json.outputs.runner}}
     steps:
 
-      - name: "Fix permissions"
-        run: |
-
-          sudo chown -R $USER.$USER .
+      - name: Runner clean
+        uses: armbian/actions/runner-clean@main
 
       - name: Checkout Armbian Framework
         uses: actions/checkout@v3.3.0
@@ -159,9 +157,8 @@ jobs:
 
     steps:
 
-      - name: "Generate key id" # We need this in case we run multiple runners on one machine
-        run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
-        shell: bash
+      - name: Runner clean
+        uses: armbian/actions/runner-clean@main
 
       - name: Checkout Armbian build repo
         uses: actions/checkout@v3 # We don't need to clone git, really. A wget would suffice for GH-hosted runners. But using clone is better for Igor-hosted runners.
@@ -188,15 +185,8 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_KEY_TORRENTS }}
-          name: ${{ env.RANDOM }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
-
-      - name: Copy SSH keys
-        env:
-          SSH_KEY_TORRENTS: ${{ secrets.SSH_KEY_TORRENTS }}
-        if: env.SSH_KEY_TORRENTS != null
-        run: rsync -a ~/.ssh/${{ env.RANDOM }}  /tmp/${{ env.RANDOM }} # need to copy it outside as action deletes them all
 
       - name: Cleanup
         run: |
@@ -274,21 +264,16 @@ jobs:
       - name: Deploy to server
         env:
           SSH_KEY_TORRENTS: ${{ secrets.SSH_KEY_TORRENTS }}
-        if: env.SSH_KEY_TORRENTS != null && inputs.release == 'stable'
+          HOST_UPLOAD: ${{ secrets.HOST_UPLOAD }}
+        if: env.SSH_KEY_TORRENTS != null && env.HOST_UPLOAD != null && inputs.release == 'stable'
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
-          lftp -u upload, -e "set sftp:connect-program ssh -ax -i /tmp/${{ env.RANDOM }}; set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ images/ ;bye" sftp://users.armbian.com
-
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ images/ ;bye" sftp://${{ env.HOST_UPLOAD }}
+          
       - name: Cleanup
         run: |
 
           sudo rm -rf build/output/images/* || true
           sudo rm -rf build/cache/rootfs/* || true
-          # remove other projects
-          PROJECT=$(echo ${{ github.workspace }} | rev | cut -d'/' -f 1 | rev)
-          find $(echo ${{ github.workspace }} | rev | cut -d"/" -f3- | rev) -mindepth 1 -maxdepth 1 ! -name "_*" ! -name ${PROJECT} -exec sudo rm -rf {} + || true
-
-      - name: Remove SSH keys
-        run: rm -f /tmp/${{ env.RANDOM }}
