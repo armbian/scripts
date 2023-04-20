@@ -36,9 +36,9 @@ on:
         required: true
       KEY_ARMBIAN_UPLOAD:
         required: true
-      KNOWN_HOSTS_UPLOAD:
+      KNOWN_HOSTS_ARMBIAN_UPLOAD:
         required: true
-      HOST_UPLOAD:
+      ARMBIAN_HOST_UPLOAD:
         required: false
       GPG_KEY1:
         required: true
@@ -185,7 +185,7 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
-          #known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
 
       - name: Cleanup
@@ -264,13 +264,13 @@ jobs:
       - name: Deploy to server
         env:
           KEY_ARMBIAN_UPLOAD: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
-          HOST_UPLOAD: ${{ secrets.HOST_UPLOAD }}
-        if: env.KEY_ARMBIAN_UPLOAD != null && env.HOST_UPLOAD != null && inputs.release == 'stable'
+          ARMBIAN_HOST_UPLOAD: ${{ secrets.ARMBIAN_HOST_UPLOAD }}
+        if: env.KEY_ARMBIAN_UPLOAD != null && env.ARMBIAN_HOST_UPLOAD != null && inputs.release == 'stable'
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ stable/ ;bye" sftp://${{ env.HOST_UPLOAD }}
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ stable/ ;bye" sftp://${{ env.ARMBIAN_HOST_UPLOAD }}
           
       - name: Cleanup
         run: |
