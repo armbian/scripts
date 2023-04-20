@@ -69,7 +69,7 @@ jobs:
         shell: bash
 
       - name: Install SSH key for storage
-        uses: shimataro/ssh-key-action@v2.5.0
+        uses: shimataro/ssh-key-action@v2.5.1
         with:
           key: ${{ secrets.KEY_CI }}
           name: ${{ env.RANDOM }}
