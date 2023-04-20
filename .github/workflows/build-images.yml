@@ -38,6 +38,8 @@ on:
         required: true
       KNOWN_HOSTS_UPLOAD:
         required: true
+      HOST_UPLOAD:
+        required: false
       GPG_KEY1:
         required: true
       GPG_PASSPHRASE1:
