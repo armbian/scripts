@@ -34,7 +34,7 @@ on:
     secrets:
       ACCESS_TOKEN:
         required: true
-      SSH_KEY_TORRENTS:
+      KEY_ARMBIAN_UPLOAD:
         required: true
       KNOWN_HOSTS_UPLOAD:
         required: true
@@ -180,12 +180,12 @@ jobs:
 
       - name: Install SSH key for storage
         env:
-          SSH_KEY_TORRENTS: ${{ secrets.SSH_KEY_TORRENTS }}
-        if: env.SSH_KEY_TORRENTS != null
+          KEY_ARMBIAN_UPLOAD: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
+        if: env.KEY_ARMBIAN_UPLOAD != null
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.SSH_KEY_TORRENTS }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
+          key: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
+          #known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
           if_key_exists: replace
 
       - name: Cleanup
@@ -263,9 +263,9 @@ jobs:
 
       - name: Deploy to server
         env:
-          SSH_KEY_TORRENTS: ${{ secrets.SSH_KEY_TORRENTS }}
+          KEY_ARMBIAN_UPLOAD: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
           HOST_UPLOAD: ${{ secrets.HOST_UPLOAD }}
-        if: env.SSH_KEY_TORRENTS != null && env.HOST_UPLOAD != null && inputs.release == 'stable'
+        if: env.KEY_ARMBIAN_UPLOAD != null && env.HOST_UPLOAD != null && inputs.release == 'stable'
         run: |
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
