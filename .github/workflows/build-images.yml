@@ -262,7 +262,7 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Deploy to server
-        timeout-minutes: 15
+        timeout-minutes: 30
         env:
           KEY_ARMBIAN_UPLOAD: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
           ARMBIAN_HOST_UPLOAD: ${{ secrets.ARMBIAN_HOST_UPLOAD }}
