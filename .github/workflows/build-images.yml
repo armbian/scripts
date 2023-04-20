@@ -270,7 +270,7 @@ jobs:
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ images/ ;bye" sftp://${{ env.HOST_UPLOAD }}
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ stable/ ;bye" sftp://${{ env.HOST_UPLOAD }}
           
       - name: Cleanup
         run: |
