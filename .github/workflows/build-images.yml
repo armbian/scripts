@@ -10,6 +10,9 @@ on:
       branch:
        required: false
        type: string
+      deploy:
+       required: false
+       type: string
       release:
        required: false
        type: string
@@ -266,12 +269,15 @@ jobs:
         env:
           KEY_ARMBIAN_UPLOAD: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
           ARMBIAN_HOST_UPLOAD: ${{ secrets.ARMBIAN_HOST_UPLOAD }}
-        if: env.KEY_ARMBIAN_UPLOAD != null && env.ARMBIAN_HOST_UPLOAD != null && inputs.release == 'stable'
+
+        if: env.KEY_ARMBIAN_UPLOAD != null && env.ARMBIAN_HOST_UPLOAD != null && inputs.deploy == 'true'
         run: |
+          # install dependencies
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ stable/ ;bye" sftp://${{ env.ARMBIAN_HOST_UPLOAD }}
+          # secure upload
+          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/images/ ${{ inputs.release }}/ ;bye" sftp://${{ env.ARMBIAN_HOST_UPLOAD }}
           
       - name: Cleanup
         run: |
