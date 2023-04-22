@@ -35,9 +35,9 @@ on:
       ACCESS_TOKEN:
         required: true
       KEY_ARMBIAN_UPLOAD:
-        required: true
+        required: false
       KNOWN_HOSTS_ARMBIAN_UPLOAD:
-        required: true
+        required: false
       ARMBIAN_HOST_UPLOAD:
         required: false
       GPG_KEY1:
