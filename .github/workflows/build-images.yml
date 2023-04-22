@@ -200,12 +200,12 @@ jobs:
             API_CALLS_LEFT=$(curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" https://api.github.com/rate_limit | jq -r '.rate.remaining')
             PERCENT=$(( API_CALLS_LEFT * 100 / API_CALLS_TOTAL ))
             if [[ $PERCENT =~ ^[0-9]+$ ]]; then
-                    if [[ $PERCENT -gt 50 ]]; then
+                    if [[ $PERCENT -gt 30 ]]; then
                             echo "API rate in good shape $PERCENT % free"
                     exit 0
                     fi
             fi
-            echo "API rate lower then 50%, sleping 5m"
+            echo "API rate lower then 30%, sleping 5m"
             sleep 5m
           done
 
