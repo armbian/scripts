@@ -182,6 +182,17 @@ jobs:
           find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
 
+          # repack deb files
+          DEBS=($(find $SOURCE -type f -name "thunderbird*" -o -name "firefox*" -o -name "chromium*"))
+          for d in ${DEBS[@]}; do
+            BEFORE=$(deb-reversion -c $d -s armbian)
+            # add epoch 9
+            AFTER=9:$(echo $BEFORE | cut -d":" -f2)
+            echo "$d : $BEFORE -> $AFTER"
+            sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
+            sudo rm $d
+          done
+
           if [[ ${TARGET} == main ]]; then
                   if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
                   if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/ \;; fi
