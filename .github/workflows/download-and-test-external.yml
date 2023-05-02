@@ -123,7 +123,7 @@ jobs:
         run: |
 
           find os/external/keys/ -type f -name "*.gpg" -exec gpg --import --no-default-keyring --keyring trustedkeys.gpg "{}" \;
-          sudo apt-get -y install debian-keyring ubuntu-keyring
+          sudo apt-get -y install debian-keyring ubuntu-keyring devscripts
           gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 0E98404D386FA1D9
 
       - name: Download
@@ -181,6 +181,18 @@ jobs:
           find $SOURCE -type f -name "chromium-browser_*" | sort | head -n -3 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
+
+          # repack deb files
+          DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
+          for d in ${DEBS[@]}; do
+            echo $d
+           # BEFORE=$(deb-reversion -c ${d} -s armbian)
+            # add epoch 9
+            #AFTER=9:$(echo $BEFORE | cut -d":" -f2)
+            #echo "$d : $BEFORE -> $AFTER"
+            #sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
+            #sudo rm $d
+          done
 
           if [[ ${TARGET} == main ]]; then
                   if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
