@@ -19,7 +19,7 @@
 |GitHub|40|136 Gb|
 |Hristov|16|15 Gb|
 |Igor|248|465 Gb|
-|JetHub|32|39 Gb|
+|JetHub|12|64 Gb|
 |Lane|32|31 Gb|
 |Werner|16|62 Gb|
 |Xogium|12|7 Gb|
