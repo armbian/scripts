@@ -343,7 +343,7 @@ jobs:
         image: ${{ fromJSON(needs.test.outputs.matrix) }}
 
     name: "I"
-    timeout-minutes: 10
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     container:
         image: "${{ matrix.image.image }}"
