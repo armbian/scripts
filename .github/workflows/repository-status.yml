@@ -83,20 +83,20 @@ jobs:
           | LC_ALL=C awk -F , -v OFS=\| '$3/=1024' | cut -d"." -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
 
           # header and footer are edited at GitHub          
-          cat scripts/.github/header.inc > scripts/README.md
+          #cat scripts/.github/header.inc > scripts/README.md
           echo -en "\n\n" >> scripts/README.md
           cat label.tmp >> scripts/README.md
-          cat scripts/.github/footer.inc >> scripts/README.md
+          #cat scripts/.github/footer.inc >> scripts/README.md
 
-#      - name: "Upload status"
-#        uses: ncipollo/release-action@v1
-#        with:
-#          artifacts: "runners_capacity.json"
-#          tag: "status"
-#          omitBody: true
-#          omitName: true
-#          allowUpdates: true
-#          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Upload status"
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "runners_capacity.json"
+          tag: "status"
+          omitBody: true
+          omitName: true
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update scripts
         run: |
