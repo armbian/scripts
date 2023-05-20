@@ -69,7 +69,7 @@ jobs:
           cat runners_capacity.json
 
           # add smoke test success
-          gh run download --name status --repo github.com/armbian/build
+          gh run download --name status --repo github.com/armbian/scripts
           jq '.SMOKE += "'$(cat success)'%"' runners_capacity.json > tmp.json          
           cp tmp.json runners_capacity.json
           cat runners_capacity.json
@@ -83,10 +83,10 @@ jobs:
           | LC_ALL=C awk -F , -v OFS=\| '$3/=1024' | cut -d"." -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
 
           # header and footer are edited at GitHub          
-          #cat scripts/.github/header.inc > scripts/README.md
-          #echo -en "\n\n" >> scripts/README.md
-          #cat label.tmp >> scripts/README.md
-          #cat scripts/.github/footer.inc >> scripts/README.md
+          cat scripts/.github/header.inc > scripts/README.md
+          echo -en "\n\n" >> scripts/README.md
+          cat label.tmp >> scripts/README.md
+          cat scripts/.github/footer.inc >> scripts/README.md
 
       - name: "Upload status"
         uses: ncipollo/release-action@v1
