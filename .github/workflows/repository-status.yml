@@ -88,15 +88,15 @@ jobs:
           cat label.tmp >> scripts/README.md
           cat scripts/.github/footer.inc >> scripts/README.md
 
-      - name: "Upload status"
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "runners_capacity.json"
-          tag: "status"
-          omitBody: true
-          omitName: true
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+#      - name: "Upload status"
+#        uses: ncipollo/release-action@v1
+#        with:
+#          artifacts: "runners_capacity.json"
+#          tag: "status"
+#          omitBody: true
+#          omitName: true
+#          allowUpdates: true
+#          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update scripts
         run: |
