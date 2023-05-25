@@ -231,6 +231,7 @@ jobs:
         id: rootfs
         run: |
 
+           [[ "${{ inputs.release }}" == stable ]] && BETA="no" || BETA="yes"
            DESKTOP_ENVIRONMENT="${{env.DESKTOP}}"
            BUILD_DESKTOP="yes"
            BUILD_MINIMAL="no"
@@ -240,6 +241,7 @@ jobs:
            # IMAGE_VERSION="${{ inputs.version }}"
            bash ./compile.sh armbian-images \
            BSPFREEZE="yes" \
+           BETA="${BETA}" \
            IMAGE_VERSION="${{ inputs.version }}" \
            SHARE_LOG="yes" \
            BOARD="${{env.BOARD}}" \
