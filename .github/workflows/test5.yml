@@ -104,7 +104,7 @@ jobs:
           labels: |
             Maintenance :recycle:
           assignees: igorpecovnik
-          reviewers: EvilOlaf
+#          reviewers: EvilOlaf
           draft: false
 
 #      - name: Git commit
