@@ -31,7 +31,7 @@ jobs:
           }
           EOF
           bash ./compile.sh kernel \
-          CI="false" \
+          OCI_TARGET_BASE="" \
           SHARE_LOG="yes" \
           ARTIFACT_IGNORE_CACHE="yes" \
           BOARD="orangepi5" \
