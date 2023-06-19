@@ -48,7 +48,7 @@ jobs:
           echo "<ul>"
           function enable_extension()
           {
-          return true
+          return 0
           }
           jq -c '.[]' armbian_maintainers.json | while read i; do
           NAME=$(echo $i | jq --raw-output '.First_Name')
@@ -59,7 +59,7 @@ jobs:
           echo "      <ul>"
                   for i in $(echo $BOARD | sed "s/,/ /g")
                   do
-                      unset B
+                      unset BOARD_NAME
                       B=$(ls -1 config/boards/${i}* 2> /dev/null || true)
                       [[ -n $B ]] && source $B
                       echo "        <li>$i $BOARD_NAME</li>"
