@@ -73,6 +73,7 @@ jobs:
           done
           echo "</ul>"
           } >> $GITHUB_STEP_SUMMARY
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git diff
    
 #      - name: Build Kernel at ${{ github.event.pull_request.head.sha }}
