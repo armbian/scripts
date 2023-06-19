@@ -84,14 +84,36 @@ jobs:
           echo "</ul>"
           } >> $GITHUB_STEP_SUMMARY
 
-      - name: Git commit
-        run: |
-          echo "test" > test.txt
-          git config --local user.email "info@armbian.com"
-          git config --local user.name "Armbianworker"
-          git config --global --add safe.directory $(pwd)
-          git commit --allow-empty -m "Update github actions" -a
-          git log -3
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          commit-message: Update report
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: update-maintainers
+          delete-branch: true
+          title: 'Update maintainers list'
+          body: |
+            Update maintainers
+            - synched from the database
+            
+          labels: |
+            Maintenance :recycle:
+          assignees: igorpecovnik
+          reviewers: EvilOlaf
+          draft: false
+
+#      - name: Git commit
+#        run: |
+#          echo "test" > test.txt
+#          git config --local user.email "info@armbian.com"
+#          git config --local user.name "Armbianworker"
+#          git config --global --add safe.directory $(pwd)
+#          git commit --allow-empty -m "Update github actions" -a
+#          git log -3
    
 #      - name: Build Kernel at ${{ github.event.pull_request.head.sha }}
 #        id: kernel
