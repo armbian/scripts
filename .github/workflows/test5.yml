@@ -72,7 +72,8 @@ jobs:
           }
           EOF
           bash ./compile.sh kernel \
-          GITHUB_ACTIONS="" \
+          GITHUB_ACTIONS="true" \
+          GITHUB_ACTIONS="false" \
           SHARE_LOG="yes" \
           ARTIFACT_IGNORE_CACHE="yes" \
           BOARD="orangepi5" \
