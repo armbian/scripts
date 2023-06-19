@@ -39,7 +39,7 @@ jobs:
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
-          lftp -u upload, -e "cd json; get armbian_maintainers.json ;bye" sftp://users.armbian.com
+          lftp -u upload, -e "cd json; get armbian_maintainers.json ;bye" sftp://rsync.armbian.com
           cat armbian_maintainers.json | jq
 
       - name: Build Kernel at ${{ github.event.pull_request.head.sha }}
