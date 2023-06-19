@@ -1,8 +1,8 @@
 name: "Read maintainers from DB"
 
 on:
-  schedule:
-    - cron: "0 8 * * *"
+  #schedule:
+  #  - cron: "0 8 * * *"
   workflow_dispatch:
 
 jobs:
@@ -96,7 +96,7 @@ jobs:
           signoff: false
           branch: update-maintainers
           delete-branch: true
-          title: 'Update maintainers list'
+          title: 'Maintainers list auto synchronise'
           body: |
             Update maintainers
             - synched from the database
