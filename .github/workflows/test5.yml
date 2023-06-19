@@ -61,9 +61,10 @@ jobs:
                   do
                       unset BOARD_NAME
                       B=$(ls -1 config/boards/${i}* 2> /dev/null || true)
-                      #[[ -n $B ]] && source $B
+                      [[ -n $B ]] && source $B
                       if [[ -n $B ]]; then
                       echo "        <li>$i</li>"
+                      [[ $BOARD_MAINTAINER != *$MAINTAINER_GITHUB* ]] && MAINTAINER_GITHUB+="$MAINTAINER_GITHUB"
                       sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$MAINTAINER_GITHUB\"/" config/boards/${i}* 
                       fi
                   done
