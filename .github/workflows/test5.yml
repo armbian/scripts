@@ -83,6 +83,7 @@ jobs:
           done
           echo "</ul>"
           } >> $GITHUB_STEP_SUMMARY
+          rm -f armbian_maintainers.json
 
       - name: Create Pull Request
         id: cpr
