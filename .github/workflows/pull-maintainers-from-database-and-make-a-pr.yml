@@ -36,14 +36,21 @@ jobs:
           KEY_TORRENTS: ${{ secrets.KEY_TORRENTS }}
         if: env.KEY_TORRENTS != null
         run: |
+
+          # install dependencies
           if ! command -v "lftp" > /dev/null 2>&1; then
              sudo apt-get -y -qq install lftp
           fi
           if ! command -v "jq" > /dev/null 2>&1; then
              sudo apt-get -y -qq install jq
           fi
+          # cleanup
           rm -f armbian_maintainers.json
+
+          # download json that is prepared for this action in another cron job
           lftp -u upload, -e "cd json; get armbian_maintainers.json ;bye" sftp://${{ secrets.ARMBIAN_HOST_UPLOAD }}
+
+          # lets make nice GitHub summary
           {
           echo "<ul>"
           function enable_extension()
@@ -83,6 +90,7 @@ jobs:
           done
           echo "</ul>"
           } >> $GITHUB_STEP_SUMMARY
+          # cleanup
           rm -f armbian_maintainers.json
 
       - name: Create Pull Request
@@ -106,30 +114,3 @@ jobs:
           assignees: igorpecovnik
 #          reviewers: EvilOlaf
           draft: false
-
-#      - name: Git commit
-#        run: |
-#          echo "test" > test.txt
-#          git config --local user.email "info@armbian.com"
-#          git config --local user.name "Armbianworker"
-#          git config --global --add safe.directory $(pwd)
-#          git commit --allow-empty -m "Update github actions" -a
-#          git log -3
-   
-#      - name: Build Kernel at ${{ github.event.pull_request.head.sha }}
-#        id: kernel
-#        run: |
-#          mkdir -p userpatches/extensions/
-#          cat <<- EOF > userpatches/extensions/pull-request.sh
-#          function post_family_config__force_commit_for_rk3588() {
-#              KERNELBRANCH="commit:${{ github.event.pull_request.head.sha }}"
-#          }
-#          EOF
-#          bash ./compile.sh kernel \
-#          GITHUB_ACTIONS="true" \
-#          GITHUB_ACTIONS="false" \
-#          SHARE_LOG="yes" \
-#          ARTIFACT_IGNORE_CACHE="yes" \
-#          BOARD="orangepi5" \
-#          BRANCH="legacy" \
-#          #ENABLE_EXTENSIONS="pull-request"
