@@ -46,6 +46,10 @@ jobs:
           lftp -u upload, -e "cd json; get armbian_maintainers.json ;bye" sftp://${{ secrets.ARMBIAN_HOST_UPLOAD }}
           {
           echo "<ul>"
+          function enable_extension()
+          {
+          return true
+          }
           jq -c '.[]' armbian_maintainers.json | while read i; do
           NAME=$(echo $i | jq --raw-output '.First_Name')
           BOARD=$(echo $i | jq --raw-output '.Maintaining')
