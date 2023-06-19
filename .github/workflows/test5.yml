@@ -1,14 +1,14 @@
-name: 555
+name: "Read maintainers from DB"
 
 on:
+  schedule:
+    - cron: "0 8 * * *"
   workflow_dispatch:
-  pull_request:
-    types: [opened, reopened, edited, synchronize]
 
 jobs:
 
   Build:
-    name: Compile kernel
+    name: Maintainers sync
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'armbian' }}
     steps:
