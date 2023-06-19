@@ -18,7 +18,7 @@ jobs:
         with:
           repository: armbian/build
           ref:  main
-          fetch-depth: 1
+          fetch-depth: 0
           clean: false
 
       - name: Install SSH key for storage
@@ -61,9 +61,9 @@ jobs:
                   do
                       unset BOARD_NAME
                       B=$(ls -1 config/boards/${i}* 2> /dev/null || true)
-                      [[ -n $B ]] && source $B
+                      #[[ -n $B ]] && source $B
                       if [[ -n $B ]]; then
-                      echo "        <li>$i $BOARD_NAME</li>"
+                      echo "        <li>$i</li>"
                       sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$MAINTAINER_GITHUB\"/" config/boards/${i}* 
                       fi
                   done
