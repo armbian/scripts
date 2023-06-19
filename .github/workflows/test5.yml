@@ -53,7 +53,7 @@ jobs:
           jq -c '.[]' armbian_maintainers.json | while read i; do
           NAME=$(echo $i | jq --raw-output '.First_Name')
           BOARD=$(echo $i | jq --raw-output '.Maintaining')
-          MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github')
+          MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
           if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
           echo "    <li><a href=$MAINTAINER_GITHUB>$NAME</a>"
           echo "      <ul>"
@@ -64,6 +64,7 @@ jobs:
                       [[ -n $B ]] && source $B
                       if [[ -n $B ]]; then
                       echo "        <li>$i $BOARD_NAME</li>"
+                      sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$MAINTAINER_GITHUB\"/" config/boards/${i}* 
                       fi
                   done
           echo "      </ul>"
@@ -72,6 +73,7 @@ jobs:
           done
           echo "</ul>"
           } >> $GITHUB_STEP_SUMMARY
+          git diff
    
 #      - name: Build Kernel at ${{ github.event.pull_request.head.sha }}
 #        id: kernel
