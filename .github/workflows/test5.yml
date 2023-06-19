@@ -52,8 +52,8 @@ jobs:
           }
           
           # reset all maintainers so we generate from scratch
-          sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"\"/" config/boards/*.*
-          
+          sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"\"/" config/boards/*.{conf,wip,eos,tvb}
+
           jq -c '.[]' armbian_maintainers.json | while read i; do
           NAME=$(echo $i | jq --raw-output '.First_Name')
           BOARD=$(echo $i | jq --raw-output '.Maintaining')
