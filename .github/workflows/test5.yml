@@ -70,7 +70,7 @@ jobs:
                       else
                       BOARD_MAINTAINER="$MAINTAINER_GITHUB"
                       fi
-                      sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$BOARD_MAINTAINER\"/" config/boards/${i}* 
+                      sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$BOARD_MAINTAINER\"/" config/boards/${i}.* 
                       fi
                   done
           echo "      </ul>"
