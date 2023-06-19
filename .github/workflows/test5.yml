@@ -55,7 +55,7 @@ jobs:
           echo "      <ul>"
                   for i in $(echo $BOARD | sed "s/,/ /g")
                   do
-                      B=$(ls -1 config/boards/odroidc1* 2> /dev/null || true)
+                      B=$(ls -1 config/boards/${i}* 2> /dev/null || true)
                       [[ -n $B ]] && source $B
                       echo "        <li>$BOARD_NAME</li>"
                   done
