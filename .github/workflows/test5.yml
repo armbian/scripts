@@ -73,8 +73,11 @@ jobs:
           done
           echo "</ul>"
           } >> $GITHUB_STEP_SUMMARY
+
+      - name: Git commit
+        run: |
           echo "test" > test.txt
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory $(pwd)
           git diff
    
 #      - name: Build Kernel at ${{ github.event.pull_request.head.sha }}
