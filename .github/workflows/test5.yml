@@ -42,7 +42,8 @@ jobs:
           if ! command -v "jq" > /dev/null 2>&1; then
              sudo apt-get -y -qq install jq
           fi
-          lftp -u upload, -e "cd json; get --overwrite armbian_maintainers.json ;bye" sftp://${{ secrets.ARMBIAN_HOST_UPLOAD }}
+          rm -f armbian_maintainers.json
+          lftp -u upload, -e "cd json; get armbian_maintainers.json ;bye" sftp://${{ secrets.ARMBIAN_HOST_UPLOAD }}
           {
           jq -c '.[]' armbian_maintainers.json | while read i; do
           NAME=$(echo $i | jq --raw-output '.First_Name')
