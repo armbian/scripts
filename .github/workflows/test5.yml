@@ -62,7 +62,9 @@ jobs:
                       unset BOARD_NAME
                       B=$(ls -1 config/boards/${i}* 2> /dev/null || true)
                       [[ -n $B ]] && source $B
+                      if [[ -n $B ]]; then
                       echo "        <li>$i $BOARD_NAME</li>"
+                      fi
                   done
           echo "      </ul>"
           echo "    </li>"
