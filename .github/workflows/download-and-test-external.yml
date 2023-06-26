@@ -54,7 +54,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v36
+        uses: tj-actions/changed-files@v37
         with:
           path: os
           files: |
@@ -300,7 +300,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v36
+        uses: tj-actions/changed-files@v37
         with:
           path: os
           files: |
@@ -432,7 +432,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v36
+        uses: tj-actions/changed-files@v37
         with:
           path: os
           files: |
