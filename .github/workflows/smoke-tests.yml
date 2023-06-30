@@ -113,7 +113,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y install iperf3 neofetch datamash p7zip-full" || true
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "timeout 60 neofetch" || true
 
       - name: To nightly
