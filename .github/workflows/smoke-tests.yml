@@ -93,7 +93,7 @@ jobs:
           echo "REBOOT=false" >> $GITHUB_ENV
 
           server="${{ env.DUT_IP }}"
-          if nc -z $server 22 -w 5 2>/dev/null; then
+          if nc -z $server 22 -w 15 2>/dev/null; then
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
             echo "ONLINE=true" >> $GITHUB_ENV
