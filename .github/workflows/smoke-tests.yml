@@ -180,6 +180,7 @@ jobs:
           sleep 3m
 
       - name: Ping
+        timeout-minutes: 5
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
