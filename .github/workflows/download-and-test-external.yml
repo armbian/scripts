@@ -74,6 +74,7 @@ jobs:
       project: ${{steps.make.outputs.project}}
     strategy:
       fail-fast: false
+      max-parallel: 18
       matrix:
         node: ${{fromJson(needs.start.outputs.matrix)}}
 
@@ -287,6 +288,7 @@ jobs:
     needs: download
     runs-on: ubuntu-latest
     outputs:
+      max-parallel: 18
       matrix:  ${{steps.json.outputs.JSON_CONTENT}}
     steps:
 
