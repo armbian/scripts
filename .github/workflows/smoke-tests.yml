@@ -26,17 +26,16 @@ jobs:
     runs-on: [self-hosted, Linux, local]
     steps:
 
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+      #- name: Runner prepare
+      #  uses: armbian/actions/runner-prepare@main
 
-      - name: Power on
-        if: ${{ !failure() && !cancelled() }}
-        uses: armbian/actions/power-on@main
-        with:
-          KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
-          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
-          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
-          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+      #- name: Power on
+      #  uses: armbian/actions/power-on@main
+      #  with:
+      #    KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
+      #    USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+      #    HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+      #    KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
 
       - name: Determine changed kernels
         id: json
@@ -201,13 +200,12 @@ jobs:
 
   Stop:
     name: "Power system off"
-    if: ${{ !failure() && !cancelled() }}
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
 
-      - name: Runner prepare
-        uses: armbian/actions/runner-prepare@main
+      #- name: Runner prepare
+      # uses: armbian/actions/runner-prepare@main
 
       - name: Clean
         run: |
@@ -235,12 +233,12 @@ jobs:
           name: status
           path: status
 
-      - name: Power off
-        if: always()
-        uses: armbian/actions/power-off@main
-        with:
+      #- name: Power off
+      #  if: always()
+      #  uses: armbian/actions/power-off@main
+      #  with:
 
-          KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
-          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
-          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
-          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+      #    KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
+      #    USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+      #    HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+      #    KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
