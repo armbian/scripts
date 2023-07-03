@@ -30,7 +30,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
 
       - name: Power on
-        if: ! always()
+        if: ${{ !failure() && !cancelled() }}
         uses: armbian/actions/power-on@main
         with:
           KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
@@ -201,7 +201,7 @@ jobs:
 
   Stop:
     name: "Power system off"
-    if: ! always()
+    if: ${{ !failure() && !cancelled() }}
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
