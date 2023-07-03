@@ -97,7 +97,8 @@ jobs:
           echo "DUT_ID=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
           echo "DUT_IP=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
 
-          ls -l build/config/board/${{ env.DUT_IP }}* || true
+          source build/config/board/${{ env.DUT_IP }}* || true
+          echo "$BOARD_NAME $BRANCH"
 
           #curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           #"https://stuff.armbian.com/netbox/api/dcim/power-ports/?limit=500&name__empty=false&device_id=${{ env.DUT_ID }}" \
@@ -194,7 +195,8 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
         
-          sleep 3m
+          echo "sleep 3m"
+          
 
       - name: Ping
         timeout-minutes: 3
