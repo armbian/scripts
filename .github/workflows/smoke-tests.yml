@@ -97,7 +97,7 @@ jobs:
           echo "DUT_ID=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
           echo "DUT_IP=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
           
-          CFG_CONTENT=$(cat build/config/boards/${{ env.DUT_IP }}.* | grep -e "KERNEL_TARGET\|BOARD_NAME")
+          CFG_CONTENT=$(cat build/config/boards/"${{ env.DUT_SLUG }}".* | grep -e "KERNEL_TARGET\|BOARD_NAME")
           eval $CFG_CONTENT
           echo "$BOARD_NAME $KERNEL_TARGET"
 
