@@ -93,21 +93,22 @@ jobs:
         run: |
 
           CHUNK="${{ matrix.node }}"
-          DUT_SLUG=$(echo $CHUNK | cut -d":" -f1)
-          echo "DUT_SLUG=$DUT_SLUG" >> $GITHUB_ENV
-          echo "DUT_ID=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
-          echo "DUT_IP=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
           
-          echo $DUT_SLUG
-          TEST=${{ env.DUT_SLUG }}
+          DUT_SLUG=$(echo $CHUNK | cut -d":" -f1)
+          DUT_ID=$(echo $CHUNK | cut -d":" -f2)
+          DUT_IP=$(echo $CHUNK | cut -d":" -f3)
+          
+          echo "DUT_SLUG=$DUT_SLUG" >> $GITHUB_ENV
+          echo "DUT_ID=$DUT_ID" >> $GITHUB_ENV
+          echo "DUT_IP=$DUT_IP" >> $GITHUB_ENV
           
           CFG_CONTENT=$(cat build/config/boards/${DUT_SLUG}.* | grep -e "KERNEL_TARGET\|BOARD_NAME")
           eval $CFG_CONTENT
           echo "$BOARD_NAME $KERNEL_TARGET"
 
-          #curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
-          #"https://stuff.armbian.com/netbox/api/dcim/power-ports/?limit=500&name__empty=false&device_id=${{ env.DUT_ID }}" \
-          #| jq '.results[] | .link_peer.display' 
+          curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
+          "https://stuff.armbian.com/netbox/api/dcim/power-ports/?limit=500&name__empty=false&device_id=$DUT_ID" \
+          | jq '.results[] | .link_peer.display' 
 
       - name: "Is ${{ env.DUT_IP }} online?"
         run: |
