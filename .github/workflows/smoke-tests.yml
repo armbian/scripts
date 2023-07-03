@@ -91,7 +91,11 @@ jobs:
           echo "DUT_SLUG=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
           echo "DUT_IP=$(echo $CHUNK | cut -d":" -f4)" >> $GITHUB_ENV
 
-      - name: Is online?
+          curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
+          "https://stuff.armbian.com/netbox/api/dcim/power-ports/?limit=500&name__empty=false&device_id=${{ env.DUT_ID }}" \
+          | jq '.results[] | .link_peer.display' 
+
+      - name: "Is ${{ env.DUT_IP }} online?"
         run: |
 
           # set this here
