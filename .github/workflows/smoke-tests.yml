@@ -45,7 +45,7 @@ jobs:
           echo '[
                   "FriendlyElec Zero Pi:10.0.30.195",
                   "FriendlyElec Nanopi Neo 2 black:10.0.30.184"
-               ]'
+               ]'  >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
           
           #echo ::set-output name=matrix::$(
