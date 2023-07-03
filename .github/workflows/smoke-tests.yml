@@ -30,7 +30,7 @@ jobs:
         uses: armbian/actions/runner-prepare@main
 
       - name: Power on
-        if: ${{ true.test }}
+        if: ! always()
         uses: armbian/actions/power-on@main
         with:
           KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
@@ -201,8 +201,7 @@ jobs:
 
   Stop:
     name: "Power system off"
-    #if: always()
-    if: ${{ true.test }}
+    if: ! always()
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
