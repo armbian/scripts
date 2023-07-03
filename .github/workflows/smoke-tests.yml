@@ -66,6 +66,14 @@ jobs:
       - name: Runner clean
         uses: armbian/actions/runner-clean@main
 
+      - name: Checkout Armbian build repo
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/build
+          fetch-depth: 1
+          clean: false
+          path: build
+
       - name: "Generate key id" # We need this in case we run multiple runners on one machine
         run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
         shell: bash
@@ -88,6 +96,8 @@ jobs:
           echo "DUT_SLUG=$(echo $CHUNK | cut -d":" -f1)" >> $GITHUB_ENV
           echo "DUT_ID=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
           echo "DUT_IP=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
+
+          ls -l build/config/board/${{ env.DUT_IP }}* || true
 
           #curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           #"https://stuff.armbian.com/netbox/api/dcim/power-ports/?limit=500&name__empty=false&device_id=${{ env.DUT_ID }}" \
