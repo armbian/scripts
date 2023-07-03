@@ -85,10 +85,9 @@ jobs:
         run: |
 
           CHUNK="${{ matrix.node }}"
-          echo "DUT_NAME=$(echo $CHUNK | cut -d":" -f1)" >> $GITHUB_ENV
+          echo "DUT_SLUG=$(echo $CHUNK | cut -d":" -f1)" >> $GITHUB_ENV
           echo "DUT_ID=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
-          echo "DUT_SLUG=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
-          echo "DUT_IP=$(echo $CHUNK | cut -d":" -f4)" >> $GITHUB_ENV
+          echo "DUT_IP=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
 
           #curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           #"https://stuff.armbian.com/netbox/api/dcim/power-ports/?limit=500&name__empty=false&device_id=${{ env.DUT_ID }}" \
