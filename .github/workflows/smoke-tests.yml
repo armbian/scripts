@@ -51,7 +51,7 @@ jobs:
           "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
           | jq '.results[] | .display, .device_type.slug, .primary_ip.address' | head -1 \
           | xargs -n3 -d'\n' | grep -v null | sed -e 's/ ([^()]*)//g' \
-          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq
+          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   Test:
