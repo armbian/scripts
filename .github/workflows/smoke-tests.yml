@@ -79,7 +79,7 @@ jobs:
           known_hosts: github.com ssh-rsa AAAAB3Nz
           if_key_exists: replace
 
-      - name: Read values
+      - name: "Read values"
         run: |
 
           CHUNK="${{ matrix.node }}"
@@ -87,7 +87,7 @@ jobs:
           echo "DUT_SLUG=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
           echo "DUT_IP=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
 
-      - name: Is online?
+      - name: "Is ${{ env.DUT_IP }} online?"
         run: |
 
           # set this here
