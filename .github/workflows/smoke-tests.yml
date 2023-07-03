@@ -42,17 +42,17 @@ jobs:
         run: |
 
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
-          echo '[
-                  "FriendlyElec Zero Pi:10.0.30.195",
-                  "FriendlyElec Nanopi Neo 2 black:10.0.30.184"
-               ]'  >> $GITHUB_OUTPUT
+          #echo '[
+          #        "FriendlyElec Zero Pi:10.0.30.195",
+          #        "FriendlyElec Nanopi Neo 2 black:10.0.30.184"
+          #     ]'  >> $GITHUB_OUTPUT
+          #
+          curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
+          "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
+          | jq '.results[] | .display, .device_type.slug, .primary_ip.address' | head -1 \
+          | xargs -n3 -d'\n' | grep -v null | sed -e 's/ ([^()]*)//g' \
+          | sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq
           echo 'EOF' >> $GITHUB_OUTPUT
-          
-          #echo ::set-output name=matrix::$(
-          #curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
-          #"https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
-          #| jq '.results[] | .display, .device_type.slug, .primary_ip.address' | xargs -n3 -d'\n' | grep -v null | sed -e 's/ ([^()]*)//g' \
-          #| sed 's/\/24"/"/g' | sed "s/\" \"/:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq)
 
   Test:
     name: "DUT"
