@@ -84,7 +84,8 @@ jobs:
 
           CHUNK="${{ matrix.node }}"
           echo "DUT_NAME=$(echo $CHUNK | cut -d":" -f1)" >> $GITHUB_ENV
-          echo "DUT_IP=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
+          echo "DUT_SLUG=$(echo $CHUNK | cut -d":" -f2)" >> $GITHUB_ENV
+          echo "DUT_IP=$(echo $CHUNK | cut -d":" -f3)" >> $GITHUB_ENV
 
       - name: Is online?
         run: |
