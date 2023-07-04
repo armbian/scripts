@@ -128,13 +128,14 @@ jobs:
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
             echo "ONLINE=true" >> $GITHUB_ENV
+            echo "LINUXFAMILY=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV
           else
             echo "$server ✗ needs to be power cycled"
             echo "ONLINE=false" >> $GITHUB_ENV
             [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
           fi
 
-      - name: "Legacy"
+      - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}        
         run: |
 
