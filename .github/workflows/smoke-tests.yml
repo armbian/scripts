@@ -135,7 +135,7 @@ jobs:
           fi
 
       - name: "Legacy"
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}        
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'xxx') }}        
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
