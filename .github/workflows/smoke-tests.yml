@@ -150,7 +150,7 @@ jobs:
 
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}        
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
@@ -158,7 +158,7 @@ jobs:
 
       - name: Reboot
         timeout-minutes: 5
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 2"
@@ -181,7 +181,7 @@ jobs:
 
       - name: Reboot
         timeout-minutes: 5
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 2"
@@ -204,7 +204,7 @@ jobs:
 
       - name: Reboot
         timeout-minutes: 5
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 2"
