@@ -44,7 +44,7 @@ jobs:
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
-          | jq '.results[] | .device_type.slug, .id, .primary_ip.address' | xargs -n3 -d'\n' | head -3 | grep -v null \
+          | jq '.results[] | .device_type.slug, .id, .primary_ip.address' | xargs -n3 -d'\n' | head -6 | grep -v null \
           | sed 's/\/24"/"/g' | sed "s/ /:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
@@ -135,7 +135,21 @@ jobs:
           fi
 
       - name: "Legacy"
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'xxx') }}        
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}        
+        run: |
+
+           echo "${{ env.KERNEL_TARGET }}"
+           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "source /etc/armbian-release; echo ${LINUXFAMILY}" || true
+
+      - name: "Current"
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}        
+        run: |
+
+           echo "${{ env.KERNEL_TARGET }}"
+           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "source /etc/armbian-release; echo ${LINUXFAMILY}" || true
+
+      - name: "Edge"
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}        
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
