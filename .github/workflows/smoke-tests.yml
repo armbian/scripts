@@ -152,7 +152,7 @@ jobs:
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-legacy-${{ env.LINUXFAMILY }}; apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-legacy-${{ env.LINUXFAMILY }}; apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
         timeout-minutes: 3
@@ -167,7 +167,7 @@ jobs:
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-current-${{ env.LINUXFAMILY }}; apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
+           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-current-${{ env.LINUXFAMILY }}; apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
         timeout-minutes: 3
@@ -182,7 +182,7 @@ jobs:
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-edge-${{ env.LINUXFAMILY }}; apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
+           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-edge-${{ env.LINUXFAMILY }}; apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
         timeout-minutes: 3
