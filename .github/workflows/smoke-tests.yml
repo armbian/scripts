@@ -162,7 +162,14 @@ jobs:
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 2"
-          sleep 3m
+          while true
+          do
+              sleep 10
+              echo "Destination Host Unreachable"
+              if nc -z "${{ env.DUT_IP }}" 22 -w 15 2>/dev/null; then
+              break
+              fi
+          done
 
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
@@ -178,7 +185,14 @@ jobs:
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 2"
-          sleep 3m
+          while true
+          do
+              sleep 10
+              echo "Destination Host Unreachable"
+              if nc -z "${{ env.DUT_IP }}" 22 -w 15 2>/dev/null; then
+              break
+              fi
+          done
 
       - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
@@ -194,7 +208,14 @@ jobs:
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r 2"
-          sleep 3m
+          while true
+          do
+              sleep 10
+              echo "Destination Host Unreachable"
+              if nc -z "${{ env.DUT_IP }}" 22 -w 15 2>/dev/null; then
+              break
+              fi
+          done
 
       - name: Login
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
