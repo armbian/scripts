@@ -146,7 +146,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt purge -y linux-image-* linux-dtb-*" || true
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y purge '^linux-image-*' '^linux-dtb-*'" || true
 
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
@@ -161,7 +161,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r"
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r now"
           sleep 3m
 
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
@@ -177,7 +177,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r"
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r now"
           sleep 3m
 
       - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
@@ -193,7 +193,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r"
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r now"
           sleep 3m
 
       - name: Login
