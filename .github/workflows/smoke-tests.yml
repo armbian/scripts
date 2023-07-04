@@ -173,6 +173,7 @@ jobs:
 
       - name: Collect data
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
+        timeout-minutes: 3
         uses: armbian/actions/collect-data@main
 
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
@@ -200,6 +201,7 @@ jobs:
           
       - name: Collect data
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
+        timeout-minutes: 3
         uses: armbian/actions/collect-data@main
 
       - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
@@ -227,6 +229,7 @@ jobs:
 
       - name: Collect data
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        timeout-minutes: 3
         uses: armbian/actions/collect-data@main
 
       - name: Login
