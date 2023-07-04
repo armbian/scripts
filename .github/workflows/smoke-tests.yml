@@ -161,7 +161,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now || true"
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
           while true
           do
               sleep 10
@@ -184,7 +184,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now || true"
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
           while true
           do
               sleep 10
@@ -207,7 +207,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now || true"
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
           while true
           do
               sleep 10
