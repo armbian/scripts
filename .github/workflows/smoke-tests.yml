@@ -131,8 +131,15 @@ jobs:
           else
             echo "$server ✗ needs to be power cycled"
             echo "ONLINE=false" >> $GITHUB_ENV
-            [[ -n "${{ matrix.power-socket }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ matrix.power-socket }}" || true
+            [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
           fi
+
+      - name: "Legacy"
+        if: ${{ github.repository_owner == 'Armbian' && env.KERNEL_TARGET == legacy }}
+        run: |
+
+           echo "${{ env.KERNEL_TARGET }}"
+           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "source /etc/armbian-release; echo ${LINUXFAMILY}" || true
 
       - name: Login
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
