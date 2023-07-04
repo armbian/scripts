@@ -44,7 +44,7 @@ jobs:
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
-          | jq '.results[] | .device_type.slug, .id, .primary_ip.address' | xargs -n3 -d'\n' | head -6 | grep -v null \
+          | jq '.results[] | .device_type.slug, .id, .primary_ip.address' | xargs -n3 -d'\n' | head -10 | grep -v null \
           | sed 's/\/24"/"/g' | sed "s/ /:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
@@ -135,6 +135,18 @@ jobs:
             [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
           fi
 
+      - name: "Make sure we are updating from nightly repository"
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
+
+      - name: "Remove any installed kernel"
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt purge -y linux-image-* linux-dtb-*" || true
+
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}        
         run: |
@@ -142,19 +154,43 @@ jobs:
            echo "${{ env.KERNEL_TARGET }}"
            ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-legacy-${{ env.LINUXFAMILY }}; apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
 
+      - name: Reboot
+        timeout-minutes: 3
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r"
+          sleep 3m
+
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
            ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-current-${{ env.LINUXFAMILY }}; apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
-      
-      - name: "Edge"
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}        
+
+      - name: Reboot
+        timeout-minutes: 3
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r"
+          sleep 3m
+
+      - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "source /etc/armbian-release; echo ${LINUXFAMILY}" || true
+           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-edge-${{ env.LINUXFAMILY }}; apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
+
+      - name: Reboot
+        timeout-minutes: 3
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown -r"
+          sleep 3m
 
       - name: Login
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
@@ -168,12 +204,6 @@ jobs:
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "timeout 60 neofetch" || true
-
-      - name: To nightly
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
-        run: |
-
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
 
       - name: Dmesg
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
