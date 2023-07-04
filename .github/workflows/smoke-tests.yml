@@ -171,6 +171,9 @@ jobs:
               fi
           done
 
+      - name: Collect data
+        uses: armbian/actions/collect-data@main
+
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
