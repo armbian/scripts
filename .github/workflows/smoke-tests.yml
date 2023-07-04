@@ -142,12 +142,14 @@ jobs:
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
 
       - name: "Remove any installed kernel"
+        timeout-minutes: 2
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt purge -y linux-image-* linux-dtb-*" || true
 
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
+        timeout-minutes: 2
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}        
         run: |
 
@@ -163,6 +165,7 @@ jobs:
           sleep 3m
 
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
+        timeout-minutes: 2
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
         run: |
 
@@ -178,6 +181,7 @@ jobs:
           sleep 3m
 
       - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
+        timeout-minutes: 2
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
         run: |
 
