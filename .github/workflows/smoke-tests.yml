@@ -254,8 +254,8 @@ jobs:
         run: rm -f /tmp/${{ env.RANDOM }}
 
   Stop:
-    name: "Test"
-    if: always() && ${{ github.repository_owner == 'Armbian' }}
+    name: "Power system off"
+    if: always() && ${{ inputs.PWRMNGMT == 'true' }}
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
