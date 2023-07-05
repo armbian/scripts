@@ -6,7 +6,11 @@ on:
       GITBRANCH:
        required: true
        type: string
-       default: "main"        
+       default: "main"
+      PWRMNGMT:
+       required: true
+       type: string
+       default: "true"
     secrets:
       NETBOX_TOKEN:
         required: true
@@ -33,7 +37,12 @@ jobs:
 
       - name: Runner clean
         uses: armbian/actions/runner-clean@main
-
+        
+      - name: "Power on"
+        if: ${{ github.event.inputs.bump == 'true' }}
+        run: |
+          echo "power up"
+          
 #      - name: Power on
 #        uses: armbian/actions/power-on@main
 #        with:
