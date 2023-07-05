@@ -272,9 +272,9 @@ jobs:
 
       - name: Calculate
         run: |
-
-          cat ./*.json > merged.json
-          cat merged.json >> $GITHUB_STEP_SUMMARY
+          echo "[" > merged.json
+          cat ./*.json | sed -i '$ s/.$//' >> merged.json
+          echo "]" >> merged.json
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' }}
