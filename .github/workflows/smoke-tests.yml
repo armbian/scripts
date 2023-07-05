@@ -4,7 +4,9 @@ on:
   workflow_call:
     inputs:
       GITBRANCH:
-      required: true
+       required: true
+       type: string
+       default: "main"        
     secrets:
       NETBOX_TOKEN:
         required: true
