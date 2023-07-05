@@ -39,7 +39,7 @@ jobs:
         uses: armbian/actions/runner-clean@main
         
       - name: "Power on"
-        if: ${{ github.event.inputs.PWRMNGMT == 'true' }}
+        if: ${{ inputs.PWRMNGMT == 'true' }}
         run: |
           echo "power up"
           
