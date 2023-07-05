@@ -150,7 +150,7 @@ jobs:
 
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
@@ -158,7 +158,7 @@ jobs:
 
       - name: Reboot
         timeout-minutes: 5
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
@@ -172,13 +172,13 @@ jobs:
           done
 
       - name: Collect data
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
         timeout-minutes: 3
         uses: armbian/actions/collect-data@main
 
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
@@ -186,7 +186,7 @@ jobs:
 
       - name: Reboot
         timeout-minutes: 5
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
@@ -200,13 +200,13 @@ jobs:
           done
           
       - name: Collect data
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
         timeout-minutes: 3
         uses: armbian/actions/collect-data@main
 
       - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
@@ -214,7 +214,7 @@ jobs:
 
       - name: Reboot
         timeout-minutes: 5
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
@@ -228,7 +228,7 @@ jobs:
           done
 
       - name: Collect data
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
         timeout-minutes: 3
         uses: armbian/actions/collect-data@main
 
