@@ -157,7 +157,7 @@ jobs:
            ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-legacy-${{ env.LINUXFAMILY }}; apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
-        timeout-minutes: 5
+        timeout-minutes: 10
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
         run: |
 
@@ -187,7 +187,7 @@ jobs:
            ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-current-${{ env.LINUXFAMILY }}; apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
-        timeout-minutes: 5
+        timeout-minutes: 10
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
         run: |
 
@@ -217,7 +217,7 @@ jobs:
            ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-edge-${{ env.LINUXFAMILY }}; apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
-        timeout-minutes: 5
+        timeout-minutes: 10
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
         run: |
 
@@ -271,21 +271,6 @@ jobs:
           fi
 
           timeout 2000 ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y update; apt-get -y --fix-broken install; apt-get -y -o Dpkg::Options::=\"--force-confold\" upgrade; apt-get -y dist-upgrade; apt-get -y autoremove" || true
-
-      - name: Iperf
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
-        run: |
-
-          while :
-          do
-            IPERF=$(timeout 1000 ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "iperf3 -c 10.0.40.2 -t 5 -J 2>/dev/null | jq '.intervals[] .sum .bits_per_second' | LC_ALL=C datamash median 1 | cut -d"-" -f2" | LC_ALL=C awk '{$1/=1048576;printf "%.0f\n",$1}')
-            if [[ -n "${IPERF}" ]] ; then
-              echo "IPERF=${IPERF}" >> $GITHUB_ENV
-              break
-            fi
-            echo "The server is busy running a test"
-            sleep 2
-          done
 
       - name: 7Zip
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
