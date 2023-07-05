@@ -273,7 +273,6 @@ jobs:
       - name: Calculate
         run: |
 
-          unzip JSON
           cat ./*.json > merged.json
           cat merged.json >> $GITHUB_STEP_SUMMARY
 
