@@ -116,6 +116,8 @@ jobs:
           "https://stuff.armbian.com/netbox/api/dcim/power-ports/?limit=500&name__empty=false&device_id=$DUT_ID" \
           | jq '.results[] | .link_peer.display')
           echo "POWER_PORT=$(echo $CFG_CONTENT | cut -d'(' -f2 | cut -d')' -f1 | grep -Eo '[0-9]{1,4}')" >> $GITHUB_ENV
+          # upgrade
+          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
 
       - name: "Is ${{ env.DUT_IP }} online via power port ${{ env.POWER_PORT }} ?"
         run: |
