@@ -258,33 +258,31 @@ jobs:
       - name: Clean
         run: |
 
-          sudo rm -rf status
+          rm -rf JSON *.json
 
       - name: Download changes
         uses: actions/download-artifact@v3.0.2
         with:
-          name: status
-          path: status
+          name: JSON
+          
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: JSON
 
       - name: Calculate
         run: |
 
-          echo "|IP|DUT|U-boot|Kernel|Iperf Mbit/s|7Z bench|Online|Reboot|" > status.md
-          echo "|:--|:--|:--|--:|--:|--:|:--:|:--:|" >> status.md 
-          cat status/*.md >> status.md 
-          cat status.md >> $GITHUB_STEP_SUMMARY
-          #
-          ls -1 status/*.txt | wc -l > status/total
-          grep false status/* | cut -d":" -f2 | cut -d"," -f1-2 > status/failed
-          echo "scale=2 ; (100*($(cat status/total)-$(cat status/failed | wc -l))/$(cat status/total))" | bc > status/success
-          rm -f status/*.*
+          unzip JSON
+          cat ./*.json > merged.json
+          cat merged.json >> $GITHUB_STEP_SUMMARY
 
       - name: Upload status
         if: ${{ github.repository_owner == 'Armbian' }}
         uses: actions/upload-artifact@v3
         with:
           name: status
-          path: status
+          path: merged.json
 
       #- name: Power off
       #  if: always()
