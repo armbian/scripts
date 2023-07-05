@@ -2,6 +2,9 @@ name: Smoke tests
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      GITBRANCH:
+      required: true
     secrets:
       NETBOX_TOKEN:
         required: true
@@ -71,6 +74,7 @@ jobs:
         with:
           repository: armbian/build
           fetch-depth: 1
+          ref: "${{ inputs.GITBRANCH }}"
           clean: false
           path: build
 
