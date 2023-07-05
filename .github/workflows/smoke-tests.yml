@@ -44,7 +44,7 @@ jobs:
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
           "https://stuff.armbian.com/netbox/api/dcim/devices/?limit=500&name__empty=false&tenant=igor&status=active&device_role=DUT&tag=qa" \
-          | jq '.results[] | .device_type.slug, .id, .primary_ip.address' | xargs -n3 -d'\n' | tail -5 | grep -v null \
+          | jq '.results[] | .device_type.slug, .id, .primary_ip.address' | xargs -n3 -d'\n' | tail -15 | grep -v null \
           | sed 's/\/24"/"/g' | sed "s/ /:/g" | sed "s/\"//g" |jq -cnR '[inputs | select(length>0)]' | jq >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
@@ -144,12 +144,13 @@ jobs:
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
 
-      - name: "Remove any installed kernel"
+      - name: "Remove any installed kernel and cleanup"
         timeout-minutes: 3
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y purge '^linux-image-*' '^linux-dtb-*'" || true
+          rm -rf *.json
 
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
         timeout-minutes: 10
