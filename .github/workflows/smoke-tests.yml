@@ -35,21 +35,14 @@ jobs:
     runs-on: [self-hosted, Linux, local]
     steps:
 
-      - name: Runner clean
-        uses: armbian/actions/runner-clean@main
-        
       - name: "Power on"
         if: ${{ inputs.PWRMNGMT == 'true' }}
-        run: |
-          echo "power up"
-          
-#      - name: Power on
-#        uses: armbian/actions/power-on@main
-#        with:
-#          KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
-#          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
-#          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
-#         KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+        uses: armbian/actions/power-on@main
+        with:
+          KEY_POWER_ON: ${{ secrets.KEY_POWER_ON }}
+          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
 
       - name: Get devices from database
         id: json
@@ -69,7 +62,7 @@ jobs:
     if: ${{ needs.Prepare.outputs.matrix != '[]' && needs.Prepare.outputs.matrix != '' }}
     timeout-minutes: 60
     strategy:
-      # max-parallel: 32
+      max-parallel: 32
       fail-fast: false
       matrix:
 
@@ -262,48 +255,42 @@ jobs:
 
   Stop:
     name: "Test"
-    if: always()
+    if: always() && ${{ github.repository_owner == 'Armbian' }}
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
 
-      - name: Runner clean
+      - name: "Runner clean"
         uses: armbian/actions/runner-clean@main
 
-      - name: Clean
-        run: |
-
-          rm -rf JSON *.json
-
-      - name: Download changes
+      - name: "Download changes"
         uses: actions/download-artifact@v3.0.2
         with:
           name: JSON
           
-      - name: Delete artifact
+      - name: "Delete artifact"
         uses: geekyeggo/delete-artifact@v2
         with:
           name: JSON
 
-      - name: Calculate
+      - name: "Merge JSON parts"
         run: |
           echo "[" > merged.json
           cat ./*.parts | sed '$ s/.$//' >> merged.json
           echo "]" >> merged.json
 
-      - name: Upload status
-        if: ${{ github.repository_owner == 'Armbian' }}
+      - name: "Upload JSON"
         uses: actions/upload-artifact@v3
         with:
           name: status
           path: merged.json
 
-      #- name: Power off
-      #  if: always()
-      #  uses: armbian/actions/power-off@main
-      #  with:
+      - name: Power off
+        if: always() && ${{ inputs.PWRMNGMT == 'true' }}
+        uses: armbian/actions/power-off@main
+        with:
 
-      #    KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
-      #    USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
-      #    HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
-      #    KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
+          KEY_POWER_OFF: ${{ secrets.KEY_POWER_OFF }}
+          USER_REPOSITORY: ${{ secrets.USER_REPOSITORY }}
+          HOST_REPOSITORY: ${{ secrets.HOST_REPOSITORY }}
+          KNOWN_HOSTS_REPOSITORY: ${{ secrets.KNOWN_HOSTS_REPOSITORY }}
