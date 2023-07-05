@@ -273,7 +273,7 @@ jobs:
       - name: Calculate
         run: |
           echo "[" > merged.json
-          cat ./*.json | sed '$ s/.$//' >> merged.json
+          cat ./*.parts | sed '$ s/.$//' >> merged.json
           echo "]" >> merged.json
 
       - name: Upload status
