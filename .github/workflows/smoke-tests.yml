@@ -185,7 +185,7 @@ jobs:
 
       - name: Collect data
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
-        timeout-minutes: 3
+        timeout-minutes: 15
         uses: armbian/actions/collect-data@main
         with:
           kernel-target: legacy
@@ -215,7 +215,7 @@ jobs:
           
       - name: Collect data
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
-        timeout-minutes: 3
+        timeout-minutes: 15
         uses: armbian/actions/collect-data@main
         with:
           kernel-target: current
@@ -245,7 +245,7 @@ jobs:
 
       - name: Collect data
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
-        timeout-minutes: 3
+        timeout-minutes: 15
         uses: armbian/actions/collect-data@main
         with:
           kernel-target: edge
