@@ -81,6 +81,10 @@ jobs:
     name: "M"
     runs-on: [Ubuntu-latest]
     steps:
+    
+      - name: Update
+        run: |
+          sudo apt update
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
@@ -92,7 +96,7 @@ jobs:
           # all of these default to true, but feel free to set to
           # "false" if necessary for your workflow
           android: true
-          dotnet: false
+          dotnet: true
           haskell: true
           large-packages: true
           swap-storage: true
