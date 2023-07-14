@@ -85,7 +85,7 @@ jobs:
       - name: Update
         run: |
           sudo apt update
-          sudo apt -y upgrade
+          #########sudo apt -y upgrade
           sudo apt -y clean
 
       - name: Free Disk Space (Ubuntu)
