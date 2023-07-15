@@ -57,51 +57,49 @@ jobs:
 
           # extract values fron JSON
           {
-          echo "<ul>"
-          jq -c '.[]' /tmp/armbian_maintainers.json | while read i; do
-          NAME=$(echo $i | jq --raw-output '.First_Name')
-          BOARD=$(echo $i | jq --raw-output '.Maintaining')
-          MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
-          if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
-              echo "    <li><a href=https://github.com/${MAINTAINER_GITHUB}>$NAME</a>"
-              echo "      <ul>"
-              for i in $(echo $BOARD | sed "s/,/ /g")
-                  do
-                      unset BOARD_NAME BOARD_MAINTAINER CFG_CONTENT
-                      CFG_CONTENT="$(cat config/boards/${i}.* 2> /dev/null | grep -e "BOARD_MAINTAINER\|BOARD_NAME" || true)"
-                      if [[ -n "$CFG_CONTENT" ]]; then
-                          eval "$CFG_CONTENT"
-                          echo "        <li>$i</li>"
-                          if [[ -n "${BOARD_MAINTAINER}" && "${BOARD_MAINTAINER}" != *$MAINTAINER_GITHUB* ]]; then
-                              BOARD_MAINTAINER+=" $MAINTAINER_GITHUB"
-                          else
-                              BOARD_MAINTAINER="$MAINTAINER_GITHUB"
-                          fi
-                          sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$BOARD_MAINTAINER\"/" config/boards/${i}.*
+            echo "<ul>"
+            jq -c '.[]' /tmp/armbian_maintainers.json | while read i; do
+              NAME=$(echo $i | jq --raw-output '.First_Name')
+              BOARD=$(echo $i | jq --raw-output '.Maintaining')
+              MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
+              if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
+                echo "    <li><a href=https://github.com/${MAINTAINER_GITHUB}>$NAME</a>"
+                echo "      <ul>"
+                for i in $(echo $BOARD | sed "s/,/ /g"); do
+                  unset BOARD_NAME BOARD_MAINTAINER CFG_CONTENT
+                  CFG_CONTENT="$(cat config/boards/${i}.* 2> /dev/null | grep -e "BOARD_MAINTAINER\|BOARD_NAME" || true)"
+                  if [[ -n "$CFG_CONTENT" ]]; then
+                    eval "$CFG_CONTENT"
+                    echo "        <li>$i</li>"
+                    if [[ -n "${BOARD_MAINTAINER}" && "${BOARD_MAINTAINER}" != *$MAINTAINER_GITHUB* ]]; then
+                      BOARD_MAINTAINER+=" $MAINTAINER_GITHUB"
+                    else
+                      BOARD_MAINTAINER="$MAINTAINER_GITHUB"
+                    fi
+                    sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$BOARD_MAINTAINER\"/" config/boards/${i}.*
 
-                          # if maintainer exits, rename .csc to .conf
-                          if [[ -n "${BOARD_MAINTAINER}" ]]; then
-                              mv config/boards/${i}.csc config/boards/${i}.conf 2>/dev/null || true
-                          fi
-                      fi
-                  done
-          echo "      </ul>"
-          echo "    </li>"
-          fi
-          done
-          echo "</ul>"
+                    # if maintainer exits, rename .csc to .conf
+                    if [[ -n "${BOARD_MAINTAINER}" ]]; then
+                      mv config/boards/${i}.csc config/boards/${i}.conf 2>/dev/null || true
+                    fi
+                  fi
+                done
+                echo "      </ul>"
+                echo "    </li>"
+              fi
+            done
+            echo "</ul>"
 
-          # rename configuration to .csc where we lost maintainer
-          grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
-          while read -r line
-          do
-          if [[ "${line}" != "${line/.conf/.csc}" ]]; then
-              mv $line ${line/.conf/.csc}
-          fi
-          if [[ "${line}" != "${line/.wip/.csc}" ]]; then
-              mv $line ${line/.wip/.csc}
-          fi
-          done
+            # rename configuration to .csc where we lost maintainer
+            grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
+              while read -r line; do
+                if [[ "${line}" != "${line/.conf/.csc}" ]]; then
+                  mv $line ${line/.conf/.csc}
+                fi
+                if [[ "${line}" != "${line/.wip/.csc}" ]]; then
+                  mv $line ${line/.wip/.csc}
+                fi
+              done
 
           } >> $GITHUB_STEP_SUMMARY
 
