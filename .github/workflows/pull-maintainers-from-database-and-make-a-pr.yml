@@ -70,10 +70,10 @@ jobs:
           echo "      <ul>"
                   for i in $(echo $BOARD | sed "s/,/ /g")
                   do
-                      unset BOARD_NAME BOARD_MAINTAINER B
-                      B=$(ls -1 config/boards/${i}* 2> /dev/null || true)
+                      unset BOARD_NAME BOARD_MAINTAINER CFG_CONTENT
+                      CFG_CONTENT="$(cat build/config/boards/${DUT_SLUG}.* | grep -e "BOARD_MAINTAINER\|BOARD_NAME" || true)"
                       if [[ -n $B ]]; then
-                      source $B
+                      source $CFG_CONTENT
                       echo "        <li>$i</li>"
                       
                       if [[ -n $BOARD_MAINTAINER && $BOARD_MAINTAINER != *$MAINTAINER_GITHUB* ]]; then
