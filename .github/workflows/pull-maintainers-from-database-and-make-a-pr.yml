@@ -76,7 +76,7 @@ jobs:
                       source "$CFG_CONTENT"
                       echo "        <li>$i</li>"
                       
-                      if [[ -n $BOARD_MAINTAINER && $BOARD_MAINTAINER != *$MAINTAINER_GITHUB* ]]; then
+                      if [[ -n "${BOARD_MAINTAINER}" && "${BOARD_MAINTAINER}" != *$MAINTAINER_GITHUB* ]]; then
                       BOARD_MAINTAINER+=" $MAINTAINER_GITHUB"
                       else
                       BOARD_MAINTAINER="$MAINTAINER_GITHUB"
