@@ -98,6 +98,9 @@ jobs:
 
           } >> $GITHUB_STEP_SUMMARY
 
+          # Re-generate CODEOWNERS
+          ./.github/generate_CODEOWNERS.sh 
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v5
