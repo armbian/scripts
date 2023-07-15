@@ -57,20 +57,18 @@ jobs:
 
           # extract values fron JSON
           {
-            echo "<ul>"
             jq -c '.[]' /tmp/armbian_maintainers.json | while read i; do
               NAME=$(echo $i | jq --raw-output '.First_Name')
               BOARD=$(echo $i | jq --raw-output '.Maintaining')
               MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
               if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
-                echo "    <li><a href=https://github.com/${MAINTAINER_GITHUB}>$NAME</a>"
-                echo "      <ul>"
+                echo "- [$NAME](https://github.com/${MAINTAINER_GITHUB})"
                 for i in $(echo $BOARD | sed "s/,/ /g"); do
                   unset BOARD_NAME BOARD_MAINTAINER CFG_CONTENT
                   CFG_CONTENT="$(cat config/boards/${i}.* 2> /dev/null | grep -e "BOARD_MAINTAINER\|BOARD_NAME" || true)"
                   if [[ -n "$CFG_CONTENT" ]]; then
                     eval "$CFG_CONTENT"
-                    echo "        <li>$i</li>"
+                    echo -e "  - $i</li>"
                     if [[ -n "${BOARD_MAINTAINER}" && "${BOARD_MAINTAINER}" != *$MAINTAINER_GITHUB* ]]; then
                       BOARD_MAINTAINER+=" $MAINTAINER_GITHUB"
                     else
@@ -84,11 +82,8 @@ jobs:
                     fi
                   fi
                 done
-                echo "      </ul>"
-                echo "    </li>"
               fi
             done
-            echo "</ul>"
 
             # rename configuration to .csc where we lost maintainer
             grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
