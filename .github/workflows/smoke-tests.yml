@@ -254,8 +254,8 @@ jobs:
         run: rm -f /tmp/${{ env.RANDOM }}
 
   Stop:
-    name: "Power system off"
-    if: always() && ${{ inputs.PWRMNGMT == 'true' }}
+    name: "Merge artifacts"
+    if: always()
     needs: Test
     runs-on: [self-hosted, Linux, local]
     steps:
@@ -286,7 +286,7 @@ jobs:
           path: merged.json
 
       - name: Power off
-        if: always() && ${{ inputs.PWRMNGMT == 'true' }}
+        if: ${{ inputs.PWRMNGMT == 'true' }}
         uses: armbian/actions/power-off@main
         with:
 
