@@ -45,7 +45,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v3.5.3
         with:
           repository: armbian/os
           path: os
@@ -85,18 +85,11 @@ jobs:
       - name: Update
         run: |
           sudo apt update
-          #########sudo apt -y upgrade
           sudo apt -y clean
 
-      - name: Free Disk Space (Ubuntu)
+      - name: Free Github Runner
         uses: jlumbroso/free-disk-space@main
         with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
-        
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
           android: true
           dotnet: true
           haskell: true
@@ -112,7 +105,6 @@ jobs:
           if_key_exists: replace
 
       - name: Import GPG key we need to sign repository
-
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.GPG_KEY1 }}
@@ -137,16 +129,14 @@ jobs:
 
       - name: Install Aptly
         run: |
-
           wget https://github.com/aptly-dev/aptly/releases/download/v1.5.0/aptly_1.5.0_amd64.deb
           sudo dpkg -i aptly_1.5.0_amd64.deb
           sudo rm aptly_1.5.0_amd64.deb
 
-      - name: Install keys
+      - name: Install all keys
         run: |
-
           find os/external/keys/ -type f -name "*.gpg" -exec gpg --import --no-default-keyring --keyring trustedkeys.gpg "{}" \;
-          sudo apt-get -y install debian-keyring ubuntu-keyring devscripts
+          sudo apt-get -y install debian-keyring ubuntu-keyring
           gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 0E98404D386FA1D9
 
       - name: Download
@@ -171,15 +161,10 @@ jobs:
 
           # we use different download metods (github, aplty)
           if [[ ${METHOD} == gh ]]; then
-
               gh release download -p '*.deb' --repo ${URL} --dir temp
-
           elif [[ ${METHOD} == direct ]]; then
-
               wget -O ${SOURCE}/${{ matrix.node }}.deb ${URL}
-
           else
-
               SOURCE="/home/runner/.aptly/public/"
               COMPONENT="main"
               [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
@@ -188,10 +173,9 @@ jobs:
               aptly -max-tries=3 mirror update ${{ matrix.node }}-${RELEASE}
               aptly snapshot create ${{ matrix.node }}-${RELEASE} from mirror ${{ matrix.node }}-${RELEASE}
               aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${{ matrix.node }}-${RELEASE}
-
           fi
 
-          # clean workaround
+          # Cleaning
           find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-rk3399_*" | sort | head -n -1 | xargs sudo rm || true
@@ -205,17 +189,23 @@ jobs:
           find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
 
+          # store info to GitHub Actions
+          echo "<details><summary>Show packages</summary><p>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev | sed -e 's/^/- /;'>> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+
           # repack deb files
-          DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
-          for d in ${DEBS[@]}; do
-            echo $d
-           # BEFORE=$(deb-reversion -c ${d} -s armbian)
-            # add epoch 9
+          #DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
+          #for d in ${DEBS[@]}; do
+            #BEFORE=$(deb-reversion -c ${d} -s armbian)
+            #add epoch 9
             #AFTER=9:$(echo $BEFORE | cut -d":" -f2)
             #echo "$d : $BEFORE -> $AFTER"
             #sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
             #sudo rm $d
-          done
+          #done
 
           if [[ ${TARGET} == main ]]; then
                   if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
@@ -230,50 +220,30 @@ jobs:
               if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/extra/${RELEASE}-${TARGET} \;; fi
           fi
 
-
       - name: Deploy to server
         if: inputs.REFERENCE == 'main'
         run: |
-
           sudo apt-get -y -qq install lftp
-
           # upload beta repository
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
-
           # upload stable repository
           lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/debs/ debs/ ;bye" sftp://users.armbian.com
-
 
       - name: Build testing repository
         run: |
 
-          #tree build/output
-
-          # store infor to GitHub Actions
-          echo "<details><summary>Show packages</summary><p>" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev | sed -e 's/^/- /;'>> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "</details>" >> $GITHUB_STEP_SUMMARY
-
           cd build/tools/repository
           mkdir -p repository/public # this needs to be moved to the repo generation
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' aptly.conf
-
-          #sed 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' build/tools/repository/aptly.conf > aptly.conf
-          #sed 's|"rootDir": ".*"|"rootDir": "build/output"|g' aptly.conf
-
+          # sed 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' build/tools/repository/aptly.conf > aptly.conf
+          # sed 's|"rootDir": ".*"|"rootDir": "build/output"|g' aptly.conf
           # we check beta as there it goes always
           ./repo -c update -i ../../output/debs-beta -o repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
-          #cd ..; cd ..
-          #tree
-          #build/tools/repository/repo -c update -i build/output/debs-beta -o build/output/repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
           rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
-          pwd
-
       - name: Create a temporary artifact folder
-        run: mkdir downloads
+        run: |
+          mkdir downloads
 
       - name: Add artifacts
         run: |
@@ -406,8 +376,6 @@ jobs:
           for i in ${INSTALL}; do
           apt-get install -y $i
           done
-
-
 
   clean:
 
