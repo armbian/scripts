@@ -1,0 +1,44 @@
+name: Login
+on:
+  workflow_dispatch:
+  
+jobs:
+
+  Prepare:
+    name: "Login"
+    runs-on: [self-hosted, Linux, local]
+    steps:
+
+      - name: Login
+        run: |
+         
+            export TERM=vt100
+            USER_HOST=10.0.10.238
+            # login credentials
+            USER_ROOT=root
+            PASS_ROOT=testpassword
+            USER_NORMAL=guest
+            PASS_NORMAL=testpassword
+            expect -c "
+              spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
+              set timeout 120
+              expect \"Create root password: \"
+              send \"${PASS_ROOT}\r\"
+              expect \"Repeat root password: \"
+              send \"${PASS_ROOT}\r\"
+              expect \"zsh\"
+              send \"2\r\"
+              expect \"*to abort\"
+              send \"${USER_NORMAL}\r\"
+              expect \"Create*password:\"
+              send \"${PASS_NORMAL}\r\"
+              expect \"Repeat*password:\"
+              send \"${PASS_NORMAL}\r\"
+              expect \"Please provide your real name: \"
+              send \"${NAME_NORMAL}\r\"
+              expect \"*language based on your location*\"
+              send \"y\r\"
+              expect \"*#\"
+              send \"exit\r\"
+            "
+        
