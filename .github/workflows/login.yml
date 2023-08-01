@@ -35,16 +35,13 @@ jobs:
             USER_NORMAL=guest
             PASS_NORMAL=testpassword
             
-            ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${USER_HOST}" > /dev/null 2>&1            
-            if [[ "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
-              echo "Already done or 3rd party"
-              if [[ "$(ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=2 ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" ]]; then                  
-                  sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
-                  sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" ${USER_NORMAL}@${USER_HOST}
+            # clean 
+            #ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${USER_HOST}" > /dev/null 2>&1
+            
+            if [[ "$(ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=2 ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" ]]; then
+              if [[ "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
+                  echo "Already done or 3rd party"            
               else
-                  echo "Keys are installed"
-              fi
-            else
               expect -c "
               spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
               set timeout 120
@@ -67,4 +64,8 @@ jobs:
               expect \"*#\"
               send \"exit\r\"
               "
+              fi
+            else
+              sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
+              sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" ${USER_NORMAL}@${USER_HOST}
             fi       
