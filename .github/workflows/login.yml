@@ -34,6 +34,7 @@ jobs:
             PASS_ROOT=testpassword
             USER_NORMAL=guest
             PASS_NORMAL=testpassword
+            REPLACE_KEY=true
             
             # clean 
             #ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${USER_HOST}" > /dev/null 2>&1
