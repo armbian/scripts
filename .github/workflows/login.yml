@@ -12,9 +12,7 @@ jobs:
 
       - name: Login
         run: |
-         
-            apt -y install sshpass
-         
+                
             export TERM=vt100
             USER_HOST=10.0.10.238
             # login credentials
