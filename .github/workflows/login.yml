@@ -24,9 +24,10 @@ jobs:
             
             ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${USER_HOST}" > /dev/null 2>&1
             sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " &>/dev/null
-            
-            if [[ $? -eq 127 ]]; then
-            expect -c "
+            if [[ "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
+              echo "Already done"
+            else
+              expect -c "
               spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
               set timeout 120
               expect \"Create root password: \"
@@ -47,5 +48,5 @@ jobs:
               send \"y\r\"
               expect \"*#\"
               send \"exit\r\"
-            "
+              "
             fi       
