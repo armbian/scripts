@@ -24,7 +24,7 @@ jobs:
         run: |
         
           mkdir -p ~/.ssh/
-          cp ci.pub ~/.ssh/id_rsa.pub
+          cp autotests.pub ~/.ssh/id_rsa.pub
           ls -l ~/.ssh/
           export TERM=vt100
             
