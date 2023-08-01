@@ -23,12 +23,9 @@ jobs:
       - name: Login
         run: |
         
-          ls -l ~/.ssh/
+          mkdir -p ~/.ssh/
           cp ci.pub > ~/.ssh/id_rsa.pub
-          echo ":"
           ls -l ~/.ssh/
-          
-
           export TERM=vt100
             
             USER_HOST=10.0.10.238
