@@ -73,6 +73,14 @@ jobs:
       - name: Runner clean
         uses: armbian/actions/runner-clean@main
 
+      - name: Checkout Armbian OS repo
+        uses: actions/checkout@v3
+        with:
+          repository: armbian/scripts
+          fetch-depth: 1
+          clean: false
+          path: scripts
+
       - name: Checkout Armbian build repo
         uses: actions/checkout@v3
         with:
@@ -82,20 +90,12 @@ jobs:
           clean: false
           path: build
 
-      - name: "Generate key id" # We need this in case we run multiple runners on one machine
-        run: echo "RANDOM=ID_$((RANDOM%1000000))" >> $GITHUB_ENV
-        shell: bash
-
       - name: Install SSH key for storage
         uses: shimataro/ssh-key-action@v2.5.1
         with:
           key: ${{ secrets.KEY_CI }}
-          name: ${{ env.RANDOM }}
           known_hosts: github.com ssh-rsa AAAAB3Nz
           if_key_exists: replace
-
-      - name: Copy SSH keys
-        run: rsync -a ~/.ssh/${{ env.RANDOM }}  /tmp/${{ env.RANDOM }} # need to copy it outside as action deletes them all
 
       - name: Read values
         run: |
@@ -136,9 +136,9 @@ jobs:
             echo "$server ✓"
             echo "PROCEED=true" >> $GITHUB_ENV
             echo "ONLINE=true" >> $GITHUB_ENV
-            echo "LINUXFAMILY=$(ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV
+            echo "LINUXFAMILY=$(ssh  -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV
             # upgrade
-            ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
+            ssh  -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
 
           else
             echo "$server ✗ needs to be power cycled"
@@ -146,18 +146,72 @@ jobs:
             [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
           fi
 
+      - name: First run and copy ssh keys to the DUT
+        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        run: |
+
+          [[ -z $(command -v sshpass) ]] && sudo apt-get -yy install sshpass
+
+          mkdir -p ~/.ssh/
+          cp scripts/autotests.pub ~/.ssh/id_rsa.pub
+          ls -l ~/.ssh/
+          export TERM=vt100
+
+            USER_HOST=10.0.10.238
+            # login credentials
+            USER_ROOT=root
+            PASS_ROOT=testpassword
+            USER_NORMAL=guest
+            PASS_NORMAL=testpassword
+            REPLACE_KEY=true
+            
+            # clean
+            ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${{ env.DUT_IP }}" > /dev/null 2>&1
+
+            if [[ "$(ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=2 root@${{ env.DUT_IP }} "w " 2>&1 | grep "Permission denied")" ]]; then
+              if [[ ! "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${{ env.DUT_IP }} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
+              expect -c "
+              spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${{ env.DUT_IP }}
+              set timeout 120
+              expect \"Create root password: \"
+              send \"${PASS_ROOT}\r\"
+              expect \"Repeat root password: \"
+              send \"${PASS_ROOT}\r\"
+              expect \"zsh\"
+              send \"2\r\"
+              expect \"*to abort\"
+              send \"${USER_NORMAL}\r\"
+              expect \"Create*password:\"
+              send \"${PASS_NORMAL}\r\"
+              expect \"Repeat*password:\"
+              send \"${PASS_NORMAL}\r\"
+              expect \"Please provide your real name: \"
+              send \"${NAME_NORMAL}\r\"
+              expect \"*language based on your location*\"
+              send \"y\r\"
+              expect \"*#\"
+              send \"exit\r\"
+              "
+              fi
+            fi
+ 
+            echo "Install keys always"
+            sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" root@${{ env.DUT_IP }}
+            #sshpass -p "${PASS_NORMAL}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" guest@${{ env.DUT_IP }}
+
+
       - name: "Make sure we are updating from nightly repository"
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
+          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
 
       - name: "Remove any installed kernel and cleanup"
         timeout-minutes: 3
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y purge '^linux-image-*' '^linux-dtb-*'" || true
+          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y purge '^linux-image-*' '^linux-dtb-*'" || true
           rm -rf *.json
 
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
@@ -166,14 +220,14 @@ jobs:
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-legacy-${{ env.LINUXFAMILY }}; apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-legacy-${{ env.LINUXFAMILY }}; apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
         timeout-minutes: 15
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
+          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
           while true
           do
               sleep 10
@@ -196,14 +250,14 @@ jobs:
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-current-${{ env.LINUXFAMILY }}; apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-current-${{ env.LINUXFAMILY }}; apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
         timeout-minutes: 15
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
+          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
           while true
           do
               sleep 10
@@ -226,14 +280,14 @@ jobs:
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-edge-${{ env.LINUXFAMILY }}; apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-edge-${{ env.LINUXFAMILY }}; apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
 
       - name: Reboot
         timeout-minutes: 15
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
         run: |
 
-          ssh -i /tmp/${{ env.RANDOM }} -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
+          ssh  -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
           while true
           do
               sleep 10
@@ -249,9 +303,6 @@ jobs:
         uses: armbian/actions/collect-data@main
         with:
           kernel-target: edge
-
-      - name: Remove SSH keys
-        run: rm -f /tmp/${{ env.RANDOM }}
 
   Stop:
     name: "Merge artifacts"
