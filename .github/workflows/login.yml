@@ -40,7 +40,8 @@ jobs:
             
             if [[ "$(ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=2 ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" ]]; then
               if [[ "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
-                  echo "Already done or 3rd party"            
+                  sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
+                  sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" ${USER_NORMAL}@${USER_HOST}
               else
               expect -c "
               spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
