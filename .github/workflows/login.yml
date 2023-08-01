@@ -24,7 +24,7 @@ jobs:
         run: |
         
           ls -l ~/.ssh/
-          cat ci.pub ~/.ssh/id_rsa.pub
+          cp ci.pub > ~/.ssh/id_rsa.pub
           echo ":"
           ls -l ~/.ssh/
           
@@ -41,6 +41,7 @@ jobs:
             ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${USER_HOST}" > /dev/null 2>&1            
             if [[ "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
               echo "Already done or 3rd party"
+              sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
             else
               expect -c "
               spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
