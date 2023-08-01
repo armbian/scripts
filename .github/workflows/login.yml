@@ -21,6 +21,11 @@ jobs:
             PASS_ROOT=testpassword
             USER_NORMAL=guest
             PASS_NORMAL=testpassword
+            
+            ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${USER_HOST}" > /dev/null 2>&1
+            sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " &>/dev/null
+            
+            if [[ $? -eq 127 ]]; then
             expect -c "
               spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
               set timeout 120
@@ -43,4 +48,4 @@ jobs:
               expect \"*#\"
               send \"exit\r\"
             "
-        
+            fi       
