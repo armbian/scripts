@@ -12,8 +12,9 @@ jobs:
 
       - name: Login
         run: |
-                
-            export TERM=vt100
+
+          export TERM=vt100
+            
             USER_HOST=10.0.10.238
             # login credentials
             USER_ROOT=root
