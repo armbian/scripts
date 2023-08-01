@@ -24,7 +24,7 @@ jobs:
             
             ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${USER_HOST}" > /dev/null 2>&1            
             if [[ "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
-              echo "Already done"
+              echo "Already done or 3rd party"
             else
               expect -c "
               spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${USER_HOST}
