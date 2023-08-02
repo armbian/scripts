@@ -143,6 +143,7 @@ jobs:
           fi
 
       - name: First run and copy ssh keys to the DUT
+        timeout-minutes: 30
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
@@ -195,7 +196,7 @@ jobs:
             sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" root@${{ env.DUT_IP }}
             #sshpass -p "${PASS_NORMAL}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" guest@${{ env.DUT_IP }}
 
-      - name: First run and copy ssh keys to the DUT
+      - name: Update and install dependencies
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
