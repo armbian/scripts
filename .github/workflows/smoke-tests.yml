@@ -119,7 +119,7 @@ jobs:
           CFG_CONTENT="$(cat build/config/boards/${DUT_SLUG}.* | grep -e "KERNEL_TARGET\|KERNEL_TEST_TARGET\|BOARD_NAME")"
           eval "$CFG_CONTENT"
           echo "BOARD_NAME=$BOARD_NAME" >> $GITHUB_ENV
-          [[ -z "${KERNEL_TEST_TARGET}" ]] && KERNEL_TARGET="${KERNEL_TEST_TARGET}"
+          [[ -n "${KERNEL_TEST_TARGET}" ]] && KERNEL_TARGET="${KERNEL_TEST_TARGET}"
           echo "KERNEL_TARGET=$KERNEL_TARGET" >> $GITHUB_ENV
 
           # read power connector id
