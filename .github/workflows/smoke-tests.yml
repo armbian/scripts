@@ -228,7 +228,17 @@ jobs:
         run: |
 
            echo "${{ env.KERNEL_TARGET }}"
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-legacy-${{ env.LINUXFAMILY }}; apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt -y upgrade" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-headers-legacy-${{ env.LINUXFAMILY }}" || true
+           
+           # list other files
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-legacy" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-desktop-${{ env.DUT_SLUG }}-legacy" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-zsh" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-firmware-full" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-plymouth-theme" || true           
 
       - name: Reboot
         timeout-minutes: 15
@@ -260,6 +270,13 @@ jobs:
            echo "${{ env.KERNEL_TARGET }}"
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-current-${{ env.LINUXFAMILY }}; apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
 
+           # list other files
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-current" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-desktop-${{ env.DUT_SLUG }}-current" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-zsh" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-firmware-full" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-plymouth-theme" || true  
+
       - name: Reboot
         timeout-minutes: 15
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
@@ -289,6 +306,13 @@ jobs:
 
            echo "${{ env.KERNEL_TARGET }}"
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt install linux-image-edge-${{ env.LINUXFAMILY }}; apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
+
+           # list other files
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-edge" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-desktop-${{ env.DUT_SLUG }}-edge" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-zsh" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-firmware-full" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-plymouth-theme" || true  
 
       - name: Reboot
         timeout-minutes: 15
