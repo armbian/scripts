@@ -215,7 +215,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
 
       - name: "Remove any installed kernel and cleanup"
-        timeout-minutes: 3
+        timeout-minutes: 10
         if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
         run: |
 
