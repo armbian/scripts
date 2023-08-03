@@ -304,7 +304,7 @@ jobs:
 
       - name: Collect data
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
-        timeout-minutes: 15
+        timeout-minutes: 25
         uses: armbian/actions/collect-data@main
         with:
           kernel-target: edge
