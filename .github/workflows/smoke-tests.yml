@@ -12,6 +12,8 @@ on:
        type: string
        default: "true"
     secrets:
+      ACCESS_TOKEN_ARMBIANWORKER:
+        required: true
       NETBOX_TOKEN:
         required: true
       KEY_CI:
@@ -341,6 +343,16 @@ jobs:
           name: status
           path: merged.json
 
+
+      - name: Read/Write data into README
+        uses: eddiejaoude/github-actions-reader-writer@v0.1
+        with:
+          json-file-path: 'merged.json'
+          github-token: ${{ secrets.ACCESS_TOKEN_ARMBIANWORKER }}
+          columns: 1
+          object-field-names: '[ "board_name", "kernel_target", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor" ]'
+          html-cell: '<td align="left">{{ board_name }}</td><td align=left>{{ kernel_target }}</td><td align=right>{{ u-boot }}</td><td align=right>{{ kernel }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td><td align=right><a href="{{ armbian_monitor }}">Logs</a></td>'
+          
       - name: Power off
         if: ${{ inputs.PWRMNGMT == 'true' }}
         uses: armbian/actions/power-off@main
