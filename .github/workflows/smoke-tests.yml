@@ -229,9 +229,9 @@ jobs:
 
            echo "${{ env.KERNEL_TARGET }}"
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt -y upgrade" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-legacy-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-headers-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-image-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y headers-legacy-${{ env.LINUXFAMILY }}" || true
            
            # list other files
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-legacy" || true
@@ -269,9 +269,9 @@ jobs:
 
            echo "${{ env.KERNEL_TARGET }}"
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt -y upgrade" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-current-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-dtb-current-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-headers-current-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-image-current-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-dtb-current-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-headers-current-${{ env.LINUXFAMILY }}" || true
 
            # list other files
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-current" || true
@@ -309,9 +309,9 @@ jobs:
 
            echo "${{ env.KERNEL_TARGET }}"
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt -y upgrade" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-image-edge-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install linux-headers-edge-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-image-edge-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
+           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-headers-edge-${{ env.LINUXFAMILY }}" || true
 
            # list other files
            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-edge" || true
