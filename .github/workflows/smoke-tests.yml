@@ -140,6 +140,8 @@ jobs:
             echo "$server ✗ needs to be power cycled"
             echo "ONLINE=false" >> $GITHUB_ENV
             [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
+            # exit from this job
+            exit 1
           fi
 
       - name: First run and copy ssh keys to the DUT
