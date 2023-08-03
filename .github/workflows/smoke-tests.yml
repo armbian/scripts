@@ -223,7 +223,7 @@ jobs:
           rm -rf *.json
 
       - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
-        timeout-minutes: 15
+        timeout-minutes: 45
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
         run: |
 
@@ -263,7 +263,7 @@ jobs:
           kernel-target: legacy
 
       - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
-        timeout-minutes: 15
+        timeout-minutes: 45
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
         run: |
 
@@ -303,7 +303,7 @@ jobs:
           kernel-target: current
 
       - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
-        timeout-minutes: 15
+        timeout-minutes: 45
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
         run: |
 
