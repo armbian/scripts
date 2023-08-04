@@ -216,7 +216,7 @@ jobs:
           rm -rf *.json
 
       - name: Run on DUT
-        if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' && contains(env.KERNEL_TARGET, 'legacy') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
         id: duts
         timeout-minutes: 30
         uses: armbian/actions/dut-run@main
