@@ -215,7 +215,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
           rm -rf *.json
 
-      - name: Run on DUT
+      - name: Install legacy kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
         timeout-minutes: 30
         uses: armbian/actions/dut-run@main
@@ -227,7 +227,7 @@ jobs:
           BRANCH: "legacy"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
-      - name: Run on DUT
+      - name: Install current kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
         timeout-minutes: 30
         uses: armbian/actions/dut-run@main
@@ -237,6 +237,18 @@ jobs:
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "current"
+          LINUXFAMILY: "${{ env.LINUXFAMILY }}"
+
+      - name: Install edge kernel on DUT
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        timeout-minutes: 30
+        uses: armbian/actions/dut-run@main
+        with:
+          DUT_IP: "${{ env.DUT_IP }}"
+          DUT_SLUG: "${{ env.DUT_SLUG }}"
+          STATUS: "${{ env.STATUS }}"
+          BOARD_NAME: "${{ env.BOARD_NAME }}"
+          BRANCH: "edge"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
   Stop:
