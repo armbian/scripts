@@ -16,7 +16,7 @@ jobs:
           known_hosts: github.com ssh-rsa AAAAB3Nz
           if_key_exists: replace
           
-      - name: Collect data
+      - name: Run on DUT
         timeout-minutes: 15
         uses: armbian/actions/dut-run@main
         with:
