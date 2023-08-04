@@ -87,7 +87,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: armbian/build
-          fetch-depth: 1
+          fetch-depth: 0
           ref: "${{ inputs.GITBRANCH }}"
           clean: false
           path: build
@@ -140,16 +140,14 @@ jobs:
             echo "PROCEED=true" >> $GITHUB_ENV
             echo "ONLINE=true" >> $GITHUB_ENV
           else
-            echo "$server ✗ needs to be power cycled"
-            echo "ONLINE=false" >> $GITHUB_ENV
+            echo "$server ✗ needs to be power cycled"            
             [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
-            # exit from this job
-            exit 1
+            echo "STATUS=failed" >> $GITHUB_ENV
           fi
 
       - name: First run and copy ssh keys to the DUT
         timeout-minutes: 30
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}
         run: |
 
           [[ -z $(command -v sshpass) ]] && sudo apt-get -yy install sshpass
@@ -202,146 +200,56 @@ jobs:
             #sshpass -p "${PASS_NORMAL}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" guest@${{ env.DUT_IP }}
 
       - name: Update and install dependencies
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        timeout-minutes: 15
+        if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}
         run: |
 
             echo "LINUXFAMILY=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV            
             ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update; dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
 
       - name: "Make sure we are updating from nightly repository"
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
+        timeout-minutes: 3
+        if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}        
         run: |
 
           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
-
-      - name: "Remove any installed kernel and cleanup"
-        timeout-minutes: 10
-        if: ${{ github.repository_owner == 'Armbian' && env.PROCEED == 'true' }}
-        run: |
-
-          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y purge '^linux-image-*'" || true
-          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt-get -y purge '^linux-dtb-*'" || true
           rm -rf *.json
 
-      - name: "Install linux-image-legacy-${{ env.LINUXFAMILY }}"
-        timeout-minutes: 45
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
-        run: |
-
-           echo "${{ env.KERNEL_TARGET }}"
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt -y upgrade" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-image-legacy-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-dtb-legacy-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-headers-legacy-${{ env.LINUXFAMILY }}" || true
-           
-           # list other files
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-legacy" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-desktop-${{ env.DUT_SLUG }}-legacy" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-zsh" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-firmware-full" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-plymouth-theme" || true           
-
-      - name: Reboot
-        timeout-minutes: 15
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
-        run: |
-
-          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
-          while true
-          do
-              sleep 10
-              echo "Destination Host Unreachable"
-              if nc -z "${{ env.DUT_IP }}" 22 -w 15 2>/dev/null; then
-              break
-              fi
-          done
-
-      - name: Collect data
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && env.PROCEED == 'true' }}
-        timeout-minutes: 15
-        uses: armbian/actions/collect-data@main
+      - name: Install legacy kernel on DUT
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
+        timeout-minutes: 30
+        uses: armbian/actions/dut-run@main
         with:
-          kernel-target: legacy
+          DUT_IP: "${{ env.DUT_IP }}"
+          DUT_SLUG: "${{ env.DUT_SLUG }}"
+          STATUS: "${{ env.STATUS }}"
+          BOARD_NAME: "${{ env.BOARD_NAME }}"
+          BRANCH: "legacy"
+          LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
-      - name: "Install linux-image-current-${{ env.LINUXFAMILY }}"
-        timeout-minutes: 45
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
-        run: |
-
-           echo "${{ env.KERNEL_TARGET }}"
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt -y upgrade" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-image-current-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-dtb-current-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-headers-current-${{ env.LINUXFAMILY }}" || true
-
-           # list other files
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-current" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-desktop-${{ env.DUT_SLUG }}-current" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-zsh" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-firmware-full" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-plymouth-theme" || true  
-
-      - name: Reboot
-        timeout-minutes: 15
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
-        run: |
-
-          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
-          while true
-          do
-              sleep 10
-              echo "Destination Host Unreachable"
-              if nc -z "${{ env.DUT_IP }}" 22 -w 15 2>/dev/null; then
-              break
-              fi
-          done
-          
-      - name: Collect data
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && env.PROCEED == 'true' }}
-        timeout-minutes: 15
-        uses: armbian/actions/collect-data@main
+      - name: Install current kernel on DUT
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
+        timeout-minutes: 30
+        uses: armbian/actions/dut-run@main
         with:
-          kernel-target: current
+          DUT_IP: "${{ env.DUT_IP }}"
+          DUT_SLUG: "${{ env.DUT_SLUG }}"
+          STATUS: "${{ env.STATUS }}"
+          BOARD_NAME: "${{ env.BOARD_NAME }}"
+          BRANCH: "current"
+          LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
-      - name: "Install linux-image-edge-${{ env.LINUXFAMILY }}"
-        timeout-minutes: 45
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
-        run: |
-
-           echo "${{ env.KERNEL_TARGET }}"
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update ; apt -y upgrade" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-image-edge-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-dtb-edge-${{ env.LINUXFAMILY }}" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt install -y linux-headers-edge-${{ env.LINUXFAMILY }}" || true
-
-           # list other files
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-cli-${{ env.DUT_SLUG }}-edge" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-bsp-desktop-${{ env.DUT_SLUG }}-edge" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-zsh" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-firmware-full" || true
-           ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt search  armbian-plymouth-theme" || true  
-
-      - name: Reboot
-        timeout-minutes: 15
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
-        run: |
-
-          ssh  -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "shutdown --no-wall -r now" || true
-          while true
-          do
-              sleep 10
-              echo "Destination Host Unreachable"
-              if nc -z "${{ env.DUT_IP }}" 22 -w 15 2>/dev/null; then
-              break
-              fi
-          done
-
-      - name: Collect data
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && env.PROCEED == 'true' }}
-        timeout-minutes: 25
-        uses: armbian/actions/collect-data@main
+      - name: Install edge kernel on DUT
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        timeout-minutes: 30
+        uses: armbian/actions/dut-run@main
         with:
-          kernel-target: edge
+          DUT_IP: "${{ env.DUT_IP }}"
+          DUT_SLUG: "${{ env.DUT_SLUG }}"
+          STATUS: "${{ env.STATUS }}"
+          BOARD_NAME: "${{ env.BOARD_NAME }}"
+          BRANCH: "edge"
+          LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
   Stop:
     name: "Merge artifacts"
