@@ -22,6 +22,8 @@ jobs:
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "10.0.30.210"
+          DUT_SLUG: "orangepi3"
+          BOARD_NAME: "Orange Pi3"
           BRANCH: "current"
           LINUXFAMILY: "x86"
 
