@@ -21,4 +21,5 @@ jobs:
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "10.0.30.210"
-          LINUXFAMILY: "current"
+          BRANCH: "current"
+          LINUXFAMILY: "sunxi64"
