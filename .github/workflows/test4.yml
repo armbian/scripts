@@ -17,9 +17,15 @@ jobs:
           if_key_exists: replace
           
       - name: Run on DUT
+        id: duts
         timeout-minutes: 15
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "10.0.30.210"
           BRANCH: "current"
           LINUXFAMILY: "sunxi64"
+
+      - name: Read
+        if: always()
+        run: |
+          echo "Status ${{ steps.duts.outputs.status }}"
