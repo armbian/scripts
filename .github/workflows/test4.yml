@@ -1,47 +1,17 @@
-name: Run them all
+name: Testtttt
 on:
   workflow_dispatch:
  
 jobs:
 
   start:
-    name: "Power On"
-    runs-on: ubuntu-latest
+    name: "Test"
+    runs-on: igor
     steps:
      
-      - name: Enable Hetzner Virtual Machines
-        uses: armbian/actions/hetzner_on@main
+      - name: Collect data
+        timeout-minutes: 15
+        uses: armbian/actions/dut-run@main
         with:
-          machine-type: cax11
-          runners-count: 3
-          machine-count: 2
-          key: ${{ secrets.KEY_TORRENTS }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS_TORRENTS }}
-          hetzner_id: ${{ secrets.HETZNER_ONE }}
-          github_token: ${{ secrets.TEST }}
-
-  build:
-    name: "Building"
-    needs: start
-    runs-on: ubuntu-latest
-    steps:
-     
-      - name: Install Homebrew
-        run: sleep 1m
- 
-  stop:
-    name: "Power Off"
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-     
-      - name: Enable Hetzner Virtual Machines
-        uses: armbian/actions/hetzner_off@main
-        with:
-          machine-type: cax11
-          runners-count: 3
-          machine-count: 2
-          key: ${{ secrets.KEY_TORRENTS }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS_TORRENTS }}
-          hetzner_id: ${{ secrets.HETZNER_ONE }}
-          github_token: ${{ secrets.TEST }}
+          DUT_IP: "10.0.30.210"
+          LINUXFAMILY: "current"
