@@ -23,7 +23,7 @@ jobs:
         with:
           DUT_IP: "10.0.30.210"
           BRANCH: "current"
-          LINUXFAMILY: "sunxi64"
+          LINUXFAMILY: "x86"
 
       - name: Read
         if: always()
