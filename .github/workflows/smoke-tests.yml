@@ -199,7 +199,8 @@ jobs:
             sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" root@${{ env.DUT_IP }}
             #sshpass -p "${PASS_NORMAL}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" guest@${{ env.DUT_IP }}
 
-      - name: Update and install dependencies        
+      - name: Update and install dependencies
+        timeout-minutes: 15
         if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}
         run: |
 
@@ -207,6 +208,7 @@ jobs:
             ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update; dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
 
       - name: "Make sure we are updating from nightly repository"
+        timeout-minutes: 3
         if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}        
         run: |
 
