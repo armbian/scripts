@@ -8,7 +8,14 @@ jobs:
     name: "Test"
     runs-on: igor
     steps:
-     
+
+      - name: Install SSH key for storage
+        uses: shimataro/ssh-key-action@v2.5.1
+        with:
+          key: ${{ secrets.KEY_CI }}
+          known_hosts: github.com ssh-rsa AAAAB3Nz
+          if_key_exists: replace
+          
       - name: Collect data
         timeout-minutes: 15
         uses: armbian/actions/dut-run@main
