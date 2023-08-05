@@ -217,7 +217,7 @@ jobs:
 
       - name: Install legacy kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
-        timeout-minutes: 30
+        timeout-minutes: 45
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -229,7 +229,7 @@ jobs:
 
       - name: Install current kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
-        timeout-minutes: 30
+        timeout-minutes: 45
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -241,7 +241,7 @@ jobs:
 
       - name: Install edge kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
-        timeout-minutes: 30
+        timeout-minutes: 45
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
