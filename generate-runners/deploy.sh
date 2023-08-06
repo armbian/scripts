@@ -50,12 +50,12 @@ do
 	sudo groupdel actions-runner-${i}
 	sudo adduser --quiet --disabled-password --shell /bin/bash --home /home/actions-runner-${i} --gecos "actions-runner-${i}" actions-runner-${i}
 	# add to sudoers
-	if ! grep -q "actions-runner-${i}" /etc/sudoers; then
+	if ! sudo grep -q "actions-runner-${i}" /etc/sudoers; then
             echo "actions-runner-${i} ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
         fi
 	sudo usermod -aG docker actions-runner-${i}
 	sudo tar xzf .tmp/actions-runner-linux-${ARCH}-${LATEST}.tar.gz -C /home/actions-runner-${i}
-	sudo chown -R actions-runner-${i}.actions-runner-${i} /home/actions-runner-${i}
+	sudo chown -R actions-runner-${i}:actions-runner-${i} /home/actions-runner-${i}
 
         # 1st runner has different labels
         LABEL=$LABEL_SECONDARY
