@@ -208,7 +208,7 @@ jobs:
           rm -rf *.json
 
       - name: Update and install dependencies
-        timeout-minutes: 15
+        timeout-minutes: 25
         if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}
         run: |
 
