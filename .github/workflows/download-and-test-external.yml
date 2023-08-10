@@ -230,8 +230,8 @@ jobs:
         if: inputs.REFERENCE == 'main'
         run: |
         
-          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc --rsync-path="mkdir -p /incoming/debs && sync" build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
-          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc --rsync-path="mkdir -p /incoming/debs-beta && sync" build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
+          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
+          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Build testing repository
         run: |
