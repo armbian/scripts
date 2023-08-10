@@ -141,6 +141,7 @@ jobs:
         uses: actions/checkout@v3.4.0
         with:
           repository: armbian/build
+          ref: AR-1444
           path: build
           fetch-depth: '1'
           clean: false
@@ -254,7 +255,8 @@ jobs:
           # sed 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' build/tools/repository/aptly.conf > aptly.conf
           # sed 's|"rootDir": ".*"|"rootDir": "build/output"|g' aptly.conf
           # we check beta as there it goes always
-          ./repo -c update -i ../../output/debs-beta -o repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
+          #./repo -c update -i ../../output/debs-beta -o repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
+          tools/repository/repo -c update -p sendmail
           rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
       - name: Create a temporary artifact folder
