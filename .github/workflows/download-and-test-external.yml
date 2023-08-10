@@ -59,7 +59,6 @@ jobs:
 
       - name: Remove temporally repositories that are older then 3 days
         run: |
-          
           ssh artifacts@armbian.tnahosting.net "find artifacts/* -mtime +3 -delete"
           
       - name: Checkout
@@ -115,14 +114,14 @@ jobs:
           docker-images: true
           swap-storage: true
 
-      - name: Install SSH key for storage
+      - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_UPLOAD }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
 
-      - name: Import GPG key we need to sign repository
+      - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.GPG_KEY1 }}
@@ -169,7 +168,6 @@ jobs:
           . os/external/${{ matrix.node }}.conf
 
           # read existing releases
-          #ALL_RELEASES=($(find build/config/distributions -mindepth 1 -maxdepth 1 -type d | sed 's/.*\///' ))
           ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
 
           # recreate folder structure as we are uploading to our system
@@ -195,7 +193,7 @@ jobs:
               aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${{ matrix.node }}-${RELEASE}
           fi
 
-          # Cleaning
+          # Cleaning exceptions
           find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-arm64_*" | sort | head -n -1 | xargs sudo rm || true
@@ -245,20 +243,14 @@ jobs:
       - name: Deploy to server
         if: inputs.REFERENCE == 'main'
         run: |
-        
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Build testing repository
         run: |
-
           cd build
-          
           mkdir -p repository/public
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' tools/repository/aptly.conf
-
-          # we check beta as there it goes always
-          #./repo -c update -i ../../output/debs-beta -o repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
           tools/repository/repo -i output/debs-beta -c update -p sendmail
           rsync -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
@@ -268,7 +260,6 @@ jobs:
 
       - name: Add artifacts
         run: |
-
           cd downloads
           echo "armbian.tnahosting.net/" > url.txt
           echo "artifacts/${{ env.PR_NUMBER }}/" > path.txt
@@ -311,12 +302,6 @@ jobs:
         run: |
 
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
-          #packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))                    
-          #for i in ${packages[@]}; do
-          #    for j in ${dockerimages[@]}; do
-          #    echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
-          #    done
-          #done | jq -s >> $GITHUB_OUTPUT
           packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
           [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && packages=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
           for i in ${packages[@]}; do
@@ -433,7 +418,6 @@ jobs:
         id: json
         run: |
 
-          #packages=($(find os/external/*.conf -printf '%f\n' | cut -d"." -f1))
           packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
           [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && MATRIX=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
           for i in ${packages[@]}; do
