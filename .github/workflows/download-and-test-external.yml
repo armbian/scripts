@@ -323,10 +323,10 @@ jobs:
               . os/external/${i}.conf
               [[ -z $INSTALL ]] && continue
               if [[ $RELEASE != all ]]; then
-                  dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+                  dockerimages=("debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:jammy" "ubuntu:lunar")
                   dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$RELEASE"))
                 else
-                  dockerimages=("debian:buster" "debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:focal" "ubuntu:jammy" "ubuntu:lunar")
+                  dockerimages=("debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:jammy" "ubuntu:lunar")
               fi
               for j in ${dockerimages[@]}; do
               echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
