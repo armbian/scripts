@@ -57,11 +57,10 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
 
-      - name: Clean temporally repository
+      - name: Remove temporally repositories that are older then 3 days
         run: |
-        
-          SOURCE=$(mktemp -d)
-          rsync -e "ssh -o StrictHostKeyChecking=no" -arvh --delete ${SOURCE}/ artifacts@armbian.tnahosting.net:/home/artifacts/artifacts/
+          
+          ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "find artifacts/* -mtime +3 -delete"
           
       - name: Checkout
         uses: actions/checkout@v3.5.3
