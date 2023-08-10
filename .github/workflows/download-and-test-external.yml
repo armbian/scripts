@@ -246,8 +246,8 @@ jobs:
         if: inputs.REFERENCE == 'main'
         run: |
         
-          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
-          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
+          rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
+          rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Build testing repository
         run: |
@@ -260,7 +260,7 @@ jobs:
           # we check beta as there it goes always
           #./repo -c update -i ../../output/debs-beta -o repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
           tools/repository/repo -i output/debs-beta -c update -p sendmail
-          rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
+          rsync -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
       - name: Create a temporary artifact folder
         run: |
@@ -349,13 +349,6 @@ jobs:
         image: "${{ matrix.image.image }}"
     steps:
 
-      #- name: Install SSH key for storage
-      #  uses: shimataro/ssh-key-action@v2
-      #  with:
-      #    key: ${{ secrets.KEY_TORRENTS }}
-      #    known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
-      #    if_key_exists: replace
-
       - name: Download a single artifact
         uses: actions/download-artifact@v3
         with:
@@ -413,13 +406,6 @@ jobs:
           key: ${{ secrets.KEY_UPLOAD }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
-
-      #- name: Install SSH key for storage
-#        uses: shimataro/ssh-key-action@v2
- #       with:
-  #        key: ${{ secrets.KEY_TORRENTS }}
-   #       known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
-    #      if_key_exists: replace
 
       - name: Download a single artifact
         uses: actions/download-artifact@v3
