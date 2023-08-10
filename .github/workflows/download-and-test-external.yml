@@ -28,8 +28,14 @@ on:
         required: true
       KEY_TORRENTS:
         required: false
+      HOST_UPLOAD:
+        required: true
+      HOST_UPLOAD_USER:
+        required: true
+      HOST_UPLOAD_PORT:
+        required: true
       KNOWN_HOSTS_UPLOAD:
-        required: false
+        required: true
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -223,11 +229,9 @@ jobs:
       - name: Deploy to server
         if: inputs.REFERENCE == 'main'
         run: |
-          sudo apt-get -y -qq install lftp
-          # upload beta repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/debs-beta/ debs-beta/ ;bye" sftp://users.armbian.com
-          # upload stable repository
-          lftp -u upload, -e "set net:timeout 4;set net:max-retries 6;mirror -R --no-empty-dirs --parallel=8 --no-perms build/output/debs/ debs/ ;bye" sftp://users.armbian.com
+        
+          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc --rsync-path="mkdir -p /incoming/debs && sync" build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
+          rsync -e "ssh -o StrictHostKeyChecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc --rsync-path="mkdir -p /incoming/debs-beta && sync" build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Build testing repository
         run: |
