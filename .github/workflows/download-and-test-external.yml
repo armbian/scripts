@@ -61,7 +61,7 @@ jobs:
         run: |
         
           SOURCE=$(mktemp -d)
-          rsync -arvh ${SOURCE}/ artifacts@armbian.tnahosting.net:/home/artifacts/artifacts/
+          rsync -e "ssh -o StrictHostKeyChecking=no" -arvh ${SOURCE}/ artifacts@armbian.tnahosting.net:/home/artifacts/artifacts/
           
       - name: Checkout
         uses: actions/checkout@v3.5.3
