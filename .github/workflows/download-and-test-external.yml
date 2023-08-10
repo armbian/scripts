@@ -249,15 +249,15 @@ jobs:
       - name: Build testing repository
         run: |
 
-          cd build/tools/repository
-          mkdir -p repository/public # this needs to be moved to the repo generation
-          sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' aptly.conf
-          # sed 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' build/tools/repository/aptly.conf > aptly.conf
-          # sed 's|"rootDir": ".*"|"rootDir": "build/output"|g' aptly.conf
+          cd build
+          
+          mkdir -p repository/public
+          sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' tools/repository/aptly.conf
+
           # we check beta as there it goes always
           #./repo -c update -i ../../output/debs-beta -o repository -p sendmail -r bullseye,buster,focal,jammy,lunar,bookworm,sid || true
-          tools/repository/repo -c update -p sendmail
-          rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
+          tools/repository/repo -i output/debs-beta -c update -p sendmail
+          rsync -e "ssh -o StrictHostKeyChecking=no" -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
       - name: Create a temporary artifact folder
         run: |
