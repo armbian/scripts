@@ -412,7 +412,7 @@ jobs:
  #       with:
   #        key: ${{ secrets.KEY_TORRENTS }}
    #       known_hosts: ${{ secrets.KNOWN_HOSTS_UPLOAD }}
-    3      if_key_exists: replace
+    #      if_key_exists: replace
 
       - name: Download a single artifact
         uses: actions/download-artifact@v3
