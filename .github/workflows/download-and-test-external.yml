@@ -60,7 +60,7 @@ jobs:
       - name: Remove temporally repositories that are older then 3 days
         run: |
           
-          ssh artifacts@armbian.tnahosting.net "find artifacts/* -mtime +3 -delete"
+          ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "find artifacts/* -mtime +3 -delete"
           
       - name: Checkout
         uses: actions/checkout@v3.5.3
