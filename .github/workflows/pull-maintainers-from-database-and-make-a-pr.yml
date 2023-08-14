@@ -31,12 +31,9 @@ jobs:
           clean: false
 
       - name: Install SSH key for storage
-        env:
-          KEY_ARMBIAN_UPLOAD: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
-        if: env.KEY_ARMBIAN_UPLOAD != null
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.KEY_ARMBIAN_UPLOAD }}
+          key: ${{ secrets.KEY_UPLOAD }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
 
@@ -47,10 +44,10 @@ jobs:
         run: |
 
           # install dependencies
-          sudo apt-get -y -qq install lftp jq
+          sudo apt-get -y -qq install jq
 
           # download json that is prepared for this action in another cron job
-          lftp -u upload, -e "cd json; get -O /tmp/ armbian_maintainers.json ;bye" sftp://${{ secrets.ARMBIAN_HOST_UPLOAD }}
+          rsync -e "ssh -p 10022" -arvc upload@fi.mirror.armbian.de:/incoming/json/armbian_maintainers.json /tmp/
 
           # reset all maintainers so we generate from scratch
           sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"\"/" config/boards/*.{conf,wip,eos,tvb}
