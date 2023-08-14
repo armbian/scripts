@@ -47,7 +47,7 @@ jobs:
           sudo apt-get -y -qq install jq
 
           # download json that is prepared for this action in another cron job
-          rsync -e "ssh -p 10022" -arvc upload@fi.mirror.armbian.de:/incoming/json/armbian_maintainers.json /tmp/
+          rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/json/armbian_maintainers.json /tmp/
 
           # reset all maintainers so we generate from scratch
           sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"\"/" config/boards/*.{conf,wip,eos,tvb}
