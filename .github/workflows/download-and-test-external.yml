@@ -242,6 +242,8 @@ jobs:
       - name: Deploy to server
         if: inputs.REFERENCE == 'main'
         run: |
+
+          echo "running" | tee build/output/debs/status build/output/debs-beta/status > /dev/null
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
@@ -390,6 +392,14 @@ jobs:
           key: ${{ secrets.KEY_UPLOAD }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
+
+      - name: Change status to done
+        if: inputs.REFERENCE == 'main'
+        run: |
+
+          echo "done" > status
+          rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
+          rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Download a single artifact
         uses: actions/download-artifact@v3
