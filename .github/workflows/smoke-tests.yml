@@ -288,7 +288,7 @@ jobs:
             "armbian_monitor" : "",
             "kernel_target" : "Branch"
           },
-          EOT
+          EOF
           cat ./*.parts | sed '$ s/.$//' >> merged.json
           echo "]" >> merged.json
 
