@@ -273,7 +273,22 @@ jobs:
 
       - name: "Merge JSON parts"
         run: |
-          echo "[" > merged.json
+          cat <<- EOF > merged.json
+          [
+          {
+            "started" : "Started",
+            "status" : "",
+            "dut_ip" : "IP",
+            "board_name" : "Board name",
+            "board_slug" : "Board ID",
+            "u-boot" : "U-boot",
+            "kernel" : "Kernel version",
+            "iperf" : "Iperf",
+            "sevenzip" : "7z -b",
+            "armbian_monitor" : "",
+            "kernel_target" : "Branch"
+          },
+          EOT
           cat ./*.parts | sed '$ s/.$//' >> merged.json
           echo "]" >> merged.json
 
