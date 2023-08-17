@@ -74,9 +74,9 @@ jobs:
                     sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$BOARD_MAINTAINER\"/" config/boards/${i}.*
 
                     # if maintainer exits, rename .csc to .conf
-                    if [[ -n "${BOARD_MAINTAINER}" ]]; then
-                      mv config/boards/${i}.csc config/boards/${i}.conf 2>/dev/null || true
-                    fi
+                    #if [[ -n "${BOARD_MAINTAINER}" ]]; then
+                    #  mv config/boards/${i}.csc config/boards/${i}.conf 2>/dev/null || true
+                    #fi
                   fi
                 done
               fi
