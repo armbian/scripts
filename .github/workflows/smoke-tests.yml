@@ -199,21 +199,13 @@ jobs:
             sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" root@${{ env.DUT_IP }}
             #sshpass -p "${PASS_NORMAL}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" guest@${{ env.DUT_IP }}
 
-      - name: "Make sure we are updating from nightly repository"
-        timeout-minutes: 3
-        if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}        
-        run: |
-
-          ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "sed -i 's/http:\/\/[^ ]*/http:\/\/beta.armbian.com/' /etc/apt/sources.list.d/armbian.list" || true
-          rm -rf *.json
-
-      - name: Update and install dependencies
+      - name: Read Linux family
         timeout-minutes: 25
         if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}
         run: |
 
             echo "LINUXFAMILY=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV            
-            ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "apt update; dpkg --configure -a; apt-get -y install binutils iperf3 neofetch datamash p7zip-full" || true
+            rm -rf *.json
 
       - name: Install legacy kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
@@ -225,6 +217,7 @@ jobs:
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "legacy"
+          REPOSITORY: "beta.armbian.com"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
       - name: Install current kernel on DUT
@@ -237,6 +230,7 @@ jobs:
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "current"
+          REPOSITORY: "apt.armbian.com"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
       - name: Install edge kernel on DUT
@@ -249,6 +243,7 @@ jobs:
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "edge"
+          REPOSITORY: "beta.armbian.com"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
   Stop:
