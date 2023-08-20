@@ -207,7 +207,7 @@ jobs:
             echo "LINUXFAMILY=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV            
             rm -rf *.json
 
-      - name: Install legacy kernel on DUT
+      - name: Install beta legacy kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
         timeout-minutes: 45
         uses: armbian/actions/dut-run@main
@@ -220,7 +220,33 @@ jobs:
           REPOSITORY: "beta.armbian.com"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
-      - name: Install current kernel on DUT
+      - name: Install stable legacy kernel on DUT
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
+        timeout-minutes: 45
+        uses: armbian/actions/dut-run@main
+        with:
+          DUT_IP: "${{ env.DUT_IP }}"
+          DUT_SLUG: "${{ env.DUT_SLUG }}"
+          STATUS: "${{ env.STATUS }}"
+          BOARD_NAME: "${{ env.BOARD_NAME }}"
+          BRANCH: "legacy"
+          REPOSITORY: "apt.armbian.com"
+          LINUXFAMILY: "${{ env.LINUXFAMILY }}"
+
+      - name: Install beta current kernel on DUT
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
+        timeout-minutes: 45
+        uses: armbian/actions/dut-run@main
+        with:
+          DUT_IP: "${{ env.DUT_IP }}"
+          DUT_SLUG: "${{ env.DUT_SLUG }}"
+          STATUS: "${{ env.STATUS }}"
+          BOARD_NAME: "${{ env.BOARD_NAME }}"
+          BRANCH: "current"
+          REPOSITORY: "beta.armbian.com"
+          LINUXFAMILY: "${{ env.LINUXFAMILY }}"
+
+      - name: Install stable current kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
         timeout-minutes: 45
         uses: armbian/actions/dut-run@main
@@ -233,7 +259,7 @@ jobs:
           REPOSITORY: "apt.armbian.com"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
-      - name: Install edge kernel on DUT
+      - name: Install beta edge kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
         timeout-minutes: 45
         uses: armbian/actions/dut-run@main
@@ -244,6 +270,19 @@ jobs:
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "edge"
           REPOSITORY: "beta.armbian.com"
+          LINUXFAMILY: "${{ env.LINUXFAMILY }}"
+
+      - name: Install stable edge kernel on DUT
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        timeout-minutes: 45
+        uses: armbian/actions/dut-run@main
+        with:
+          DUT_IP: "${{ env.DUT_IP }}"
+          DUT_SLUG: "${{ env.DUT_SLUG }}"
+          STATUS: "${{ env.STATUS }}"
+          BOARD_NAME: "${{ env.BOARD_NAME }}"
+          BRANCH: "edge"
+          REPOSITORY: "apt.armbian.com"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
   Stop:
