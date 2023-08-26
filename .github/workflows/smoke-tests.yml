@@ -230,7 +230,7 @@ jobs:
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "legacy"
-          REPOSITORY: "apt.armbian.com"
+          REPOSITORY: "stpete-mirror.armbian.com\/apt"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
       - name: Install beta current kernel on DUT
@@ -256,7 +256,7 @@ jobs:
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "current"
-          REPOSITORY: "apt.armbian.com"
+          REPOSITORY: "stpete-mirror.armbian.com\/apt"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
       - name: Install beta edge kernel on DUT
@@ -282,7 +282,7 @@ jobs:
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "edge"
-          REPOSITORY: "apt.armbian.com"
+          REPOSITORY: "stpete-mirror.armbian.com\/apt"
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
   Stop:
