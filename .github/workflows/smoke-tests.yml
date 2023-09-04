@@ -134,6 +134,8 @@ jobs:
           # set this here
           echo "REBOOT=false" >> $GITHUB_ENV
 
+          [[ -z $(command -v nc) ]] && sudo apt-get -yy install netcat
+
           server="${{ env.DUT_IP }}"
           if nc -z $server 22 -w 15 2>/dev/null; then
             echo "$server ✓"
