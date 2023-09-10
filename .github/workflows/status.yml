@@ -1,7 +1,7 @@
 name: Get values
 on:
   workflow_dispatch:
-  push:
+ # push:
   schedule:
     - cron: "*/30 * * * *"
 
