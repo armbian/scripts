@@ -1,0 +1,48 @@
+name: Smoke tests
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      GITBRANCH:
+       required: true
+       type: string
+       default: "main"
+      PWRMNGMT:
+       required: true
+       type: string
+       default: "true"
+    secrets:
+      ACCESS_TOKEN_ARMBIANWORKER:
+        required: true
+      NETBOX_TOKEN:
+        required: true
+      KEY_CI:
+        required: true
+      KEY_POWER_ON:
+        required: true
+      KEY_POWER_OFF:
+        required: true
+      USER_REPOSITORY:
+        required: true
+      HOST_REPOSITORY:
+        required: true
+      KNOWN_HOSTS_REPOSITORY:
+        required: true
+jobs:
+
+  Stop:
+    name: "Merge artifacts"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Armbian OS repo
+        uses: actions/checkout@v3
+
+      - name: Read/Write data into README
+        uses: eddiejaoude/github-actions-reader-writer@v0.1
+        with:
+          json-file-path: 'merged.json'
+          github-token: ${{ secrets.ACCESS_TOKEN_ARMBIANWORKER }}
+          columns: 1
+          object-field-names: '[ "started", "board_name", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor" ]'
+          html-cell: '<td align="left"><a href="{{ armbian_monitor }}">{{ board_name }}</a></td><td align="left">{{ started }}</td><td align=right>{{ kernel }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td>'
