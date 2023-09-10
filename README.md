@@ -34,6 +34,3 @@ We divide runners by arhitecture (ARM64 or X86) and size (big/small).
 4. Space = 64Gb
 
 https://www.armbian.com/contact/
-
-<!--START_SECTION:data-section-->
-<!--END_SECTION:data-section-->
