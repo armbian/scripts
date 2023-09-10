@@ -11,7 +11,7 @@
   "sevenzip" : "<b>7z -b</b>",
   "armbian_monitor" : "<b>Logs</b>",
   "kernel_target" : "<b>Branch</b>",
-  "repository" : "<b>Repository</b>"
+  "repository" : "<b>Repo</b>"
 },
 {
   "started" : "2023-09-10&nbsp;06:05:53",
@@ -23,8 +23,9 @@
   "kernel" : "n/a",
   "iperf" : "n/a",
   "sevenzip" : "n/a",
-  "armbian_monitor" : "n/a",
-  "kernel_target" : "legacy"
+  "armbian_monitor" : "n/a",  
+  "kernel_target" : "legacy",
+  "repository" : "stable"
 },
 {
   "started" : "2023-09-10&nbsp;06:05:54",
