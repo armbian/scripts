@@ -10,7 +10,8 @@
   "iperf" : "<b>Iperf</b>",
   "sevenzip" : "<b>7z -b</b>",
   "armbian_monitor" : "<b>Logs</b>",
-  "kernel_target" : "Branch"
+  "kernel_target" : "<b>Branch</b>"
+  "repository" : "<b>Repository</b>"
 },
 {
   "started" : "2023-09-10&nbsp;06:05:53",
