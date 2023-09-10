@@ -1,4 +1,4 @@
-name: Smoke tests
+name: JSON to readme
 on:
   workflow_dispatch:
   workflow_call:
