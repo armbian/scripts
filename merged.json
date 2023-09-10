@@ -9,7 +9,7 @@
   "kernel" : "<b>Kernel version</b>",
   "iperf" : "<b>Iperf</b>",
   "sevenzip" : "<b>7z -b</b>",
-  "armbian_monitor" : "",
+  "armbian_monitor" : "<b>Logs</b>",
   "kernel_target" : "Branch"
 },
 {
