@@ -11,23 +11,7 @@ on:
        required: true
        type: string
        default: "true"
-    secrets:
-      ACCESS_TOKEN_ARMBIANWORKER:
-        required: true
-      NETBOX_TOKEN:
-        required: true
-      KEY_CI:
-        required: true
-      KEY_POWER_ON:
-        required: true
-      KEY_POWER_OFF:
-        required: true
-      USER_REPOSITORY:
-        required: true
-      HOST_REPOSITORY:
-        required: true
-      KNOWN_HOSTS_REPOSITORY:
-        required: true
+
 jobs:
 
   Stop:
