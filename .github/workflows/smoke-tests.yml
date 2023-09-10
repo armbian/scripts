@@ -321,8 +321,9 @@ jobs:
             "kernel" : "<b>Kernel version</b>",
             "iperf" : "<b>Iperf</b>",
             "sevenzip" : "<b>7z -b</b>",
-            "armbian_monitor" : "",
-            "kernel_target" : "Branch"
+            "armbian_monitor" : "<b>Logs</b>",
+            "kernel_target" : "<b>Branch</b>",
+            "repository" : "<b>Repo</b>"
           },
           EOF
           cat ./*.parts | sed '$ s/.$//' >> merged.json
@@ -341,8 +342,8 @@ jobs:
           json-file-path: 'merged.json'
           github-token: ${{ secrets.ACCESS_TOKEN_ARMBIANWORKER }}
           columns: 1
-          object-field-names: '[ "started", "board_name", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor" ]'
-          html-cell: '<td align="left"><a href="{{ armbian_monitor }}">{{ board_name }}</a></td><td align="left">{{ started }}</td><td align=right>{{ kernel }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td>'
+          object-field-names: '[ "started", "board_name", "board_slug", "board_slug", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor", "kernel_target", "repository" ]'
+          html-cell: '<td align="left"><a id={{ board_slug }} href=#{{ board_slug }}>{{ board_name }}</a></td><td align=left>{{ armbian_monitor }}</td><td align=right>{{ kernel_target }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td><td align=right>{{ repository }}</td>'
           
       - name: Power off
         if: ${{ inputs.PWRMNGMT == 'true' }}
