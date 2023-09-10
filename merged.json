@@ -10,7 +10,7 @@
   "iperf" : "<b>Iperf</b>",
   "sevenzip" : "<b>7z -b</b>",
   "armbian_monitor" : "<b>Logs</b>",
-  "kernel_target" : "<b>Branch</b>"
+  "kernel_target" : "<b>Branch</b>",
   "repository" : "<b>Repository</b>"
 },
 {
