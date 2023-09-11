@@ -11,7 +11,7 @@ jobs:
     steps:
 
       - name: Checkout Armbian OS repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Read/Write data into README
         uses: eddiejaoude/github-actions-reader-writer@v0.1
