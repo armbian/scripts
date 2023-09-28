@@ -113,7 +113,7 @@ jobs:
           sudo apt -y clean
 
       - name: Free Github Runner
-        uses: jlumbroso/free-disk-space@main
+        uses: descriptinc/free-disk-space@main
         with:
           android: true
           dotnet: true
