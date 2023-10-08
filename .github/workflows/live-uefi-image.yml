@@ -10,7 +10,7 @@ jobs:
   Distro:
       outputs:
         desktop: ${{steps.list_dirs.outputs.desktop}}
-      runs-on: [qemu,igor]
+      runs-on: Linux
       timeout-minutes: 480
       strategy:
         fail-fast: false
