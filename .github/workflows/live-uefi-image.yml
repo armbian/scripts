@@ -8,9 +8,7 @@ on:
 jobs:  
 
   Distro:
-      outputs:
-        desktop: ${{steps.list_dirs.outputs.desktop}}
-      runs-on: Linux
+      runs-on: [qemu,ARM64]
       timeout-minutes: 480
       strategy:
         fail-fast: false
@@ -24,24 +22,10 @@ jobs:
           run: |
             echo ${{ matrix.arch }}
             echo ${{ matrix.target }}
-          
-  Desktop:
-  
-      needs: [ Distro ]
-      name: "Install"
-      runs-on: [qemu,igor]
-      timeout-minutes: 480
-      strategy:
-        max-parallel: 16
-        fail-fast: false
-        matrix: 
-          node: ${{fromJson(needs.Distro.outputs.desktop)}}
-
-      steps:
       
         - name: Prepare
           run: |
-            sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin dnsmasq gir1.2-spiceclientgtk-3.0 virt-viewer sshpass nmap
+            sudo apt-get -y install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin gir1.2-spiceclientgtk-3.0 virt-viewer sshpass nmap
             
         - name: Read
           run: |
