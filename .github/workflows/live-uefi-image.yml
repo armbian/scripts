@@ -22,8 +22,8 @@ jobs:
       
         - name: Prepare
           run: |
-            echo ${{ matrix.arch }
-            echo ${{ matrix.target }
+            echo ${{ matrix.arch }}
+            echo ${{ matrix.target }}
           
   Desktop:
   
