@@ -76,7 +76,7 @@ jobs:
         uses: armbian/actions/runner-clean@main
 
       - name: Checkout Armbian OS repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: armbian/scripts
           fetch-depth: 1
@@ -84,7 +84,7 @@ jobs:
           path: scripts
 
       - name: Checkout Armbian build repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: armbian/build
           fetch-depth: 0

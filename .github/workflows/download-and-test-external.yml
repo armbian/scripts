@@ -70,7 +70,7 @@ jobs:
           ssh artifacts@armbian.tnahosting.net "rm -rf artifacts/*"
 
       - name: Checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4
         with:
           repository: armbian/os
           path: os
@@ -136,7 +136,7 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE1 }}
 
       - name: Checkout Armbian OS scripts
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v4
         with:
           repository: armbian/os
           path: os
@@ -145,7 +145,7 @@ jobs:
           clean: false
 
       - name: Checkout Armbian build script
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v4
         with:
           repository: armbian/build
           path: build
@@ -290,7 +290,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v4
         with:
           repository: armbian/os
           path: os
@@ -349,7 +349,7 @@ jobs:
           path: downloads
 
       - name: Checkout Armbian OS Config
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v4
         with:
           repository: armbian/os
           ref: ${{ inputs.REFERENCE }}
@@ -415,7 +415,7 @@ jobs:
           path: downloads
 
       - name: Checkout
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v4
         with:
           repository: armbian/os
           path: os

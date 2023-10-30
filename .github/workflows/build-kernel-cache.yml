@@ -39,7 +39,7 @@ jobs:
         uses: armbian/actions/runner-clean@main
 
       - name: Checkout Armbian Framework
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v4
         with:
           repository: armbian/build
           ref:  "${{ inputs.BUILD_BRANCH }}"
@@ -48,7 +48,7 @@ jobs:
           path: build
 
       - name: Checkout Armbian OS
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v4
         with:
           repository: armbian/os
           ref:  main
@@ -116,7 +116,7 @@ jobs:
           password: ${{ secrets.ACCESS_TOKEN }}    # GitHub actions builtin token. repo has to have pkg access.
 
       - name: Checkout build repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/build
           ref:  "${{ inputs.BUILD_BRANCH }}"
