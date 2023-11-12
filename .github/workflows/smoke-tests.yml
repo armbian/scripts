@@ -331,7 +331,7 @@ jobs:
             "dut_ip" : "IP",
             "board_name" : "<b>Board name</b>",
             "board_slug" : "Board ID",
-            "board_conf_type": "<b>Type</b>",
+            "board_conf_type": "<b>Supported</b>",
             "u-boot" : "U-boot",
             "kernel" : "<b>Kernel version</b>",
             "iperf" : "<b>Iperf</b>",
