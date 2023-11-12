@@ -114,6 +114,10 @@ jobs:
           echo "DUT_SLUG=$DUT_SLUG" >> $GITHUB_ENV
           echo "DUT_ID=$DUT_ID" >> $GITHUB_ENV
           echo "DUT_IP=$DUT_IP" >> $GITHUB_ENV
+
+          # read config type
+          DUT_CONF_TYPE=$(ls -1 config/boards/$DUT_SLUG.* | sed 's/.*\.//')
+          echo "DUT_CONF_TYPE=$DUT_CONF_TYPE" >> $GITHUB_ENV
           
           # read board configs and save to environment
           CFG_CONTENT="$(cat build/config/boards/${DUT_SLUG}.* | grep -e "KERNEL_TARGET\|KERNEL_TEST_TARGET\|BOARD_NAME")"
@@ -216,6 +220,7 @@ jobs:
         with:
           DUT_IP: "${{ env.DUT_IP }}"
           DUT_SLUG: "${{ env.DUT_SLUG }}"
+          DUT_CONF_TYPE: "${{ env.DUT_CONF_TYPE }}"
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "legacy"
@@ -229,6 +234,7 @@ jobs:
         with:
           DUT_IP: "${{ env.DUT_IP }}"
           DUT_SLUG: "${{ env.DUT_SLUG }}"
+          DUT_CONF_TYPE: "${{ env.DUT_CONF_TYPE }}"
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "legacy"
@@ -242,6 +248,7 @@ jobs:
         with:
           DUT_IP: "${{ env.DUT_IP }}"
           DUT_SLUG: "${{ env.DUT_SLUG }}"
+          DUT_CONF_TYPE: "${{ env.DUT_CONF_TYPE }}"
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "current"
@@ -255,6 +262,7 @@ jobs:
         with:
           DUT_IP: "${{ env.DUT_IP }}"
           DUT_SLUG: "${{ env.DUT_SLUG }}"
+          DUT_CONF_TYPE: "${{ env.DUT_CONF_TYPE }}"
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "current"
@@ -268,6 +276,7 @@ jobs:
         with:
           DUT_IP: "${{ env.DUT_IP }}"
           DUT_SLUG: "${{ env.DUT_SLUG }}"
+          DUT_CONF_TYPE: "${{ env.DUT_CONF_TYPE }}"
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "edge"
@@ -281,6 +290,7 @@ jobs:
         with:
           DUT_IP: "${{ env.DUT_IP }}"
           DUT_SLUG: "${{ env.DUT_SLUG }}"
+          DUT_CONF_TYPE: "${{ env.DUT_CONF_TYPE }}"
           STATUS: "${{ env.STATUS }}"
           BOARD_NAME: "${{ env.BOARD_NAME }}"
           BRANCH: "edge"
@@ -317,6 +327,7 @@ jobs:
             "dut_ip" : "IP",
             "board_name" : "<b>Board name</b>",
             "board_slug" : "Board ID",
+            "board_conf_type": "Board type",
             "u-boot" : "U-boot",
             "kernel" : "<b>Kernel version</b>",
             "iperf" : "<b>Iperf</b>",
@@ -342,8 +353,8 @@ jobs:
           json-file-path: 'merged.json'
           github-token: ${{ secrets.ACCESS_TOKEN_ARMBIANWORKER }}
           columns: 1
-          object-field-names: '[ "started", "board_name", "board_slug", "board_slug", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor", "kernel_target", "repository" ]'
-          html-cell: '<td align="left"><a id={{ board_slug }} href=#{{ board_slug }}>{{ board_name }}</a></td><td align=left>{{ armbian_monitor }}</td><td align=right>{{ kernel_target }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td><td align=right>{{ repository }}</td>'
+          object-field-names: '[ "started", "board_name", "board_slug", "board_slug", "board_conf_type", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor", "kernel_target", "repository" ]'
+          html-cell: '<td align="left"><a id={{ board_slug }} href=#{{ board_slug }}>{{ board_name }}</a> {{ board_conf_type }}</td><td align=left>{{ armbian_monitor }}</td><td align=right>{{ kernel_target }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td><td align=right>{{ repository }}</td>'
           
       - name: Power off
         if: ${{ inputs.PWRMNGMT == 'true' }}
