@@ -117,14 +117,18 @@ jobs:
 
           # read config type
           DUT_CONF_TYPE=$(ls -1 config/boards/$DUT_SLUG.* | sed 's/.*\.//')
-          echo "DUT_CONF_TYPE=$DUT_CONF_TYPE" >> $GITHUB_ENV
           
           # read board configs and save to environment
-          CFG_CONTENT="$(cat build/config/boards/${DUT_SLUG}.* | grep -e "KERNEL_TARGET\|KERNEL_TEST_TARGET\|BOARD_NAME")"
+          CFG_CONTENT="$(cat build/config/boards/${DUT_SLUG}.* | grep -e "KERNEL_TARGET\|KERNEL_TEST_TARGET\|BOARD_NAME\|BOARD_MAINTAINER")"
           eval "$CFG_CONTENT"
           echo "BOARD_NAME=$BOARD_NAME" >> $GITHUB_ENV
           [[ -n "${KERNEL_TEST_TARGET}" ]] && KERNEL_TARGET="${KERNEL_TEST_TARGET}"
           echo "KERNEL_TARGET=$KERNEL_TARGET" >> $GITHUB_ENV
+          if [[ -n "${BOARD_MAINTAINER}" && "${DUT_CONF_TYPE}" == "conf" ]]; then
+          echo "DUT_CONF_TYPE=![](https://img.shields.io/static/v1?label=&message=Supported&color=green)" >> $GITHUB_ENV
+          else
+          echo "DUT_CONF_TYPE=![](https://img.shields.io/static/v1?label=&message=Pro%20%20%20bono&color=black)" >> $GITHUB_ENV
+          fi
 
           # read power connector id
           CFG_CONTENT=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
@@ -327,7 +331,7 @@ jobs:
             "dut_ip" : "IP",
             "board_name" : "<b>Board name</b>",
             "board_slug" : "Board ID",
-            "board_conf_type": "Board type",
+            "board_conf_type": "Type",
             "u-boot" : "U-boot",
             "kernel" : "<b>Kernel version</b>",
             "iperf" : "<b>Iperf</b>",
