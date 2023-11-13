@@ -216,7 +216,7 @@ jobs:
         if: ${{ github.repository_owner == 'Armbian' && env.STATUS == '' }}
         run: |
 
-            echo "LINUXFAMILY=$(ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV            
+            echo "LINUXFAMILY=$(timeout 20 ssh -o StrictHostKeyChecking=no root@${{ env.DUT_IP }} "cat /etc/armbian-release | grep LINUXFAMILY | cut -d"=" -f2" || true)" >> $GITHUB_ENV
             rm -rf *.json
 
       - name: Install beta legacy kernel on DUT
