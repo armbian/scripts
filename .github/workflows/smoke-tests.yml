@@ -360,7 +360,7 @@ jobs:
           github-token: ${{ secrets.ACCESS_TOKEN_ARMBIANWORKER }}
           columns: 1
           object-field-names: '[ "started", "board_name", "board_slug", "board_slug", "board_conf_type", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor", "kernel_target", "repository" ]'
-          html-cell: '<td align="left"><a id={{ board_slug }} href=#{{ board_slug }}>{{ board_name }}</a></td><td align=center>{{ board_conf_type }}</td><td align=left>{{ armbian_monitor }}</td><td align=right>{{ kernel_target }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td><td align=right>{{ repository }}</td>'
+          html-cell: '<td align="left"><a id={{ board_slug }} href=#{{ board_slug }}>{{ board_name }}</a></td><td align=center>{{ kernel }}</td><td align=center>{{ board_conf_type }}</td><td align=left>{{ armbian_monitor }}</td><td align=right>{{ kernel_target }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td><td align=right>{{ repository }}</td>'
           
       - name: Power off
         if: ${{ inputs.PWRMNGMT == 'true' }}
