@@ -85,7 +85,7 @@ jobs:
           # header and footer are edited at GitHub          
           cat scripts/.github/header.inc > scripts/README.md
           echo -en "\n\n" >> scripts/README.md
-          cat label.tmp >> scripts/README.md
+          #cat label.tmp >> scripts/README.md
           cat scripts/.github/footer.inc >> scripts/README.md
 
       - name: "Upload status"
