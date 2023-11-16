@@ -103,10 +103,10 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.ACCESS_TOKEN_ARMBIANWORKER }}
+          token: ${{ secrets.ACCESS_TOKEN }}
           commit-message: Update report
-          committer: Armbianworker <info@armbian.com>
-          author: armbianworker <info@armbian.com>
+          #committer: Armbianworker <info@armbian.com>
+          #author: armbianworker <info@armbian.com>
           signoff: false
           branch: update-maintainers
           delete-branch: true
