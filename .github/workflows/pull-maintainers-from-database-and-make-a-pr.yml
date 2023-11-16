@@ -25,6 +25,7 @@ jobs:
       - name: Checkout build repo
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.ACCESS_TOKEN_ARMBIANWORKER }}
           repository: armbian/build
           ref:  main
           fetch-depth: 0
