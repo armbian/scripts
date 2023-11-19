@@ -103,7 +103,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
-          commit-message: Update report
+          commit-message: '`Automatic` board configs status synchronise'
           #committer: Armbianworker <info@armbian.com>
           #author: armbianworker <info@armbian.com>
           signoff: false
