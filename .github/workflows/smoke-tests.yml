@@ -104,12 +104,12 @@ jobs:
 
           # read matrix
           CHUNK="${{ matrix.node }}"
-          
+
           # extract values
           DUT_SLUG=$(echo $CHUNK | cut -d":" -f1)
           DUT_ID=$(echo $CHUNK | cut -d":" -f2)
           DUT_IP=$(echo $CHUNK | cut -d":" -f3)
-          
+
           # save to environment
           echo "DUT_SLUG=$DUT_SLUG" >> $GITHUB_ENV
           echo "DUT_ID=$DUT_ID" >> $GITHUB_ENV
@@ -117,15 +117,15 @@ jobs:
 
           # read config type
           DUT_CONF_TYPE=$(ls -1 config/boards/$DUT_SLUG.* | sed 's/.*\.//')
-          
+
           # read board configs and save to environment
           CFG_CONTENT="$(cat build/config/boards/${DUT_SLUG}.* | grep -e "KERNEL_TARGET\|KERNEL_TEST_TARGET\|BOARD_NAME\|BOARD_MAINTAINER")"
           eval "$CFG_CONTENT"
           echo "BOARD_NAME=$BOARD_NAME" >> $GITHUB_ENV
           [[ -n "${KERNEL_TEST_TARGET}" ]] && KERNEL_TARGET="${KERNEL_TEST_TARGET}"
           echo "KERNEL_TARGET=$KERNEL_TARGET" >> $GITHUB_ENV
-          if [[ -n "${BOARD_MAINTAINER}" && "${DUT_CONF_TYPE}" == "conf" ]]; then          
-              echo "DUT_CONF_TYPE=<a href=#${DUT_SLUG}><img src=https://img.shields.io/static/v1?label=&message=Supported&color=green></a>" >> $GITHUB_ENV
+          if [[ -n "${BOARD_MAINTAINER}" && "${DUT_CONF_TYPE}" == "conf" ]]; then
+              echo "DUT_CONF_TYPE=<a href=#${DUT_SLUG}><img src=https://img.shields.io/static/v1?label=&message=Standard&color=green></a>" >> $GITHUB_ENV
           elif [[ "${DUT_CONF_TYPE}" == "wip" ]]; then
               echo "DUT_CONF_TYPE=<a href=https://www.armbian.com/donate/><img src=https://img.shields.io/static/v1?label=&message=Staging&color=orange></a>" >> $GITHUB_ENV
           else
@@ -152,7 +152,7 @@ jobs:
             echo "PROCEED=true" >> $GITHUB_ENV
             echo "ONLINE=true" >> $GITHUB_ENV
           else
-            echo "$server ✗ needs to be power cycled"            
+            echo "$server ✗ needs to be power cycled"
             [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
             echo "STATUS=failed" >> $GITHUB_ENV
           fi
@@ -176,7 +176,7 @@ jobs:
             USER_NORMAL=guest
             PASS_NORMAL=testpassword
             REPLACE_KEY=true
-            
+
             # clean
             ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${{ env.DUT_IP }}" > /dev/null 2>&1
 
@@ -206,7 +206,7 @@ jobs:
               "
               fi
             fi
- 
+
             echo "Install keys always"
             sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" root@${{ env.DUT_IP }}
             #sshpass -p "${PASS_NORMAL}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" guest@${{ env.DUT_IP }}
@@ -317,7 +317,7 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: JSON
-          
+
       - name: "Delete artifact"
         uses: geekyeggo/delete-artifact@v2
         with:
@@ -333,7 +333,7 @@ jobs:
             "dut_ip" : "IP",
             "board_name" : "<b>Board name</b>",
             "board_slug" : "Board ID",
-            "board_conf_type": "<b>Supported</b>",
+            "board_conf_type": "<b>Support</b>",
             "u-boot" : "U-boot",
             "kernel" : "<b>Kernel version</b>",
             "iperf" : "<b>Iperf</b>",
@@ -361,7 +361,7 @@ jobs:
           columns: 1
           object-field-names: '[ "started", "board_name", "board_slug", "board_slug", "board_conf_type", "u-boot", "kernel" , "iperf" , "sevenzip" , "armbian_monitor", "kernel_target", "repository" ]'
           html-cell: '<td align="left"><a id={{ board_slug }} href=#{{ board_slug }}>{{ board_name }}</a></td><td align=center>{{ kernel }}</td><td align=center>{{ board_conf_type }}</td><td align=left>{{ armbian_monitor }}</td><td align=right>{{ iperf }}</td><td align=right>{{ sevenzip }}</td><td align=right>{{ repository }}</td>'
-          
+
       - name: Power off
         if: ${{ inputs.PWRMNGMT == 'true' }}
         uses: armbian/actions/power-off@main
