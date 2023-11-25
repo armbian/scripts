@@ -11,6 +11,10 @@ on:
        required: true
        type: string
        default: "true"
+      BETAONLY:
+       required: false
+       type: string
+       default: "true"
     secrets:
       ACCESS_TOKEN_ARMBIANWORKER:
         required: true
@@ -234,7 +238,7 @@ jobs:
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
       - name: Install stable legacy kernel on DUT
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && inputs.BETAONLY == 'true' }}
         timeout-minutes: 45
         uses: armbian/actions/dut-run@main
         with:
@@ -262,7 +266,7 @@ jobs:
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
       - name: Install stable current kernel on DUT
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && inputs.BETAONLY == 'true' }}
         timeout-minutes: 45
         uses: armbian/actions/dut-run@main
         with:
@@ -290,7 +294,7 @@ jobs:
           LINUXFAMILY: "${{ env.LINUXFAMILY }}"
 
       - name: Install stable edge kernel on DUT
-        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
+        if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && inputs.BETAONLY == 'true' }}
         timeout-minutes: 45
         uses: armbian/actions/dut-run@main
         with:
