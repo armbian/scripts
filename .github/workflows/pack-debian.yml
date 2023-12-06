@@ -38,9 +38,9 @@ on:
       PASSPHRASE:
         required: true
       SSH_KEY_TORRENTS: 
-        required: true
+        required: false
       KNOWN_HOSTS_UPLOAD: 
-        required: true
+        required: false
 
 jobs:
 
