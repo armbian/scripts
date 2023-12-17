@@ -44,7 +44,7 @@ env:
 jobs:
 
   start:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.BUILD_RUNNER }
     name: "Mirror"
     outputs:
       matrix: ${{steps.lists.outputs.matrix}}
@@ -104,7 +104,7 @@ jobs:
         node: ${{fromJson(needs.start.outputs.matrix)}}
 
     name: "M"
-    runs-on: [Ubuntu-latest]
+    runs-on: ${{ inputs.BUILD_RUNNER }
     steps:
     
       - name: Update
@@ -283,7 +283,7 @@ jobs:
 
     name: "Test"
     needs: download
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.BUILD_RUNNER }
     outputs:
       max-parallel: 18
       matrix:  ${{steps.json.outputs.JSON_CONTENT}}
@@ -337,7 +337,7 @@ jobs:
 
     name: "I"
     timeout-minutes: 30
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.BUILD_RUNNER }
     container:
         image: "${{ matrix.image.image }}"
     steps:
@@ -388,7 +388,7 @@ jobs:
 
     name: "Clean"
     needs: gradle
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.BUILD_RUNNER }
     outputs:
       matrix:  ${{steps.json.outputs.JSON_CONTENT}}
     steps:
