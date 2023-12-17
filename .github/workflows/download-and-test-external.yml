@@ -112,15 +112,15 @@ jobs:
           sudo apt update
           sudo apt -y clean
 
-      - name: Free Github Runner
-        uses: descriptinc/free-disk-space@main
-        with:
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
+      #- name: Free Github Runner
+      #  uses: descriptinc/free-disk-space@main
+      #  with:
+      #    android: true
+      #    dotnet: true
+      #    haskell: true
+      #    large-packages: true
+      #    docker-images: true
+      #    swap-storage: true
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
