@@ -94,7 +94,7 @@ jobs:
             sshpass -p ${PASS_NORMAL} ssh -o "StrictHostKeyChecking=accept-new" ${USER_NORMAL}@${USER_HOST} "export DISPLAY=:0;maim" > "${{ env.RELEASE }}-${{ env.DESKTOP }}.png"
 
         - name: Upload artefacts        
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: "${{ env.RELEASE }}-${{ env.DESKTOP }}.png"
             path: ${{ env.RELEASE }}-${{ env.DESKTOP }}.png
