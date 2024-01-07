@@ -129,11 +129,11 @@ jobs:
           [[ -n "${KERNEL_TEST_TARGET}" ]] && KERNEL_TARGET="${KERNEL_TEST_TARGET}"
           echo "KERNEL_TARGET=$KERNEL_TARGET" >> $GITHUB_ENV
           if [[ -n "${BOARD_MAINTAINER}" && "${DUT_CONF_TYPE}" == "conf" ]]; then
-              echo "DUT_CONF_TYPE=<a href=#${DUT_SLUG}><img src=https://img.shields.io/static/v1?label=&message=Standard&color=green></a>" >> $GITHUB_ENV
+              echo "DUT_CONF_TYPE=<a href=https://docs.armbian.com/User-Guide_Board-Support-Rules/><img src=https://img.shields.io/static/v1?label=&message=Standard&color=green></a>" >> $GITHUB_ENV
           elif [[ "${DUT_CONF_TYPE}" == "wip" ]]; then
-              echo "DUT_CONF_TYPE=<a href=https://www.armbian.com/donate/><img src=https://img.shields.io/static/v1?label=&message=Staging&color=orange></a>" >> $GITHUB_ENV
+              echo "DUT_CONF_TYPE=<a href=https://docs.armbian.com/User-Guide_Board-Support-Rules/><img src=https://img.shields.io/static/v1?label=&message=Staging&color=orange></a>" >> $GITHUB_ENV
           else
-              echo "DUT_CONF_TYPE=<a href=https://www.armbian.com/donate/><img src=https://img.shields.io/static/v1?label=&message=Community&color=white></a>" >> $GITHUB_ENV
+              echo "DUT_CONF_TYPE=<a href=https://docs.armbian.com/User-Guide_Board-Support-Rules/><img src=https://img.shields.io/static/v1?label=&message=Community&color=white></a>" >> $GITHUB_ENV
           fi
 
           # read power connector id
