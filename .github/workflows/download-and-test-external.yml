@@ -203,6 +203,7 @@ jobs:
           fi
 
           # Cleaning exceptions
+          find $SOURCE -type f -name "*-dbg_*" | xargs sudo rm || true          
           find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-arm64_*" | sort | head -n -1 | xargs sudo rm || true
