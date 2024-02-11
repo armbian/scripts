@@ -226,6 +226,7 @@ jobs:
           echo "</details>" >> $GITHUB_STEP_SUMMARY
 
           # repack deb files
+          sudo apt-get install devscripts
           DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
           for d in ${DEBS[@]}; do
             BEFORE=$(deb-reversion -c ${d} -s armbian)
