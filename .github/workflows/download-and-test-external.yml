@@ -236,6 +236,7 @@ jobs:
             echo "$d : $BEFORE -> $AFTER"
             sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
             sudo rm $d
+            sudo mv *.deb ${SOURCE}
           done
 
           if [[ ${TARGET} == main ]]; then
