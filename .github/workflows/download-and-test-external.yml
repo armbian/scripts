@@ -227,7 +227,7 @@ jobs:
 
           # repack deb files
           sudo apt-get install devscripts
-          DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
+          DEBS=($(sudo find "${SOURCE}"* -type f -name '*thunderbird*.deb'))
           for d in ${DEBS[@]}; do
             BEFORE=$(deb-reversion -c ${d} -s armbian)
             #add epoch 9
