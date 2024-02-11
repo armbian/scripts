@@ -226,15 +226,15 @@ jobs:
           echo "</details>" >> $GITHUB_STEP_SUMMARY
 
           # repack deb files
-          #DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
-          #for d in ${DEBS[@]}; do
-            #BEFORE=$(deb-reversion -c ${d} -s armbian)
+          DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
+          for d in ${DEBS[@]}; do
+            BEFORE=$(deb-reversion -c ${d} -s armbian)
             #add epoch 9
-            #AFTER=9:$(echo $BEFORE | cut -d":" -f2)
-            #echo "$d : $BEFORE -> $AFTER"
-            #sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
-            #sudo rm $d
-          #done
+            AFTER=9:$(echo $BEFORE | cut -d":" -f2)
+            echo "$d : $BEFORE -> $AFTER"
+            sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
+            sudo rm $d
+          done
 
           if [[ ${TARGET} == main ]]; then
                   if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
