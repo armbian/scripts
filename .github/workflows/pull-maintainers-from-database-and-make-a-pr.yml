@@ -96,11 +96,11 @@ jobs:
           } >> $GITHUB_STEP_SUMMARY
 
           # Re-generate CODEOWNERS
-          ./.github/generate_CODEOWNERS.sh 
+          ./.github/generate_CODEOWNERS.sh
 
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
           commit-message: '`Automatic` board configs status synchronise'
@@ -110,7 +110,7 @@ jobs:
           branch: update-maintainers
           delete-branch: true
           title: '`Automatic` board configs status synchronise'
-          body: |            
+          body: |
             Update maintainers and board status
 
             - synced status from the database
@@ -119,7 +119,7 @@ jobs:
             If you want to become a board maintainer, [adjust data here](https://www.armbian.com/update-data/).
 
             Ref: [Board Maintainers Procedures and Guidelines](https://docs.armbian.com/Board_Maintainers_Procedures_and_Guidelines/)
-            
+
           labels: |
             Needs review
           #assignees: igorpecovnik
