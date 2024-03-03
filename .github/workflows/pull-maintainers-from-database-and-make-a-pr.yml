@@ -53,6 +53,7 @@ jobs:
           sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"\"/" config/boards/*.{conf,wip,eos,tvb}
 
           # extract values fron JSON
+          declare -A MAINTAINERS
           {
             jq -c '.[]' /tmp/armbian_maintainers.json | while read i; do
               NAME=$(echo $i | jq --raw-output '.First_Name')
@@ -61,25 +62,16 @@ jobs:
               if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
                 echo "- [$NAME](https://github.com/${MAINTAINER_GITHUB})"
                 for i in $(echo $BOARD | sed "s/,/ /g"); do
-                  unset BOARD_NAME BOARD_MAINTAINER CFG_CONTENT
-                  CFG_CONTENT="$(cat config/boards/${i}.* 2> /dev/null | grep -e "BOARD_MAINTAINER\|BOARD_NAME" || true)"
-                  if [[ -n "$CFG_CONTENT" ]]; then
-                    eval "$CFG_CONTENT"
-                    echo -e "  - $i</li>"
-                    if [[ -n "${BOARD_MAINTAINER}" && "${BOARD_MAINTAINER}" != *$MAINTAINER_GITHUB* ]]; then
-                      BOARD_MAINTAINER+=" $MAINTAINER_GITHUB"
-                    else
-                      BOARD_MAINTAINER="$MAINTAINER_GITHUB"
-                    fi
-                    sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"$BOARD_MAINTAINER\"/" config/boards/${i}.*
-
-                    # if maintainer exits, rename .csc to .conf
-                    #if [[ -n "${BOARD_MAINTAINER}" ]]; then
-                    #  mv config/boards/${i}.csc config/boards/${i}.conf 2>/dev/null || true
-                    #fi
-                  fi
+                  echo -e "  - $i</li>"
+                  MAINTAINERS["$i"]+="$MAINTAINER_GITHUB "
                 done
               fi
+            done
+
+            for cfg in config/boards/*.{conf,wip,csc,eos,tvb}; do
+              declare -a maintainers
+              readarray -t maintainers < "$(echo "${MAINTAINERS[${cfg%.*}]}" | xargs -n1 | sort -u)"
+              sed -i "s/BOARD_MAINTAINER=.*/BOARD_MAINTAINER=\"${maintainers[*]}\"/" "${cfg}"
             done
 
             # rename configuration to .csc where we lost maintainer
