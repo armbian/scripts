@@ -51,6 +51,7 @@ do
 		sh -c "cd ${runner_home} ; sudo ./svc.sh stop actions-runner-${i}; sudo ./svc.sh uninstall actions-runner-${i}"
 		sudo userdel -r -f actions-runner-${i}
 		sudo groupdel actions-runner-${i}
+		sudo rm -rf "${runner_home}"
 	fi
 
 	sudo adduser --quiet --disabled-password --shell /bin/bash --home /home/actions-runner-${i} --gecos "actions-runner-${i}" actions-runner-${i}
