@@ -24,36 +24,35 @@ REPO=os
 runner_delete ()
 {
 	DELETE=$1
+
 	x=1
 	while [ $x -le 9 ] # need to do it different as it can be more then 9 pages
 	do
 	RUNNER=$(
 	curl -s -L \
-	-H "Accept: application/vnd.github.v3+json" \
-	-H "Authorization: Bearer $TOKEN"\
-	-H "X-GitHub-Api-Version: 2022-11-28" \
-	"https://api.github.com/orgs/${ORG}/actions/runners?page=${x}" | jq -r '.runners[] | .id, .name' | xargs -n2 -d'\n' | sed -e 's/ /,/g'
-	)
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer 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" \
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  https://api.github.com/orgs/armbian/actions/runners\?page\=${x} \
+	| jq -r '.runners[] | .id, .name' | xargs -n2 -d'\n' | sed -e 's/ /,/g')
 
 	while IFS= read -r DATA; do
-	#echo "Line: $RUNNER_ID"
-	RUNNER_ID=$(echo $DATA | cut -d"," -f1)
-	RUNNER_NAME=$(echo $DATA | cut -d"," -f2)
-	#echo "Line: $RUNNER_ID $RUNNER_NAME"
-
-	# deleting a runner
-	if [[ $RUNNER_NAME == ${DELETE} ]]; then
-	curl -L \
-	-X DELETE \
-	-H "Accept: application/vnd.github+json" \
-	-H "Authorization: Bearer ${TOKEN}"\
-	-H "X-GitHub-Api-Version: 2022-11-28" \
-	https://api.github.com/orgs/${ORG}/actions/runners/${RUNNER_ID}
-	fi
+		RUNNER_ID=$(echo $DATA | cut -d"," -f1)
+		RUNNER_NAME=$(echo $DATA | cut -d"," -f2)
+		# deleting a runner
+		if [[ $RUNNER_NAME == ${DELETE} ]]; then
+			echo "Delete existing: $RUNNER_NAME"
+			curl -s -L \
+			-X DELETE \
+			-H "Accept: application/vnd.github+json" \
+			-H "Authorization: Bearer ${GH_TOKEN}"\
+			-H "X-GitHub-Api-Version: 2022-11-28" \
+			https://api.github.com/orgs/${ORG}/actions/runners/${RUNNER_ID}
+		fi
 
 	done <<< $RUNNER
 	x=$(( $x + 1 ))
-done
+	done
 }
 
 # we can generate per org or per repo
@@ -64,13 +63,18 @@ if [[ -n "${OWNER}" && -n "${REPO}" ]]; then
     PREFIX=repos
 fi
 
-# download runner app
-sudo apt-get update
-sudo apt-get -y install libxml2-utils jq docker.io
+# update OS and install dependencies
+sudo apt-get -q update
+[[ -z $(command -v xmllint) ]] && sudo apt-get -yy install libxml2-utils
+[[ -z $(command -v jq) ]] && sudo apt-get -yy install jq
+[[ -z $(command -v docker) ]] && sudo apt-get -yy install docker.io
+
+# download latest runner
 LATEST=$(curl -sL https://github.com/actions/runner/releases/ | xmllint -html -xpath '//a[contains(@href, "release")]/text()' - 2> /dev/null | grep -P '^v' | head -n1 | sed "s/v//g")
 [[ "$(dpkg --print-architecture)" == "amd64" ]] && ARCH=x64 || ARCH=arm64
 curl --create-dir --output-dir .tmp -o actions-runner-linux-${ARCH}-${LATEST}.tar.gz -L https://github.com/actions/runner/releases/download/v${LATEST}/actions-runner-linux-${ARCH}-${LATEST}.tar.gz
 
+# make runners each under its own user
 for i in $(seq -w $START $STOP)
 do
 
@@ -84,9 +88,9 @@ do
 	if id "actions-runner-${i}" >/dev/null 2>&1; then
 		runner_delete "$NAME-${i}"
 		runner_home=$(getent passwd "actions-runner-${i}" | cut -d: -f6)
-		sh -c "cd ${runner_home} ; sudo ./svc.sh stop actions-runner-${i}; sudo ./svc.sh uninstall actions-runner-${i}"
-		sudo userdel -r -f actions-runner-${i}
-		sudo groupdel actions-runner-${i}
+		sh -c "cd ${runner_home} ; sudo ./svc.sh stop actions-runner-${i} >/dev/null; sudo ./svc.sh uninstall actions-runner-${i} >/dev/null"
+		sudo userdel -r -f actions-runner-${i} 2>/dev/null
+		sudo groupdel actions-runner-${i} 2>/dev/null
 		sudo rm -rf "${runner_home}"
 	fi
 
@@ -104,8 +108,8 @@ do
         if [[ "$i" == "${START}" ]]; then
 	LABEL=$LABEL_PRIMARY
 	fi
-	
+
 	sudo runuser -l actions-runner-${i} -c "./config.sh --url https://github.com/${REGISTRATION_URL} --token ${TOKEN} --labels ${LABEL} --name $NAME-${i} --unattended"
-	sh -c "cd /home/actions-runner-${i} ; sudo ./svc.sh install actions-runner-${i}; sudo ./svc.sh start actions-runner-${i}"
+	sh -c "cd /home/actions-runner-${i} ; sudo ./svc.sh install actions-runner-${i} 2>/dev/null; sudo ./svc.sh start actions-runner-${i} >/dev/null"
 done
 rm -rf .tmp
