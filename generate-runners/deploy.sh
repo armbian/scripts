@@ -46,8 +46,13 @@ do
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  https://api.github.com/${PREFIX}/${REGISTRATION_URL}/actions/runners/registration-token | jq -r .token)
 
-	sudo userdel -r -f actions-runner-${i}
-	sudo groupdel actions-runner-${i}
+	if id "actions-runner-${i}" >/dev/null 2>&1; then
+		runner_home=$(getent passwd "actions-runner-${i}" | cut -d: -f6)
+		sh -c "cd ${runner_home} ; sudo ./svc.sh stop actions-runner-${i}; sudo ./svc.sh uninstall actions-runner-${i}"
+		sudo userdel -r -f actions-runner-${i}
+		sudo groupdel actions-runner-${i}
+	fi
+
 	sudo adduser --quiet --disabled-password --shell /bin/bash --home /home/actions-runner-${i} --gecos "actions-runner-${i}" actions-runner-${i}
 	# add to sudoers
 	if ! sudo grep -q "actions-runner-${i}" /etc/sudoers; then
