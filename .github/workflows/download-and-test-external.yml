@@ -176,6 +176,9 @@ jobs:
           # read config
           . os/external/${{ matrix.node }}.conf
 
+          APTLY_CONF="-max-tries=3 "
+          [[ "${CHECKSUM}" == "ignore" ]] && APTLY_CONF+="-ignore-checksums "
+
           # read existing releases
           ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
 
@@ -197,7 +200,7 @@ jobs:
               [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
               [[ $GLOB != *Name* && $GLOB != *Version* ]] && ADDITIONAL_FILTER="-filter-with-deps"
               aptly -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${{ matrix.node }}-${RELEASE} $(echo ${URL}) $(echo ${KEY}) $(echo ${COMPONENT})
-              aptly -max-tries=3 mirror update ${{ matrix.node }}-${RELEASE}
+              aptly ${APTLY_CONF} mirror update ${{ matrix.node }}-${RELEASE}
               aptly snapshot create ${{ matrix.node }}-${RELEASE} from mirror ${{ matrix.node }}-${RELEASE}
               aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${{ matrix.node }}-${RELEASE}
           fi
