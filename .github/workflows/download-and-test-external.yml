@@ -351,7 +351,7 @@ jobs:
     steps:
 
       - name: Download a single artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: assets-for-download
           path: downloads
@@ -417,7 +417,7 @@ jobs:
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Download a single artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: assets-for-download
           path: downloads
