@@ -79,7 +79,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v40
+        uses: tj-actions/changed-files@v43
         with:
           path: os
           files: |
@@ -176,6 +176,9 @@ jobs:
           # read config
           . os/external/${{ matrix.node }}.conf
 
+          APTLY_CONF="-max-tries=3 "
+          [[ "${CHECKSUM}" == "ignore" ]] && APTLY_CONF+="-ignore-checksums "
+
           # read existing releases
           ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
 
@@ -197,12 +200,13 @@ jobs:
               [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
               [[ $GLOB != *Name* && $GLOB != *Version* ]] && ADDITIONAL_FILTER="-filter-with-deps"
               aptly -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${{ matrix.node }}-${RELEASE} $(echo ${URL}) $(echo ${KEY}) $(echo ${COMPONENT})
-              aptly -max-tries=3 mirror update ${{ matrix.node }}-${RELEASE}
+              aptly ${APTLY_CONF} mirror update ${{ matrix.node }}-${RELEASE}
               aptly snapshot create ${{ matrix.node }}-${RELEASE} from mirror ${{ matrix.node }}-${RELEASE}
               aptly publish -architectures="armhf,arm64,amd64,riscv64" -batch=true -passphrase=${{ secrets.GPG_PASSPHRASE1 }} snapshot ${{ matrix.node }}-${RELEASE}
           fi
 
           # Cleaning exceptions
+          find $SOURCE -type f -name "*-dbg_*" | xargs sudo rm || true          
           find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-arm64_*" | sort | head -n -1 | xargs sudo rm || true
@@ -226,15 +230,17 @@ jobs:
           echo "</details>" >> $GITHUB_STEP_SUMMARY
 
           # repack deb files
-          #DEBS=($(find "${SOURCE}"* -type f -name "thunderbird_*.deb" -o -name "firefox_*.deb" -o -name "chromium*.deb"))
-          #for d in ${DEBS[@]}; do
-            #BEFORE=$(deb-reversion -c ${d} -s armbian)
+          sudo apt-get install devscripts
+          DEBS=($(sudo find "${SOURCE}"* -type f -name '*thunderbird*.deb' -o -name '*chromium-browser*.deb' -o -name '*firefox_*.deb'))
+          for d in ${DEBS[@]}; do
+            BEFORE=$(deb-reversion -c ${d} -s armbian)
             #add epoch 9
-            #AFTER=9:$(echo $BEFORE | cut -d":" -f2)
-            #echo "$d : $BEFORE -> $AFTER"
-            #sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
-            #sudo rm $d
-          #done
+            AFTER=9:$(echo $BEFORE | cut -d":" -f2)
+            echo "$d : $BEFORE -> $AFTER"
+            sudo DEBEMAIL=info@armbian.com deb-reversion -v $AFTER -s armbian $d
+            sudo rm $d
+            sudo mv *.deb ${SOURCE}
+          done
 
           if [[ ${TARGET} == main ]]; then
                   if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
@@ -261,7 +267,7 @@ jobs:
           cd build
           mkdir -p repository/public
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' tools/repository/aptly.conf
-          tools/repository/repo -i output/debs-beta -c update -p sendmail
+          tools/repository/repo -r bookworm,trixie,sid,jammy,noble -i output/debs-beta -c update -p sendmail
           rsync -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
       - name: Create a temporary artifact folder
@@ -301,7 +307,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v40
+        uses: tj-actions/changed-files@v43
         with:
           path: os
           files: |
@@ -318,10 +324,10 @@ jobs:
               . os/external/${i}.conf
               [[ -z $INSTALL ]] && continue
               if [[ $RELEASE != all ]]; then
-                  dockerimages=("debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:jammy" "ubuntu:lunar")
+                  dockerimages=("debian:trixie" "debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
                   dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$RELEASE"))
                 else
-                  dockerimages=("debian:bullseye" "debian:bookworm" "debian:sid" "ubuntu:jammy" "ubuntu:lunar")
+                  dockerimages=("debian:trixie" "debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
               fi
               for j in ${dockerimages[@]}; do
               echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
@@ -345,7 +351,7 @@ jobs:
     steps:
 
       - name: Download a single artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: assets-for-download
           path: downloads
@@ -411,7 +417,7 @@ jobs:
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Download a single artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: assets-for-download
           path: downloads
@@ -426,7 +432,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v40
+        uses: tj-actions/changed-files@v43
         with:
           path: os
           files: |
@@ -443,7 +449,7 @@ jobs:
           done
 
       - name: "Lets clean artifacts that are useless"
-        uses: geekyeggo/delete-artifact@v2
+        uses: geekyeggo/delete-artifact@v4
         with:
           name: assets-for-download
           failOnError: false
