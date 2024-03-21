@@ -449,7 +449,7 @@ jobs:
           done
 
       - name: "Lets clean artifacts that are useless"
-        uses: geekyeggo/delete-artifact@v2
+        uses: geekyeggo/delete-artifact@v4
         with:
           name: assets-for-download
           failOnError: false
