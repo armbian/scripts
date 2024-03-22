@@ -318,13 +318,12 @@ jobs:
         uses: armbian/actions/runner-clean@main
 
       - name: "Download changes"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
-          merge-multiple: true
           name: JSON
 
       - name: "Delete artifact"
-        uses: geekyeggo/delete-artifact@v4
+        uses: geekyeggo/delete-artifact@v2
         with:
           name: JSON
 
@@ -352,7 +351,7 @@ jobs:
           echo "]" >> merged.json
 
       - name: "Upload JSON"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: status
           path: merged.json
