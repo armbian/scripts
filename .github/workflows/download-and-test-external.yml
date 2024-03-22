@@ -285,6 +285,7 @@ jobs:
         with:
           name: assets-for-download
           path: downloads
+          overwrite: true
           retention-days: 5
 
   test:
