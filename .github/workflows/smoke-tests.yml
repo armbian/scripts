@@ -320,6 +320,7 @@ jobs:
       - name: "Download changes"
         uses: actions/download-artifact@v4
         with:
+          merge-multiple: true
           name: JSON
 
       - name: "Delete artifact"
