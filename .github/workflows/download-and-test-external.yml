@@ -106,7 +106,7 @@ jobs:
     name: "M"
     runs-on: ${{ inputs.BUILD_RUNNER }}
     steps:
-    
+
       - name: Update
         if: inputs.BUILD_RUNNER == 'ubuntu-latest'
         run: |
@@ -206,7 +206,7 @@ jobs:
           fi
 
           # Cleaning exceptions
-          find $SOURCE -type f -name "*-dbg_*" | xargs sudo rm || true          
+          find $SOURCE -type f -name "*-dbg_*" | xargs sudo rm || true
           find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-arm64_*" | sort | head -n -1 | xargs sudo rm || true
@@ -283,7 +283,7 @@ jobs:
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v4
         with:
-          name: assets-for-download
+          name: assets-for-download"${{ matrix.node }}"
           path: downloads
           overwrite: true
           retention-days: 5
@@ -354,7 +354,7 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: assets-for-download
+          name: assets-for-download"${{ matrix.image.image }}"
           path: downloads
 
       - name: Checkout Armbian OS Config
@@ -417,11 +417,11 @@ jobs:
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
-      - name: Download a single artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: assets-for-download
-          path: downloads
+      #- name: Download a single artifact
+      #  uses: actions/download-artifact@v4
+      #  with:
+      #    name: assets-for-download
+      #    path: downloads
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -443,14 +443,15 @@ jobs:
         id: json
         run: |
 
-          packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
-          [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && MATRIX=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
-          for i in ${packages[@]}; do
-              ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "rm -r $(cat downloads/path.txt)/${i}"
-          done
+          #packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
+          #[[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && MATRIX=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
+          #for i in ${packages[@]}; do
+          #    ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "rm -r $(cat downloads/path.txt)/${i}"
+          #done
+          ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "rm -rf artifacts/*"
 
-      - name: "Lets clean artifacts that are useless"
-        uses: geekyeggo/delete-artifact@v4
-        with:
-          name: assets-for-download
-          failOnError: false
+      #- name: "Lets clean artifacts that are useless"
+      #  uses: geekyeggo/delete-artifact@v4
+      #  with:
+      #    name: assets-for-download
+      #    failOnError: false
