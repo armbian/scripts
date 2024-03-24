@@ -283,7 +283,7 @@ jobs:
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v4
         with:
-          name: assets-for-download${{ matrix.node }}
+          name: assets-for-download-${{ matrix.node }}
           path: downloads
           overwrite: true
           retention-days: 5
@@ -354,7 +354,7 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: assets-for-download${{ matrix.node }}
+          name: assets-for-download-${{ matrix.node }}
           path: downloads
 
       - name: Checkout Armbian OS Config
@@ -450,8 +450,8 @@ jobs:
           #done
           ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "rm -rf artifacts/*"
 
-      #- name: "Lets clean artifacts that are useless"
-      #  uses: geekyeggo/delete-artifact@v4
-      #  with:
-      #    name: assets-for-download
-      #    failOnError: false
+      - name: "Lets clean artifacts that are useless"
+        uses: geekyeggo/delete-artifact@v4
+        with:
+          name: assets-for-download-*
+          failOnError: false
