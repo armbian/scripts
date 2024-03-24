@@ -210,7 +210,7 @@ jobs:
               "
               fi
             fi
-
+            sleep 4
             echo "Install keys always"
             sshpass -p "${PASS_ROOT}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" root@${{ env.DUT_IP }}
             #sshpass -p "${PASS_NORMAL}" ssh-copy-id -i ~/.ssh/id_rsa.pub -o "StrictHostKeyChecking=accept-new" guest@${{ env.DUT_IP }}
