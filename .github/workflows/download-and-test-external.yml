@@ -283,7 +283,7 @@ jobs:
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v4
         with:
-          name: assets-for-download"${{ matrix.node }}"
+          name: assets-for-download${{ matrix.node }}
           path: downloads
           overwrite: true
           retention-days: 5
@@ -354,7 +354,7 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: assets-for-download"${{ matrix.image.image }}"
+          name: assets-for-download${{ matrix.image.image }}
           path: downloads
 
       - name: Checkout Armbian OS Config
