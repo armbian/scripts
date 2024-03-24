@@ -65,6 +65,24 @@ jobs:
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
+      - name: Create a temporary artifact folder
+        run: |
+          mkdir downloads
+
+      - name: Add artifacts
+        run: |
+          cd downloads
+          echo "armbian.tnahosting.net/" > url.txt
+          echo "artifacts/${{ env.PR_NUMBER }}/" > path.txt
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets-for-download
+          path: downloads
+          overwrite: true
+          retention-days: 5
+
       - name: Remove temporally repositories
         run: |
           ssh artifacts@armbian.tnahosting.net "rm -rf artifacts/*"
@@ -270,24 +288,6 @@ jobs:
           tools/repository/repo -r bookworm,trixie,sid,jammy,noble -i output/debs-beta -c update -p sendmail
           rsync -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
-      - name: Create a temporary artifact folder
-        run: |
-          mkdir downloads
-
-      - name: Add artifacts
-        run: |
-          cd downloads
-          echo "armbian.tnahosting.net/" > url.txt
-          echo "artifacts/${{ env.PR_NUMBER }}/" > path.txt
-
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v4
-        with:
-          name: assets-for-download-${{ matrix.node }}
-          path: downloads
-          overwrite: true
-          retention-days: 5
-
   test:
 
     name: "Test"
@@ -354,7 +354,7 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: assets-for-download-${{ matrix.node }}
+          name: assets-for-download
           path: downloads
 
       - name: Checkout Armbian OS Config
@@ -453,5 +453,5 @@ jobs:
       - name: "Lets clean artifacts that are useless"
         uses: geekyeggo/delete-artifact@v4
         with:
-          name: assets-for-download-*
+          name: assets-for-download
           failOnError: false
