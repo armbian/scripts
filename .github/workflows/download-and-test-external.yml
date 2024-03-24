@@ -354,7 +354,7 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: assets-for-download${{ matrix.image.image }}
+          name: assets-for-download${{ matrix.node }}
           path: downloads
 
       - name: Checkout Armbian OS Config
