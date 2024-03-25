@@ -451,7 +451,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no artifacts@armbian.tnahosting.net "rm -rf artifacts/*"
 
       - name: "Lets clean artifacts that are useless"
-        uses: geekyeggo/delete-artifact@v4
+        uses: geekyeggo/delete-artifact@v5
         with:
           name: assets-for-download
           failOnError: false
