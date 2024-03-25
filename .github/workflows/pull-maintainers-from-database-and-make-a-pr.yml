@@ -69,8 +69,9 @@ jobs:
             done
 
             for cfg in config/boards/*.{conf,wip,csc,eos,tvb}; do
+              board_name="$(echo "${cfg##*/}" | sed -E 's/\..*//')"
               declare -a maintainers
-              readarray -t maintainers < "$(echo "${MAINTAINERS[${cfg%.*}]}" | xargs -n1 | sort -u)"
+              readarray -t maintainers < <(echo "${MAINTAINERS[${board_name}]}" | xargs -n1 | sort -u)
               sed -i "s/BOARD_MAINTAINER=.*/BOARD_MAINTAINER=\"${maintainers[*]}\"/" "${cfg}"
             done
 
