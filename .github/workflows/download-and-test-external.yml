@@ -269,8 +269,11 @@ jobs:
                   if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/extra/${i}-${TARGET} \;; fi
               done
           else
-              if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/extra/${RELEASE}-${TARGET} \;; fi
-              if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/extra/${RELEASE}-${TARGET} \;; fi
+              elements=($(echo $RELEASE | tr ':' "\n"))
+              for SELECTED_RELEASE in "${elements[@]}"; do
+                 if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/extra/${SELECTED_RELEASE}-${TARGET} \;; fi
+                 if grep -qE 'S' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs/extra/${SELECTED_RELEASE}-${TARGET} \;; fi
+              done
           fi
 
       - name: Deploy to server
