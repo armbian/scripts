@@ -44,7 +44,8 @@ env:
 jobs:
 
   start:
-    runs-on: ${{ inputs.BUILD_RUNNER }}
+    #runs-on: ${{ inputs.BUILD_RUNNER }}
+    runs-on: fast
     name: "Mirror"
     outputs:
       matrix: ${{steps.lists.outputs.matrix}}
