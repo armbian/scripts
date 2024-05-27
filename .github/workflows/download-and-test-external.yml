@@ -400,7 +400,8 @@ jobs:
 
     name: "Clean"
     needs: gradle
-    runs-on: ${{ inputs.BUILD_RUNNER }}
+    #runs-on: ${{ inputs.BUILD_RUNNER }}
+    runs-on: fast
     outputs:
       matrix:  ${{steps.json.outputs.JSON_CONTENT}}
     steps:
