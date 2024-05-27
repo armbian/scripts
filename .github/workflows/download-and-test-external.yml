@@ -68,7 +68,7 @@ jobs:
 
       - name: Create a temporary artifact folder
         run: |
-          mkdir downloads
+          mkdir -p downloads
 
       - name: Add artifacts
         run: |
