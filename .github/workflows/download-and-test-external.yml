@@ -15,6 +15,14 @@ on:
        required: false
        type: string
        default: "ubuntu-latest"
+      HOST_DEPLOY:
+        required: false
+        type: string
+        default: "hetzner-mirror.armbian.com"
+      HOST_USER:
+        required: false
+        type: string
+        default: "upload"
       REFERENCE:
        required: false
        type: string
@@ -44,21 +52,20 @@ env:
 jobs:
 
   start:
-    #runs-on: ${{ inputs.BUILD_RUNNER }}
-    runs-on: fast
+    runs-on: ${{ inputs.BUILD_RUNNER }}
     name: "Mirror"
     outputs:
       matrix: ${{steps.lists.outputs.matrix}}
     steps:
 
-      - name: Install SSH key
+      - name: "Install SSH key"
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.KEY_UPLOAD }}
           known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
 
-      - name: Change status to done
+      - name: "Change status to running"
         if: inputs.REFERENCE == 'main'
         run: |
 
@@ -66,17 +73,15 @@ jobs:
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc status ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
-      - name: Create a temporary artifact folder
+      - name: "Create a temporary artifact folder"
         run: |
-          mkdir -p downloads
 
-      - name: Add artifacts
-        run: |
+          mkdir -p downloads
           cd downloads
-          echo "armbian.tnahosting.net/" > url.txt
+          echo "${{ inputs.HOST_DEPLOY }}/" > url.txt
           echo "artifacts/${{ env.PR_NUMBER }}/" > path.txt
 
-      - name: 'Upload Artifact'
+      - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
         with:
           name: assets-for-download
@@ -86,7 +91,8 @@ jobs:
 
       - name: Remove temporally repositories
         run: |
-          ssh artifacts@armbian.tnahosting.net "rm -rf artifacts/*"
+
+          ssh ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }} "rm -rf /tank/upload/artifacts/*"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -118,7 +124,7 @@ jobs:
       project: ${{steps.make.outputs.project}}
     strategy:
       fail-fast: false
-      max-parallel: 18
+      max-parallel: 32
       matrix:
         node: ${{fromJson(needs.start.outputs.matrix)}}
 
@@ -132,16 +138,16 @@ jobs:
           sudo apt update
           sudo apt -y clean
 
-      - name: Free Github Runner
-        if: inputs.BUILD_RUNNER == 'ubuntu-latest'
-        uses: descriptinc/free-disk-space@main
-        with:
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
+      #- name: Free Github Runner
+      #  if: inputs.BUILD_RUNNER == 'ubuntu-latest'
+      #  uses: descriptinc/free-disk-space@main
+      #  with:
+      #    android: true
+      #    dotnet: true
+      #    haskell: true
+      #    large-packages: true
+      #    docker-images: true
+      #    swap-storage: true
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -175,12 +181,14 @@ jobs:
 
       - name: Install Aptly
         run: |
+
           wget https://github.com/aptly-dev/aptly/releases/download/v1.5.0/aptly_1.5.0_amd64.deb
           sudo dpkg -i aptly_1.5.0_amd64.deb
           sudo rm aptly_1.5.0_amd64.deb
 
       - name: Install all keys
         run: |
+
           find os/external/keys/ -type f -name "*.gpg" -exec gpg --import --no-default-keyring --keyring trustedkeys.gpg "{}" \;
           sudo apt-get -y install debian-keyring ubuntu-keyring
           gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 0E98404D386FA1D9
@@ -237,6 +245,7 @@ jobs:
           find $SOURCE -type f -name "box*-android*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "chromium_*" | sort | head -n -3 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-browser_*" | sort | head -n -3 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
@@ -289,8 +298,8 @@ jobs:
           cd build
           mkdir -p repository/public
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' tools/repository/aptly.conf
-          tools/repository/repo -r bookworm,trixie,sid,jammy,noble,oracular -i output/debs-beta -c update -p sendmail
-          rsync -arvc --rsync-path="mkdir -p /home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ artifacts@armbian.tnahosting.net:"/home/artifacts/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
+          tools/repository/repo -i output/debs-beta -c update -p ${{ secrets.GPG_PASSPHRASE1 }}
+          rsync -arvc --rsync-path="mkdir -p /tank/upload/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"/tank/upload/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
   test:
 
@@ -328,9 +337,14 @@ jobs:
           for i in ${packages[@]}; do
               . os/external/${i}.conf
               [[ -z $INSTALL ]] && continue
+              [[ "${ARCH}" != *amd64* ]] && continue
               if [[ $RELEASE != all ]]; then
                   dockerimages=("debian:trixie" "debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
-                  dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$RELEASE"))
+                  elements=($(echo $RELEASE | tr ':' "\n"))
+                  for SELECTED_RELEASE in "${elements[@]}"; do
+                      [[ $SELECTED_RELEASE == "oracular" ]] && SELECTED_RELEASE="noble"
+                      dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$SELECTED_RELEASE"))
+                  done
                 else
                   dockerimages=("debian:trixie" "debian:bookworm" "ubuntu:jammy")
               fi
