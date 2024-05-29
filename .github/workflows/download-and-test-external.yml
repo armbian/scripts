@@ -207,7 +207,7 @@ jobs:
           [[ "${CHECKSUM}" == "ignore" ]] && APTLY_CONF+="-ignore-checksums "
 
           # read existing releases
-          ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
+          ALL_RELEASES=($(grep -rw build/config/distributions/*/support -e 'supported' | cut -d"/" -f4 ))
 
           # recreate folder structure as we are uploading to our system
           for i in ${ALL_RELEASES[@]}; do
@@ -339,14 +339,14 @@ jobs:
               [[ -z $INSTALL ]] && continue
               [[ "${ARCH}" != *amd64* ]] && continue
               if [[ $RELEASE != all ]]; then
-                  dockerimages=("debian:trixie" "debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
+                  dockerimages=("debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
                   elements=($(echo $RELEASE | tr ':' "\n"))
                   for SELECTED_RELEASE in "${elements[@]}"; do
                       [[ $SELECTED_RELEASE == "oracular" ]] && SELECTED_RELEASE="noble"
                       dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$SELECTED_RELEASE"))
                   done
                 else
-                  dockerimages=("debian:trixie" "debian:bookworm" "ubuntu:jammy")
+                  dockerimages=("debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
               fi
               for j in ${dockerimages[@]}; do
               echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
