@@ -92,7 +92,7 @@ jobs:
       - name: Remove temporally repositories
         run: |
 
-          ssh ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }} "rm -rf /tank/upload/artifacts/*"
+          ssh ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }} "rm -rf /var/www/netcup.armbian.com/html/artifacts/*"
 
       - name: Checkout
         uses: actions/checkout@v4
