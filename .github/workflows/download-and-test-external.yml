@@ -299,7 +299,7 @@ jobs:
           mkdir -p repository/public
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' tools/repository/aptly.conf
           tools/repository/repo -i output/debs-beta -c update -p ${{ secrets.GPG_PASSPHRASE1 }}
-          rsync -arvc --rsync-path="mkdir -p /tank/upload/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"/var/www/netcup.armbian.com/html/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
+          rsync -arvc --rsync-path="mkdir -p /var/www/netcup.armbian.com/html/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"/var/www/netcup.armbian.com/html/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
   test:
 
