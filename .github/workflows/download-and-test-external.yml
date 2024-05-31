@@ -233,23 +233,23 @@ jobs:
           fi
 
           # Cleaning exceptions
-          find $SOURCE -type f -name "*-dbg_*" | xargs sudo rm || true
-          find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "microsoft-edge*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-arm64_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-rk3399_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-rk3588_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-tegrax1_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-rpi3arm64*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-rpi4arm64*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box*-android*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
-          find $SOURCE -type f -name "chromium_*" | sort | head -n -3 | xargs sudo rm || true
-          find $SOURCE -type f -name "chromium-browser_*" | sort | head -n -3 | xargs sudo rm || true
-          find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true
-          find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
+          find $SOURCE -type f -name "*-dbg_*" | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "zoom_*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "microsoft-edge*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-generic*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-arm64_*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-rk3399_*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-rk3588_*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-tegrax1_*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-rpi3arm64*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-rpi4arm64*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box*-android*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "chromium_*" | sort | head -n -3 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "chromium-browser_*" | sort | head -n -3 | xargs sudo rm 2>/dev/null  true
+          find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm 2>/dev/null || true
+          find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm 2>/dev/null || true
 
           # store info to GitHub Actions
           echo "<details><summary>Show packages</summary><p>" >> $GITHUB_STEP_SUMMARY
