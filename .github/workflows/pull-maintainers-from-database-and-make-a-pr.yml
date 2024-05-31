@@ -55,27 +55,33 @@ jobs:
           # extract values fron JSON
           declare -A MAINTAINERS
           {
-            jq -c '.[]' /tmp/armbian_maintainers.json | while read i; do
-              NAME=$(echo $i | jq --raw-output '.First_Name')
-              BOARD=$(echo $i | jq --raw-output '.Maintaining')
-              MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
-              if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
-                echo "- [$NAME](https://github.com/${MAINTAINER_GITHUB})"
-                for i in $(echo $BOARD | sed "s/,/ /g"); do
-                  echo -e "  - $i</li>"
-                  MAINTAINERS["$i"]+="$MAINTAINER_GITHUB "
-                done
-              fi
-            done
 
-            for cfg in config/boards/*.{conf,wip,csc,eos,tvb}; do
-              declare -a maintainers
-              readarray -t maintainers < "$(echo "${MAINTAINERS[${cfg%.*}]}" | xargs -n1 | sort -u)"
-              sed -i "s/BOARD_MAINTAINER=.*/BOARD_MAINTAINER=\"${maintainers[*]}\"/" "${cfg}"
+            # read database
+            jq -c '.[]' /tmp/armbian_maintainers.json  | jq -s 'sort_by(.Github)' | jq -c '.[]' | while read i; do
+
+                NAME=$(echo $i | jq --raw-output '.First_Name')
+                BOARD=$(echo $i | jq --raw-output '.Maintaining')
+                MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
+
+                if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
+                    echo "- [$NAME](https://github.com/${MAINTAINER_GITHUB})"
+                    IFS=',' read -r -a array <<< "$BOARD"
+                    for i in "${array[@]}"; do
+                        # clean whitespace before and after
+                        x=$(echo $i | xargs)
+                        if find config/boards/ -name "$x*" -printf 1 -quit | grep -q 1; then
+                            echo -e "  - $x</li>"
+                            sed -i "s/BOARD_MAINTAINER=.*/BOARD_MAINTAINER=\"${MAINTAINER_GITHUB}\"/" config/boards/$x.*
+                            MAINTAINERS["$x"]+="$MAINTAINER_GITHUB "
+                        else
+                            echo -e "  - ERROR = $i</li>"
+                        fi
+                    done
+                fi
             done
 
             # rename configuration to .csc where we lost maintainer
-            grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
+            grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 | sort | uniq |
               while read -r line; do
                 if [[ "${line}" != "${line/.conf/.csc}" ]]; then
                   mv $line ${line/.conf/.csc}
@@ -105,6 +111,8 @@ jobs:
           body: |
             Update maintainers and board status
 
+            Check for errors: https://github.com/armbian/scripts/actions/workflows/pull-maintainers-from-database-and-make-a-pr.yml
+
             - synced status from the database
             - rename to .`csc` where we don't have anyone
 
@@ -116,4 +124,4 @@ jobs:
             Needs review
           #assignees: igorpecovnik
           #reviewers: Must be org collaborator
-          draft: false
+          draft: true
