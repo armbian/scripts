@@ -67,6 +67,7 @@ fi
 sudo apt-get -q update
 [[ -z $(command -v xmllint) ]] && sudo apt-get -yy install libxml2-utils
 [[ -z $(command -v jq) ]] && sudo apt-get -yy install jq
+[[ -z $(command -v curl) ]] && sudo apt-get -yy install curl
 [[ -z $(command -v docker) ]] && sudo apt-get -yy install docker.io
 
 # download latest runner
