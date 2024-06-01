@@ -333,25 +333,35 @@ jobs:
         run: |
 
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
-          packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
-          [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && packages=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
-          for i in ${packages[@]}; do
+          # define docker images where we will run test install
+          dockerimages=("debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
+
+          # read packages and loop them
+          packages=($(grep -rw os/external/*.conf -e amd64 | cut -d"/" -f3 | cut -d"." -f1))
+          for i in "${packages[@]}"; do
+
+              # read config file
               . os/external/${i}.conf
-              [[ -z $INSTALL ]] && continue
-              [[ "${ARCH}" != *amd64* ]] && continue
-              if [[ $RELEASE != all ]]; then
-                  dockerimages=("debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
-                  elements=($(echo $RELEASE | tr ':' "\n"))
-                  for SELECTED_RELEASE in "${elements[@]}"; do
-                      [[ $SELECTED_RELEASE == "oracular" ]] && SELECTED_RELEASE="noble"
-                      dockerimages=($(printf '%s\n' "${dockerimages[@]}" | grep "$SELECTED_RELEASE"))
+
+              # for now, we can only do amd64 test installs
+              if [[ -n "${INSTALL}"  && "${ARCH}" == *amd64* ]]; then
+
+                  # if we speficy releases, we need to loop docker images and use if there is a match
+                  if [[ $RELEASE != all ]]; then
+                  for j in ${dockerimages[@]}; do
+                     elements=($(echo $RELEASE | tr ':' "\n"))
+                     for SELECTED_RELEASE in "${elements[@]}"; do
+                       if [[ $j == *"${SELECTED_RELEASE}"* ]]; then
+                          echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
+                       fi
+                    done
                   done
-                else
-                  dockerimages=("debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
+                  else
+                      for j in ${dockerimages[@]}; do
+                      echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
+                      done
+                  fi
               fi
-              for j in ${dockerimages[@]}; do
-              echo "{\"package\":\"${i}\",\"image\":\"$j\"}"
-              done
           done | jq -s >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
