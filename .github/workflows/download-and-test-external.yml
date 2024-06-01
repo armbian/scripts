@@ -207,7 +207,7 @@ jobs:
           [[ "${CHECKSUM}" == "ignore" ]] && APTLY_CONF+="-ignore-checksums "
 
           # read existing releases
-          ALL_RELEASES=($(grep -rw build/config/distributions/*/support -e 'supported' | cut -d"/" -f4 ))
+          ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
 
           # recreate folder structure as we are uploading to our system
           for i in ${ALL_RELEASES[@]}; do
