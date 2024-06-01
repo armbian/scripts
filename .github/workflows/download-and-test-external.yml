@@ -334,7 +334,7 @@ jobs:
 
           echo 'JSON_CONTENT<<EOF' >> $GITHUB_OUTPUT
           # define docker images where we will run test install
-          dockerimages=("debian:bookworm" "ubuntu:jammy" "ubuntu:noble")
+          dockerimages=("debian:bookworm" "debian:trixie" "ubuntu:jammy" "ubuntu:noble")
 
           # read packages and loop them
           packages=($(grep -rw os/external/*.conf -e amd64 | cut -d"/" -f3 | cut -d"." -f1))
