@@ -337,7 +337,8 @@ jobs:
           dockerimages=("debian:bookworm" "debian:trixie" "ubuntu:jammy" "ubuntu:noble")
 
           # read packages and loop them
-          packages=($(grep -rw os/external/*.conf -e amd64 | cut -d"/" -f3 | cut -d"." -f1))
+          packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
+          [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && packages=($(grep -rw os/external/*.conf -e amd64 | cut -d"/" -f3 | cut -d"." -f1))
           for i in "${packages[@]}"; do
 
               # read config file
