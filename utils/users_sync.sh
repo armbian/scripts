@@ -18,7 +18,7 @@ USERPATH=/var/www/users
 SFTPGROUP=sftponly
 
 # classic token from any organization member with "read:org" permission
-TOKEN=xxxxxxxxx
+TOKEN=xxxxxx
 
 # the organization you want to read members from
 ORG=armbian
@@ -55,7 +55,7 @@ then
     echo "Add this to your \"sshd_config\" if not done already."
     echo ""
     echo "Match Group $SFTPGROUP"
-    echo "    ChrootDirectory $PATUSERH/%u"
+    echo "    ChrootDirectory $USERPATH/%u"
     echo "    ForceCommand internal-sftp"
     echo "    AllowTcpForwarding no"
     echo ""
@@ -83,9 +83,6 @@ echo "Already existing members at \"$USERPATH\": \"$LOCALMEMBERS\"."
 # ...and make it comparable for shell (remove trailing slash, replace newline with | and add round brackets)
 LOCALMEMBERS_COMPARE=$(echo -n "`ls -d -- */`" | sed 's/\///g' | tr '\n' '|' | sed -r 's/^/\(/' | sed -r 's/$/\)/')
 
-# DEBUG
-exit 0
-# END DEBUG
 
 # loop through remote org members and add if not existing
 for i in $ORGMEMBERS; do
@@ -93,7 +90,7 @@ for i in $ORGMEMBERS; do
     if ! [[ $i =~ $LOCALMEMBERS_COMPARE ]]; then # skip locally already existing users
 
         # create local user and directory
-        echo " $i - no local directory found. Creating..."
+        echo "$i - no local directory found. Creating..."
         if ! useradd -m -s /bin/bash -G "$SFTPGROUP" -d "$USERPATH"/"$i" "$i"
         then
             echo "$i's directory could not be created for whatever reason"
