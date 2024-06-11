@@ -5,12 +5,20 @@
 # where are the user directories?
 # NO trailing slash!
 # the owner of the parent directory must be "root"!
+# configure nginx accordingly
 USERPATH=/var/www/users
 
 # which group is used to catch and jail users into their sftp chroot?
 SFTPGROUP=sftponly
 
+# classic token from any organization member with "read:org" permission
+TOKEN=xxxxxxxxxxxxxxxx
 
+# the organization you want to read members from
+ORG=armbian
+
+# Users that shall not get access
+BLOCKLIST='armbianworker|examplemember1|examplemember2'
 
 ### DO NOT EDIT BELOW! ###
 
@@ -42,12 +50,18 @@ fi
 
 
 
-# grab a list of current remote org members and make it comparable
-ORGMEMBERS=$(curl -s https://api.github.com/orgs/armbian/members | jq -r ".[].login")
-# Grab a list of local directories and make it comparable
+# grab a list of current remote org members, filter blocked ones
+ORGMEMBERS=$(curl -L -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/orgs/$ORG/members | jq -r ".[].login" \
+  | grep -v -E -- "$BLOCKLIST" )
+# Grab a list of local directories...
 # We assume that existing directory means locally existing user as well
-LOCALMEMBERS=$(echo -n "`ls members/`")
-LOCALMEMBERS_COMP=$(echo -n "`ls members/`" | sed 's/\ /|/g' |sed -r 's/^/\(/'  |sed -r 's/$/\)/')
+LOCALMEMBERS=$(echo -n "`ls $USERPATH`")
+# ...and make it comparable for shell
+LOCALMEMBERS_COMP=$(echo -n "`ls $USERPATH`" | sed 's/\ /|/g' |sed -r 's/^/\(/'  |sed -r 's/$/\)/')
 
 
 # loop through remote org members and add if not existing
