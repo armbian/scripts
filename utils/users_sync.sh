@@ -1,6 +1,12 @@
 #!/bin/bash
 
 
+### TODO
+# add blocklist/keeplist
+# add update/refresh keys on existing user
+# make sure concealed members are grabbed as well: https://docs.github.com/en/rest/orgs/members?apiVersion=2022-11-28#list-organization-members
+
+
 ### CONFIG
 # where are the user directories?
 # NO trailing slash!
@@ -12,22 +18,20 @@ USERPATH=/var/www/users
 SFTPGROUP=sftponly
 
 # classic token from any organization member with "read:org" permission
-TOKEN=xxxxxxxxxxxxxxxx
+TOKEN=xxxxxxxxxx
 
 # the organization you want to read members from
 ORG=armbian
 
 # Users that shall not get access
 BLOCKLIST='armbianworker|examplemember1|examplemember2'
+### END CONFIG
+
 
 ### DO NOT EDIT BELOW! ###
 
-### TODO
-# add blocklist/keeplist
-# add update/refresh keys on existing user
-# make sure concealed members are grabbed as well: https://docs.github.com/en/rest/orgs/members?apiVersion=2022-11-28#list-organization-members
 
-
+### CHECKS
 # check for root
 if [ "$EUID" -ne 0 ]; then
     echo "Please run as root"
@@ -47,7 +51,7 @@ then
     echo "    AllowTcpForwarding no"
     exit 1
 fi
-
+### END CHECKS
 
 
 # grab a list of current remote org members, filter blocked ones
@@ -59,15 +63,15 @@ ORGMEMBERS=$(curl -L -s \
   | grep -v -E -- "$BLOCKLIST" )
 # Grab a list of local directories...
 # We assume that existing directory means locally existing user as well
-LOCALMEMBERS=$(echo -n "`ls $USERPATH`")
-# ...and make it comparable for shell
-LOCALMEMBERS_COMP=$(echo -n "`ls $USERPATH`" | sed 's/\ /|/g' |sed -r 's/^/\(/'  |sed -r 's/$/\)/')
-
+cd $USERPATH
+LOCALMEMBERS=$(echo -n "`ls -d */`" | sed 's/\///g')
+# ...and make it comparable for shell (remove trailing slash, replace space with |, add round brackets)
+LOCALMEMBERS_COMPARE=$(echo -n "`ls -d */`" | sed 's/\///g' | tr '\n' '|' | sed -r 's/^/\(/' | sed -r 's/$/\)/')
 
 # loop through remote org members and add if not existing
 for i in $ORGMEMBERS; do
 
-    if ! [[ $i =~ $LOCALMEMBERS_COMP ]]; then # skip locally already existing users
+    if ! [[ $i =~ $LOCALMEMBERS_COMPARE ]]; then # skip locally already existing users
 
         # create local user and directory
         echo " $i - no local directory found. Creating..."
@@ -85,7 +89,9 @@ for i in $ORGMEMBERS; do
         chown -R "$i":$SFTPGROUP "$USERPATH"/"$i"/.ssh
         chmod 600 $USERPATH/"$i"/.ssh/authorized_keys
 
-        # Check if grabbed stuff are actual ssh keys
+        # Check if grabbed stuff are actual ssh keys.
+        # curl response for members w/o keys is "not found" but exit code is still 0
+        # so this needs to be worked around
         CHECK_KEYS=$(cat $USERPATH/"$i"/.ssh/authorized_keys|grep -c -E "^ssh")
         if [[ $CHECK_KEYS != 0 ]]; then
             echo "$i - $CHECK_KEYS key/s for $i imported"
@@ -102,12 +108,17 @@ for i in $ORGMEMBERS; do
 done
 
 # remove local users not exsting in remote org
-ORGMEMBERS_COMP=$(echo -n "`curl -s https://api.github.com/orgs/armbian/members | jq -r ".[].login"`" | sed 's/\ /|/g' |sed -r 's/^/\(/'  |sed -r 's/$/\)/')
+ORGMEMBERS_COMPARE=$(echo -n "`curl -L -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/orgs/$ORG/members | jq -r ".[].login"`" \
+  | sed 's/\ /|/g' |sed -r 's/^/\(/'  |sed -r 's/$/\)/')
 
 for i in $LOCALMEMBERS; do
 
-    if ! [[ $i =~ $ORGMEMBERS_COMP ]]; then # compare local user against list of remote org members. If not found carry on
-        echo "$i is not in the list of remote org members. Removing its legacy..."
+    if ! [[ $i =~ $ORGMEMBERS_COMPARE ]]; then # compare local user against list of remote org members. If not found carry on
+        echo "$i is not or no longer in the list of remote org members. Removing its legacy..."
         userdel --remove "$i"
     else
         echo "$i is still member of remote org. Skipping..."
