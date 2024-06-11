@@ -18,7 +18,7 @@ USERPATH=/var/www/users
 SFTPGROUP=sftponly
 
 # classic token from any organization member with "read:org" permission
-TOKEN=xxxxxxxxxx
+TOKEN=xxxxxxxxx
 
 # the organization you want to read members from
 ORG=armbian
@@ -32,9 +32,18 @@ BLOCKLIST='armbianworker|examplemember1|examplemember2'
 
 
 ### CHECKS
+# validate token
+RESPONSE=$(curl -sS -f -I -H "Authorization: token $TOKEN" https://api.github.com | grep -i x-oauth-scopes |grep -c read:org)
+if [[ $RESPONSE != 1 ]]; then
+    echo "Token invalid or lacking permission."
+    echo "Exiting..."
+    exit 1
+fi
+
 # check for root
 if [ "$EUID" -ne 0 ]; then
     echo "Please run as root"
+    echo "Exiting..."
     exit 1
 fi
 
@@ -49,24 +58,34 @@ then
     echo "    ChrootDirectory $PATUSERH/%u"
     echo "    ForceCommand internal-sftp"
     echo "    AllowTcpForwarding no"
+    echo ""
+    echo "Exiting..."
     exit 1
 fi
 ### END CHECKS
 
 
 # grab a list of current remote org members, filter blocked ones
+echo "Grabbing a list of all current members of \"$ORG\"."
+echo "Excluded by blocklist are \"$BLOCKLIST\"."
 ORGMEMBERS=$(curl -L -s \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   https://api.github.com/orgs/$ORG/members | jq -r ".[].login" \
   | grep -v -E -- "$BLOCKLIST" )
+
 # Grab a list of local directories...
 # We assume that existing directory means locally existing user as well
-cd $USERPATH
-LOCALMEMBERS=$(echo -n "`ls -d */`" | sed 's/\///g')
-# ...and make it comparable for shell (remove trailing slash, replace space with |, add round brackets)
-LOCALMEMBERS_COMPARE=$(echo -n "`ls -d */`" | sed 's/\///g' | tr '\n' '|' | sed -r 's/^/\(/' | sed -r 's/$/\)/')
+cd $USERPATH || exit 1
+LOCALMEMBERS=$(echo -n "`ls -d -- */`" | sed 's/\///g' | tr '\n' ' ')
+echo "Already existing members at \"$USERPATH\": \"$LOCALMEMBERS\"."
+# ...and make it comparable for shell (remove trailing slash, replace newline with | and add round brackets)
+LOCALMEMBERS_COMPARE=$(echo -n "`ls -d -- */`" | sed 's/\///g' | tr '\n' '|' | sed -r 's/^/\(/' | sed -r 's/$/\)/')
+
+# DEBUG
+exit 0
+# END DEBUG
 
 # loop through remote org members and add if not existing
 for i in $ORGMEMBERS; do
@@ -75,7 +94,7 @@ for i in $ORGMEMBERS; do
 
         # create local user and directory
         echo " $i - no local directory found. Creating..."
-        if ! useradd -m -s /bin/bash -G $SFTPGROUP -d $USERPATH/"$i" "$i"
+        if ! useradd -m -s /bin/bash -G "$SFTPGROUP" -d "$USERPATH"/"$i" "$i"
         then
             echo "$i's directory could not be created for whatever reason"
             exit 1
@@ -84,21 +103,21 @@ for i in $ORGMEMBERS; do
 
         # grab ssh keys and put into user's .ssh/authorized_keys file
         echo "Trying to grab ssh keys"
-        mkdir -p $USERPATH/"$i"/.ssh
+        mkdir -p "$USERPATH"/"$i"/.ssh
         curl -s https://github.com/"$i".keys > "$USERPATH"/"$i"/.ssh/authorized_keys
-        chown -R "$i":$SFTPGROUP "$USERPATH"/"$i"/.ssh
-        chmod 600 $USERPATH/"$i"/.ssh/authorized_keys
+        chown -R "$i":"$SFTPGROUP" "$USERPATH"/"$i"/.ssh
+        chmod 600 "$USERPATH"/"$i"/.ssh/authorized_keys
 
         # Check if grabbed stuff are actual ssh keys.
         # curl response for members w/o keys is "not found" but exit code is still 0
         # so this needs to be worked around
-        CHECK_KEYS=$(cat $USERPATH/"$i"/.ssh/authorized_keys|grep -c -E "^ssh")
+        CHECK_KEYS=$(grep -c -E "^ssh" "$USERPATH"/"$i"/.ssh/authorized_keys)
         if [[ $CHECK_KEYS != 0 ]]; then
             echo "$i - $CHECK_KEYS key/s for $i imported"
         else
             echo "$i - Either grabbing failed or $i does not have ssh key on git"
             echo "$i won't be able to login"
-            rm $USERPATH/"$i"/.ssh/authorized_keys
+            rm "$USERPATH"/"$i"/.ssh/authorized_keys
         fi
 
     else
@@ -113,7 +132,7 @@ ORGMEMBERS_COMPARE=$(echo -n "`curl -L -s \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   https://api.github.com/orgs/$ORG/members | jq -r ".[].login"`" \
-  | sed 's/\ /|/g' |sed -r 's/^/\(/'  |sed -r 's/$/\)/')
+  | sed 's/\ /|/g' | sed -r 's/^/\(/' | sed -r 's/$/\)/')
 
 for i in $LOCALMEMBERS; do
 
