@@ -32,6 +32,12 @@ BLOCKLIST='armbianworker|examplemember1|examplemember2'
 
 
 ### CHECKS
+# Check if curl is installed
+command -v curl >/dev/null 2>&1 || echo >&2 "\"curl\" not found. Aborting."
+
+# Check if jq is installed
+command -v jq >/dev/null 2>&1 || echo >&2 "\"jq\" not found. Aborting."
+
 # validate token
 RESPONSE=$(curl -sS -f -I -H "Authorization: token $TOKEN" https://api.github.com | grep -i x-oauth-scopes |grep -c read:org)
 if [[ $RESPONSE != 1 ]]; then
