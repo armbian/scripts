@@ -12,13 +12,13 @@
 # NO trailing slash!
 # the owner of the parent directory must be "root"!
 # configure nginx accordingly
-USERPATH=/var/www/users
+USERPATH=/armbianusers
 
 # which group is used to catch and jail users into their sftp chroot?
 SFTPGROUP=sftponly
 
 # classic token from any organization member with "read:org" permission
-TOKEN=xxxxxx
+TOKEN=xxx
 
 # the organization you want to read members from
 ORG=armbian
@@ -37,6 +37,7 @@ command -v curl >/dev/null 2>&1 || echo >&2 "\"curl\" not found. Aborting."
 
 # Check if jq is installed
 command -v jq >/dev/null 2>&1 || echo >&2 "\"jq\" not found. Aborting."
+
 
 # validate token
 RESPONSE=$(curl -sS -f -I -H "Authorization: token $TOKEN" https://api.github.com | grep -i x-oauth-scopes |grep -c read:org)
@@ -61,7 +62,7 @@ then
     echo "Add this to your \"sshd_config\" if not done already."
     echo ""
     echo "Match Group $SFTPGROUP"
-    echo "    ChrootDirectory $USERPATH/%u"
+    echo "    ChrootDirectory $USERPATH"
     echo "    ForceCommand internal-sftp"
     echo "    AllowTcpForwarding no"
     echo ""
@@ -109,6 +110,7 @@ for i in $ORGMEMBERS; do
         mkdir -p "$USERPATH"/"$i"/.ssh
         curl -s https://github.com/"$i".keys > "$USERPATH"/"$i"/.ssh/authorized_keys
         chown -R "$i":"$SFTPGROUP" "$USERPATH"/"$i"/.ssh
+        chmod 700 "$USERPATH"/"$i"/.ssh
         chmod 600 "$USERPATH"/"$i"/.ssh/authorized_keys
 
         # Check if grabbed stuff are actual ssh keys.
@@ -118,14 +120,15 @@ for i in $ORGMEMBERS; do
         if [[ $CHECK_KEYS != 0 ]]; then
             echo "$i - $CHECK_KEYS key/s for $i imported"
         else
-            echo "$i - Either grabbing failed or $i does not have ssh key on git"
-            echo "$i won't be able to login"
+            echo "(!) $i - Either grabbing failed or $i does not have ssh key on git"
+            echo "(!) $i won't be able to login"
             rm "$USERPATH"/"$i"/.ssh/authorized_keys
         fi
 
     else
         echo "$i - local directory found. Skipping..."
         # TODO: update ssh keys here
+
     fi
 done
 
