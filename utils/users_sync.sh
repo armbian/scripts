@@ -91,7 +91,7 @@ for i in $ORGMEMBERS; do
 
         # create local user and directory
         echo "$i - no local directory found. Creating..."
-        if ! useradd -m -s /bin/bash -G "$SFTPGROUP" -d "$USERPATH"/"$i" "$i"
+        if ! useradd -m -s /bin/false -G "$SFTPGROUP" -d "$USERPATH"/"$i" "$i"
         then
             echo "$i's directory could not be created for whatever reason"
             exit 1
