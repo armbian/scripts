@@ -133,19 +133,20 @@ for i in $ORGMEMBERS; do
 done
 
 # remove local users not exsting in remote org
-ORGMEMBERS_COMPARE=$(echo -n "`curl -L -s \
+ORGMEMBERS_COMPARE=$(curl -L -s \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/orgs/$ORG/members | jq -r ".[].login"`" \
-  | sed 's/\ /|/g' | sed -r 's/^/\(/' | sed -r 's/$/\)/')
+  https://api.github.com/orgs/$ORG/members | jq -r ".[].login" \
+  | grep -v -E -- "$BLOCKLIST" \
+  | tr '\n' '|' | sed -r 's/^/\(/' | sed -r 's/\|$/\)/')
 
 for i in $LOCALMEMBERS; do
 
-    if ! [[ $i =~ $ORGMEMBERS_COMPARE ]]; then # compare local user against list of remote org members. If not found carry on
+    if [[ $i =~ $ORGMEMBERS_COMPARE ]]; then # compare local user against list of remote org members. If not found carry on
+        echo "$i is still member of remote org. Skipping..."
+    else
         echo "$i is not or no longer in the list of remote org members. Removing its legacy..."
         userdel --remove "$i"
-    else
-        echo "$i is still member of remote org. Skipping..."
     fi
 done
