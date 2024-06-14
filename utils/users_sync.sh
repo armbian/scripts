@@ -132,11 +132,11 @@ for i in $ORGMEMBERS; do
         echo "$i - user and directory created"
 
         # grab ssh keys and put into user's .ssh/authorized_keys file
-        grab_keys $i
+        grab_keys "$i"
 
     else
         echo "$i - local directory found. Trying to update keys..."
-        grab_keys $i
+        grab_keys "$i"
 
     fi
 done
@@ -146,7 +146,7 @@ echo "Removing no longer existing members"
 echo ""
 ### remove local users not exsting in remote org
 # make list of remote organization members comparable
-ORGMEMBERS_COMPARE=$(echo $ORGMEMBERS | tr '\n' ' ' | sed 's/\ /\|/g'| sed -r 's/^/\(/' | sed -r 's/\|$/\)/')
+ORGMEMBERS_COMPARE=$(echo "$ORGMEMBERS" | tr '\n' ' ' | sed 's/\ /\|/g'| sed -r 's/^/\(/' | sed -r 's/\|$/\)/')
 echo "DEBUG: \$ORGMEMBERS_COMPARE: $ORGMEMBERS_COMPARE"
 echo "DEBUG: \$LOCALMEMBERS: $LOCALMEMBERS"
 # loop through org members and compare against local list
