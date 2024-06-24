@@ -184,10 +184,10 @@ jobs:
             # clean
             ssh-keygen -qf "$HOME/.ssh/known_hosts" -R "${{ env.DUT_IP }}" > /dev/null 2>&1
 
-            if [[ "$(ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=2 root@${{ env.DUT_IP }} "w " 2>&1 | grep "Permission denied")" ]]; then
-              if [[ ! "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${{ env.DUT_IP }} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
+            if [[ "$(ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=10 root@${{ env.DUT_IP }} "w " 2>&1 | grep "Permission denied")" ]]; then
+              if [[ ! "$(sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" -o ConnectTimeout=10 ${USER_ROOT}@${{ env.DUT_IP }} "w " 2>&1 | grep "Permission denied")" == "Permission denied"* ]]; then
               expect -c "
-              spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" ${USER_ROOT}@${{ env.DUT_IP }}
+              spawn sshpass -p 1234 ssh -o "StrictHostKeyChecking=accept-new" -o ConnectTimeout=10 ${USER_ROOT}@${{ env.DUT_IP }}
               set timeout 120
               expect \"Create root password: \"
               send \"${PASS_ROOT}\r\"
