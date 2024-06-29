@@ -152,12 +152,11 @@ jobs:
 
           server="${{ env.DUT_IP }}"
           scanning=0
-          broken=1
+          broken=0
           while [[ ${scanning} -lt 3 ]]; do
             sleep 0.5
-            scanning=$(( scanning + 1 ))
-            nc -z $server 22 -w 15
-            if [[ $? == 0 ]]; then broken=0; break; fi
+            scanning=$(( scanning + 1 )) || broken=1; break
+            nc -z $server 22 -w 15 || broken=1            
           done
           if [[ ${broken} == 1 ]]; then
             echo "$server ✗ needs to be power cycled"
