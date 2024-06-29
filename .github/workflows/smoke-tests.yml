@@ -151,14 +151,22 @@ jobs:
           [[ -z $(command -v nc) ]] && sudo apt-get -yy install netcat
 
           server="${{ env.DUT_IP }}"
-          if nc -z $server 22 -w 15 2>/dev/null; then
-            echo "$server ✓"
-            echo "PROCEED=true" >> $GITHUB_ENV
-            echo "ONLINE=true" >> $GITHUB_ENV
-          else
+          scanning=0
+          broken=1
+          while [[ ${scanning} -lt 3 ]]; do
+            sleep 0.5
+            scanning=$(( scanning + 1 ))
+            nc -z $server 22 -w 15
+            if [[ $? == 0 ]]; then broken=0; break; fi
+          done
+          if [[ ${broken} == 1 ]]; then
             echo "$server ✗ needs to be power cycled"
             [[ -n "${{ env.POWER_PORT }}" ]] && ssh -o StrictHostKeyChecking=no root@10.0.40.6 "./restart ${{ env.POWER_PORT }}" || true
             echo "STATUS=failed" >> $GITHUB_ENV
+          else
+            echo "$server ✓"
+            echo "PROCEED=true" >> $GITHUB_ENV
+            echo "ONLINE=true" >> $GITHUB_ENV
           fi
 
       - name: First run and copy ssh keys to the DUT
