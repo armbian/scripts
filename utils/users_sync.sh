@@ -25,6 +25,10 @@ ORG=armbian
 
 # Users that shall not get access
 BLOCKLIST='armbianworker|examplemember1|examplemember2'
+
+# enable debugging
+DEBUG=yes
+
 ### END CONFIG
 
 
@@ -106,7 +110,7 @@ ORGMEMBERS=$(curl -L -s \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   https://api.github.com/orgs/$ORG/members | jq -r ".[].login" \
   | grep -v -E -- "$BLOCKLIST" )
-echo "DEBUG: \$ORGMEMBERS: $ORGMEMBERS"
+if [ $DEBUG == "yes" ]; then echo -e "DEBUG: \$ORGMEMBERS:\n$ORGMEMBERS\n\n"; fi
 
 # Grab a list of local directories...
 # We assume that existing directory means locally existing user as well
@@ -115,7 +119,7 @@ LOCALMEMBERS=$(echo -n "`ls -d -- */`" | sed 's/\///g' | tr '\n' ' ')
 echo "Already existing members at \"$USERPATH\": \"$LOCALMEMBERS\"."
 # ...and make it comparable for shell (remove trailing slash, replace newline with | and add round brackets)
 LOCALMEMBERS_COMPARE=$(echo -n "`ls -d -- */`" | sed 's/\///g' | tr '\n' '|' | sed -r 's/^/\(/' | sed -r 's/$/\)/')
-echo "DEBUG: \$LOCALMEMBERS_COMPARE: $LOCALMEMBERS_COMPARE"
+if [ $DEBUG == "yes" ]; then echo -e "DEBUG: \$LOCALMEMBERS_COMPARE:\n$LOCALMEMBERS_COMPARE\n\n"; fi
 
 # loop through remote org members and add if not existing
 for i in $ORGMEMBERS; do
@@ -142,21 +146,28 @@ for i in $ORGMEMBERS; do
 done
 
 echo ""
-echo "Removing no longer existing members"
+echo "Removing no longer existing members of \"$ORG\""
 echo ""
 ### remove local users not exsting in remote org
 # make list of remote organization members comparable
 ORGMEMBERS_COMPARE=$(echo "$ORGMEMBERS" | tr '\n' ' ' | sed 's/\ /\|/g'| sed -r 's/^/\(/' | sed -r 's/\|$/\)/')
-echo "DEBUG: \$ORGMEMBERS_COMPARE: $ORGMEMBERS_COMPARE"
-echo "DEBUG: \$LOCALMEMBERS: $LOCALMEMBERS"
+if [ $DEBUG == "yes" ]; then echo -e "\nDEBUG: \$ORGMEMBERS_COMPARE:\n$ORGMEMBERS_COMPARE\n\n"; fi
+if [ $DEBUG == "yes" ]; then echo -e "\nDEBUG: \$LOCALMEMBERS:\n$LOCALMEMBERS\n\n"; fi
 # loop through org members and compare against local list
 for i in $LOCALMEMBERS; do
 
     if [[ $i =~ $ORGMEMBERS_COMPARE ]]; then # compare local user against list of remote org members. If not found carry on
-        echo "$i is still member of remote org. Skipping..."
+        echo "$i is still member of \"$ORG\". Skipping..."
     else
-        echo "$i is not or no longer in the list of remote org members or has been blocklisted. Removing its legacy..."
-        userdel --remove "$i"
+        echo -e "$i is not or no longer in the list of \"$ORG\" members or has been blocklisted.\nRemove the user and their files? (y/N)\nTHIS CANNOT BE UNDONE!\n"
+        read -n 1 INPUT
+        : "${INPUT:=n}"
+        if [ $INPUT == "y" ]; then
+            userdel --remove "$i"
+        else
+            echo "Keeping $i"
+        fi
     fi
 done
+
 
