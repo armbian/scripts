@@ -198,15 +198,25 @@ jobs:
           APTLY_CONF="-max-tries=3 "
           [[ "${CHECKSUM}" == "ignore" ]] && APTLY_CONF+="-ignore-checksums "
 
+          # add armbian repository key
+          wget https://apt.armbian.com/armbian.key -O key
+          gpg --dearmor < key | tee /usr/share/keyrings/armbian.gpg > /dev/null
+          chmod go+r /usr/share/keyrings/armbian.gpg
+
           # read existing releases
           ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
-
           # recreate folder structure as we are uploading to our system
           for i in ${ALL_RELEASES[@]}; do
               mkdir -p build/output/{debs,debs-beta}/${i}
               mkdir -p build/output/{debs,debs-beta}/extra/${i}-utils
               mkdir -p build/output/{debs,debs-beta}/extra/${i}-desktop
+              # add all armbian repositories
+              echo "deb [arch=armhf,arm64,amd64,riscv64 signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com ${i} main ${i}-utils ${i}-desktop" | sudo tee /etc/apt/sources.list.d/armbian-${i}.list
           done
+
+          # update and get version
+          sudo apt update
+          sudo apt search ${INSTALL%% *} 2>/dev/null | grep ${INSTALL%% *} >> $GITHUB_STEP_SUMMARY
 
           # we use different download metods (github, aplty)
           if [[ ${METHOD} == gh ]]; then
