@@ -216,7 +216,7 @@ jobs:
 
           # update and get version
           sudo apt update
-          sudo apt search ${INSTALL%% *} 2>/dev/null | grep ${INSTALL%% *} >> $GITHUB_STEP_SUMMARY
+          sudo apt search ${INSTALL%% *} 2>/dev/null | grep -w "${INSTALL%% *}" || true >> $GITHUB_STEP_SUMMARY
 
           # we use different download metods (github, aplty)
           if [[ ${METHOD} == gh ]]; then
