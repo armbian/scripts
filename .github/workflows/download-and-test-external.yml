@@ -130,15 +130,15 @@ jobs:
           sudo apt update
           sudo apt -y clean
 
-      - name: Free Github Runner
-        if: inputs.BUILD_RUNNER == 'ubuntu-latest'
-        uses: descriptinc/free-disk-space@main
-        with:
+      #- name: Free Github Runner
+      #  if: inputs.BUILD_RUNNER == 'ubuntu-latest'
+      #  uses: descriptinc/free-disk-space@main
+      #  with:
       #    android: true
       #    dotnet: true
       #    haskell: true
       #    large-packages: true
-          docker-images: true
+      #    docker-images: true
       #    swap-storage: true
 
       - name: Install SSH key
@@ -186,6 +186,7 @@ jobs:
           gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 0E98404D386FA1D9
 
       - name: Download
+        id: calculate
         run: |
 
           # default download folder
@@ -216,8 +217,8 @@ jobs:
 
           # update and get version
           sudo apt update
-          sudo apt search ${INSTALL%% *} 2>/dev/null | grep -w "${INSTALL%% *}" || true >> $GITHUB_STEP_SUMMARY
-
+          BEFORE_VERSION=$(sudo apt search ${INSTALL%% *} 2>/dev/null | grep "^${INSTALL%% *}"/ | cut -d" " -f2 | cut -d":" -f2 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' || true)
+          echo "BEFORE_VERSION=${BEFORE_VERSION}" >> $GITHUB_OUTPUT
           # we use different download metods (github, aplty)
           if [[ ${METHOD} == gh ]]; then
               gh release download -p '*.deb' --repo ${URL} --dir temp
@@ -246,19 +247,13 @@ jobs:
           find $SOURCE -type f -name "box*-rpi3arm64*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-rpi4arm64*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box*-android*" | sort | head -n -1 | xargs sudo rm || true
+          find $SOURCE -type f -name "code_*" | sort | head -n -3 | xargs sudo rm || true
           find $SOURCE -type f -name "box64_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "box86_*" | sort | head -n -1 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium_*" | sort | head -n -3 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-browser_*" | sort | head -n -3 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg_*" | sort | head -n -2 | xargs sudo rm || true
           find $SOURCE -type f -name "chromium-codecs-ffmpeg-extra_*" | sort | head -n -2 | xargs sudo rm || true
-
-          # store info to GitHub Actions
-          echo "<details><summary>Show packages</summary><p>" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev | sed -e 's/^/- /;'>> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "</details>" >> $GITHUB_STEP_SUMMARY
 
           # repack deb files
           sudo apt-get install devscripts
@@ -272,6 +267,20 @@ jobs:
             sudo rm $d
             sudo mv *.deb ${SOURCE}
           done
+
+          # store info to GitHub Actions
+          echo "<details><summary>Show packages</summary><p>" >> $GITHUB_STEP_SUMMARY
+          echo "Before: $BEFORE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          AFTER_VERSION=$(find $SOURCE -type f -name "${INSTALL%% *}*.deb" -exec dpkg-deb -f {} Version \; | sort | uniq | tail -n 1 | cut -d":" -f2 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+
+          echo "AFTER_VERSION=${AFTER_VERSION}" >> $GITHUB_OUTPUT
+
+          echo "After: $AFTER_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          find $SOURCE -type f -name "*.deb" | rev | cut -d"/" -f1 | rev | sed -e 's/^/- /;'>> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
 
           if [[ ${TARGET} == main ]]; then
                   if grep -qE 'B' <<< "$REPOSITORY"; then find $SOURCE -type f -name "*.deb" -exec cp {} build/output/debs-beta/ \;; fi
@@ -289,11 +298,15 @@ jobs:
               done
           fi
 
-      - name: Deploy to server
-        if: inputs.REFERENCE == 'main'
+      - name: "Deploy to stable server. Old: ${{ steps.calculate.outputs.BEFORE_VERSION }} - New: ${{ steps.calculate.outputs.AFTER_VERSION }}"
+        if: ${{ steps.calculate.outputs.BEFORE_VERSION != steps.calculate.outputs.AFTER_VERSION }}
         run: |
 
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
+
+      - name: "Deploy to beta server"
+        run: |
+
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Build testing repository
@@ -302,12 +315,9 @@ jobs:
           # read config once again
           . os/external/${{ matrix.node }}.conf
           cd build
-          mkdir -p repository/public
+          mkdir -p output/repository/public
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' tools/repository/aptly.conf
           tools/repository/repo -i output/debs-beta -c update -p ${{ secrets.GPG_PASSPHRASE1 }}
-          # show version of package
-          echo "New version:" >> $GITHUB_STEP_SUMMARY
-          tools/repository/repo -c show | grep -w "${INSTALL%% *}" || true >> $GITHUB_STEP_SUMMARY
           rsync -arvc --rsync-path="mkdir -p /var/www/netcup.armbian.com/html/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"/var/www/netcup.armbian.com/html/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
   test:
