@@ -82,10 +82,10 @@ jobs:
           grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
             while read -r line; do
               if [[ "${line}" != "${line/.conf/.csc}" ]]; then
-                mv -v $line ${line/.conf/.csc}
+                mv -v $line ${line/.conf/.csc} || true
               fi
               if [[ "${line}" != "${line/.wip/.csc}" ]]; then
-                mv -v $line ${line/.wip/.csc}
+                mv -v $line ${line/.wip/.csc} || true
               fi
             done
 
