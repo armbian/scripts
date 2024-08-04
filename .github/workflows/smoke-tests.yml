@@ -232,7 +232,7 @@ jobs:
 
       - name: Install beta legacy kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -246,7 +246,7 @@ jobs:
 
       - name: Install stable legacy kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'legacy') && inputs.BETAONLY != 'true' }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -260,7 +260,7 @@ jobs:
 
       - name: Install beta vendor kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'vendor') }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -274,7 +274,7 @@ jobs:
 
       - name: Install stable vendor kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'vendor') && inputs.BETAONLY != 'true' }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -288,7 +288,7 @@ jobs:
 
       - name: Install beta current kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -302,7 +302,7 @@ jobs:
 
       - name: Install stable current kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'current') && inputs.BETAONLY != 'true' }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -316,7 +316,7 @@ jobs:
 
       - name: Install beta edge kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
@@ -330,7 +330,7 @@ jobs:
 
       - name: Install stable edge kernel on DUT
         if: ${{ github.repository_owner == 'Armbian' && contains(env.KERNEL_TARGET, 'edge') && inputs.BETAONLY != 'true' }}
-        timeout-minutes: 45
+        timeout-minutes: 30
         uses: armbian/actions/dut-run@main
         with:
           DUT_IP: "${{ env.DUT_IP }}"
