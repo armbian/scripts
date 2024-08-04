@@ -212,7 +212,7 @@ jobs:
               mkdir -p build/output/{debs,debs-beta}/extra/${i}-utils
               mkdir -p build/output/{debs,debs-beta}/extra/${i}-desktop
               # add all armbian repositories
-              echo "deb [arch=armhf,arm64,amd64,riscv64 signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com ${i} main ${i}-utils ${i}-desktop" | sudo tee /etc/apt/sources.list.d/armbian-${i}.list
+              echo "deb [arch=armhf,arm64,amd64,i386,riscv64 signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com ${i} main ${i}-utils ${i}-desktop" | sudo tee /etc/apt/sources.list.d/armbian-${i}.list
           done
 
           # update and get version
