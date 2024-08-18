@@ -76,15 +76,15 @@ jobs:
             done
 
             # rename configuration to .csc where we lost maintainer
-            grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
-              while read -r line; do
-                if [[ "${line}" != "${line/.conf/.csc}" ]]; then
-                  mv $line ${line/.conf/.csc}
-                fi
-                if [[ "${line}" != "${line/.wip/.csc}" ]]; then
-                  mv $line ${line/.wip/.csc}
-                fi
-              done
+            #grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
+            #  while read -r line; do
+            #    if [[ "${line}" != "${line/.conf/.csc}" ]]; then
+            #      mv $line ${line/.conf/.csc}
+            #    fi
+            #    if [[ "${line}" != "${line/.wip/.csc}" ]]; then
+            #      mv $line ${line/.wip/.csc}
+            #    fi
+            #  done
 
           } >> $GITHUB_STEP_SUMMARY
 
