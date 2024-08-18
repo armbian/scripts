@@ -62,8 +62,10 @@ jobs:
               if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
                 echo "- [$NAME](https://github.com/${MAINTAINER_GITHUB})"
                 for i in $(echo $BOARD | sed "s/,/ /g"); do
-                  echo -e "  - $i</li>"
-                  MAINTAINERS["$i"]+="$MAINTAINER_GITHUB "
+                  if find config/boards/ -name "${i}.*" -printf 1 -quit | grep -q 1; then
+                     echo -e "  - $i</li>"
+                     MAINTAINERS["$i"]+="$MAINTAINER_GITHUB "
+                  fi
                 done
               fi
             done
