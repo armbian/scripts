@@ -65,10 +65,10 @@ jobs:
               MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
               if [[ $BOARD != null && $MAINTAINER_GITHUB != null ]]; then
                 echo "- [$NAME](https://github.com/${MAINTAINER_GITHUB})"
-                for i in $(echo $BOARD | sed "s/,/ /g"); do
+                while read -r i; do
                   echo -e "  - $i</li>"
                   MAINTAINERS["$i"]+="$MAINTAINER_GITHUB "
-                done
+                done < <( echo "$BOARD" | sed "s/,/\n/g" | sort -u )
               fi
             done < <(jq -c '.[]' /tmp/armbian_maintainers.json)
 
