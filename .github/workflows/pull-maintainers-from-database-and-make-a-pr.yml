@@ -66,7 +66,7 @@ jobs:
               if [[ "$BOARD" != null && "$MAINTAINER_GITHUB" != null ]]; then
                 echo "- [$NAME](https://github.com/${MAINTAINER_GITHUB})"
                 while read -r i; do
-                  echo -e "  - $i</li>"
+                  echo -e "  - $i"
                   MAINTAINERS["$i"]+="$MAINTAINER_GITHUB "
                 done < <( echo "$BOARD" | sed "s/,/\n/g" | sort -u )
               fi
