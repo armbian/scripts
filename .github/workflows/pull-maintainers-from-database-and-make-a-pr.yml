@@ -55,7 +55,11 @@ jobs:
           # extract values fron JSON
           declare -A MAINTAINERS
           {
-            jq -c '.[]' /tmp/armbian_maintainers.json | while read i; do
+            # By default, bash run the pipe command in subshells
+            # which make variable can't be assigned to.
+            # And yes, lastpipe can solve it
+            # But this is better.
+            while read -r i; do
               NAME=$(echo $i | jq --raw-output '.First_Name')
               BOARD=$(echo $i | jq --raw-output '.Maintaining')
               MAINTAINER_GITHUB=$(echo $i | jq --raw-output '.Github' | cut -d"/" -f4)
@@ -66,7 +70,7 @@ jobs:
                   MAINTAINERS["$i"]+="$MAINTAINER_GITHUB "
                 done
               fi
-            done
+            done < <(jq -c '.[]' /tmp/armbian_maintainers.json)
 
             for cfg in config/boards/*.{conf,wip,csc,eos,tvb}; do
               board_name="$(echo "${cfg##*/}" | sed -E 's/\..*//')"
