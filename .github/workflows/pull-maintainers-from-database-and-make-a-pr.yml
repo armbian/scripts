@@ -37,18 +37,18 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS_ARMBIAN_UPLOAD }}
           if_key_exists: replace
 
-      - name: Get JSON file
-        env:
-          KEY_TORRENTS: ${{ secrets.KEY_TORRENTS }}
-        if: env.KEY_TORRENTS != null
+      - name: Install dependencies
         run: |
-
           # install dependencies
           sudo apt-get -y -qq install jq
 
+      - name: Download armbian_maintainers.json
+        run: |
           # download json that is prepared for this action in another cron job
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/json/armbian_maintainers.json /tmp/
 
+      - name: Update maintainers
+        run: |
           # reset all maintainers so we generate from scratch
           sed -i "s/BOARD_MAINTAINER.*/BOARD_MAINTAINER=\"\"/" config/boards/*.{conf,wip,eos,tvb}
 
@@ -74,21 +74,22 @@ jobs:
               readarray -t maintainers < <(echo "${MAINTAINERS[${board_name}]}" | xargs -n1 | sort -u)
               sed -i "s/BOARD_MAINTAINER=.*/BOARD_MAINTAINER=\"${maintainers[*]}\"/" "${cfg}"
             done
-
-            # rename configuration to .csc where we lost maintainer
-            grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
-              while read -r line; do
-                if [[ "${line}" != "${line/.conf/.csc}" ]]; then
-                  mv $line ${line/.conf/.csc}
-                fi
-                if [[ "${line}" != "${line/.wip/.csc}" ]]; then
-                  mv $line ${line/.wip/.csc}
-                fi
-              done
-
           } >> $GITHUB_STEP_SUMMARY
 
-          # Re-generate CODEOWNERS
+      - name: Mark csc for no maintainer
+        run: |
+          grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
+            while read -r line; do
+              if [[ "${line}" != "${line/.conf/.csc}" ]]; then
+                mv -v $line ${line/.conf/.csc}
+              fi
+              if [[ "${line}" != "${line/.wip/.csc}" ]]; then
+                mv -v $line ${line/.wip/.csc}
+              fi
+            done
+
+      - name: Re-generate CODEOWNERS
+        run: |
           ./.github/generate_CODEOWNERS.sh
 
       - name: Create Pull Request
