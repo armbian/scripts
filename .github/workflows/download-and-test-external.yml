@@ -227,7 +227,7 @@ jobs:
           else
               SOURCE="/home/runner/.aptly/public/"
               COMPONENT="main"
-              [[ $KEY == "./" || $KEY == "stable" ]] && COMPONENT=""
+              [[ $KEY == "./" || $KEY == "stable" || $KEY == "stable non-free" ]] && COMPONENT=""
               [[ $GLOB != *Name* && $GLOB != *Version* ]] && ADDITIONAL_FILTER="-filter-with-deps"
               aptly -ignore-signatures -filter="$GLOB" ${ADDITIONAL_FILTER} -architectures="$(echo $ARCH | sed "s|:|,|g")" mirror create ${{ matrix.node }}-${RELEASE} $(echo ${URL}) $(echo ${KEY}) $(echo ${COMPONENT})
               aptly -ignore-signatures ${APTLY_CONF} mirror update ${{ matrix.node }}-${RELEASE}
