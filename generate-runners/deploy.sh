@@ -64,12 +64,10 @@ if [[ -n "${OWNER}" && -n "${REPO}" ]]; then
 fi
 
 # make swap file if not exists. useful for adhoc cloud runners
-if [[ -z $(swapon --show=SIZE --raw --noheadings | sed 's/[^0-9]//g') ]]; then
-sudo fallocate -l $(free -h | awk 'NR==2{print(int(substr($2,1,length($2)-1)/2+.5))}')G /swapfile
+sudo fallocate -l 8G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
-fi
 
 # update OS and install dependencies
 sudo apt-get -q update
