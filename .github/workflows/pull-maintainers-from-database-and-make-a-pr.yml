@@ -80,7 +80,7 @@ jobs:
             done
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Mark csc for no maintainer
+      - name: Move to CSC where we don't have a maintainer anymore
         run: |
           grep BOARD_MAINTAINER=\"\" config/boards/*.{wip,conf} | cut -d":" -f1 |
             while read -r line; do
@@ -91,6 +91,18 @@ jobs:
                 mv -v "$line" "${line/.wip/.csc}"
               fi
             done
+
+      - name: Move to WIP if there is a maintainer declared in CSC or EOS
+        run: |
+          grep BOARD_MAINTAINER= config/boards/*.{csc,eos} | grep -v '=""' | cut -d":" -f1 |
+          while read -r line; do
+            if [[ "${line}" != "${line/.eos/.wip}" ]]; then
+              echo "mv -v "$line" "${line/.eos/.wip}""
+            fi
+            if [[ "${line}" != "${line/.csc/.wip}" ]]; then
+              echo "mv -v "$line" "${line/.csc/.wip}""
+            fi
+          done
 
       - name: Re-generate CODEOWNERS
         run: |
