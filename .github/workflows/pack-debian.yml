@@ -1,0 +1,246 @@
+name: Build, release, upload to GH & server
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      matrix:
+        required: true
+        type: string
+      maintainer:
+        required: true
+        type: string
+      package:
+        required: true
+        type: string
+      licence:
+        required: false
+        type: string
+      homepage:
+        required: false
+        type: string
+      depends:
+        required: false
+        type: string
+      section:
+        required: false
+        type: string
+      priority:
+        required: false
+        type: string
+      description:
+        required: false
+        type: string
+
+    secrets:
+      GPG_PRIVATE_KEY:
+        required: true
+      PASSPHRASE:
+        required: true
+      SSH_KEY_TORRENTS:
+        required: false
+      KNOWN_HOSTS_UPLOAD:
+        required: false
+
+jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.prep.outputs.matrix }}
+    steps:
+      - name: Prepare releases
+        id: prep
+        run: |
+
+          echo "matrix=[\"${{ inputs.matrix }}\"]" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: [ prepare ]
+    runs-on: ubuntu-latest
+    outputs:
+      # not related to matrix
+      version: ${{ steps.releases.outputs.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ${{fromJson(needs.prepare.outputs.matrix)}}
+
+    steps:
+
+      - name: "Checkout Armbian OS"
+        uses: actions/checkout@v4
+        with:
+          repository: armbian/os
+          ref: main
+          fetch-depth: 1
+          path: os
+
+      - name: "Checkout this repository"
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Build ${{ matrix.node }}
+        id: releases
+        run: |
+
+          VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g")"."$(date -u +'%m%d.%H%M%S')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          ARCH=$(echo ${{ matrix.node }} | cut -d":" -f1)
+          PKG_NAME=${{ inputs.package }}_${VERSION}_${ARCH}
+
+          mkdir -p output/${PKG_NAME}/DEBIAN
+          cat <<-END > output/${PKG_NAME}/DEBIAN/control
+          Package: ${{ inputs.package }}
+          Version: ${VERSION}
+          Architecture: ${ARCH}
+          Replaces: armbian-configng
+          END
+          if [[ -n "${{ inputs.maintainer }}" ]]; then
+          echo "Maintainer: ${{ inputs.maintainer }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.depends }}" ]]; then
+          echo "Depends: ${{ inputs.depends }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.section }}" ]]; then
+          echo "Section: ${{ inputs.section }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.priority }}" ]]; then
+          echo "Priority: ${{ inputs.priority }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+          if [[ -n "${{ inputs.description }}" ]]; then
+          echo "Description: ${{ inputs.description }}" >> output/${PKG_NAME}/DEBIAN/control
+          fi
+
+          if [[ -f source/debian.conf ]]; then
+            while read p; do
+            FILE=$(echo $p | cut -d":" -f1)
+            LOCATION=$(echo $p | cut -d":" -f2 | cut -d"/" -f2-)
+            if [[ -n $LOCATION && -n $FILE ]]; then
+                mkdir -p "output/${PKG_NAME}/$LOCATION"
+                cp -R source/$FILE "output/${PKG_NAME}/$LOCATION"
+            fi
+            done < source/debian.conf
+          fi
+          fakeroot dpkg-deb -b output/${PKG_NAME}/
+          cd output/${PKG_NAME}/
+          tar cvfz ../${PKG_NAME}.tar.gz .
+
+      - name: Upload deb as artifact ${{ matrix.node }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: output/*.deb
+
+      - name: Upload tarball as artifact ${{ matrix.node }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: tar
+          path: output/*.tar.gz
+
+  release:
+    needs: [ prepare, build ]
+    if: "${{ always() }}"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Install dependencies
+        run: |
+          echo 'man-db man-db/auto-update boolean false' | sudo debconf-set-selections
+          sudo apt-get -q -y install reprepro
+
+      - uses: actions/download-artifact@v4
+        name: Download deb artifacts
+        with:
+          name: deb
+          path: output
+
+      - uses: actions/download-artifact@v4
+        name: Download tarball artifacts
+        with:
+          name: tar
+          path: output
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repository
+          ref: repository
+
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+
+      - name: Configure git identity
+        working-directory: repository
+        run: |
+
+          echo "Testing signing" | gpg --sign --armor
+
+          gpg -K
+          echo "#"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Deploy packages
+        run: |
+
+          PACKAGES_DIR="$(pwd)"/output
+          REPO_DIR="$(pwd)"/repository
+
+          [[ ! -d "${PACKAGES_DIR}" ]] && echo "Packages dir ${PACKAGES_DIR} is not there." && exit 2
+          mkdir -p "${REPO_DIR}" "${REPO_DIR}"/pool
+
+          # Configure reprepro
+          mkdir -p ${REPO_DIR}/conf
+          cat <<EOD >${REPO_DIR}/conf/distributions
+          Origin: armbian.github.io/configurator
+          Label: armbian.github.io/configurator
+          Codename: stable
+          Architectures: amd64 arm64 armhf
+          Components: main
+          Description: Armbian development repo
+          SignWith: DF00FAF1C577104B50BF1D0093D6889F9F0E78D5
+          EOD
+
+          # Determine a list of binary debs to include in the repo
+          # reprepro does not accept identical package(-names) with different contents (sha1)
+          # our build does generate different contents (in different runs) and I'd like to keep old versions around
+          LIST_DEBS_NEW=""
+          for ONE_DEB in ${PACKAGES_DIR}/*.deb; do
+          echo "Considering adding to repo: $ONE_DEB"
+          BASE_ONE_DEB=$(basename ${ONE_DEB})
+          EXISTING_DEB_IN_REPO=$(find ${REPO_DIR}/pool -type f -name ${BASE_ONE_DEB})
+          if [[ "a${EXISTING_DEB_IN_REPO}" == "a" ]]; then
+          echo "- New .deb to include in repo: ${BASE_ONE_DEB}"
+          LIST_DEBS_NEW="${LIST_DEBS_NEW} ${ONE_DEB}"
+          else
+          echo "- Existing .deb: ${BASE_ONE_DEB}"
+          fi
+          done
+
+          echo "** Final list of DEBs to include: ${LIST_DEBS_NEW}"
+          if [[ "a${LIST_DEBS_NEW}a" == "aa" ]]; then
+            echo "No new packages, nothing to do."
+          else
+          echo "New packages, running reprepro..."
+          reprepro -b "${REPO_DIR}" includedeb stable ${LIST_DEBS_NEW}
+          echo "Repository generated at ${REPO_DIR}/"
+          fi
+
+          cd ${REPO_DIR}
+          git add .
+          git commit -m "Updating repo" || true
+          git push origin repository || true
+
+      - name: "GH release"        
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "output/*.deb"
+          tag: "${{ needs.build.outputs.version }}"
+          name: "${{ needs.build.outputs.version }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
