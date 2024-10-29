@@ -28,6 +28,9 @@ on:
       priority:
         required: false
         type: string
+      compile:
+        required: false
+        type: string
       description:
         required: false
         type: string
@@ -84,6 +87,13 @@ jobs:
       - name: Build ${{ matrix.node }}
         id: releases
         run: |
+
+          # run compilation script
+          cd source
+          if [[ -n "${{ inputs.compile }}" ]]; then
+              source/${{ inputs.compile }}
+          fi
+          cd ..
 
           VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g")"."$(date -u +'%m%d.%H%M%S')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
