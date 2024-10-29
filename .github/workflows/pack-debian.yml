@@ -90,6 +90,9 @@ jobs:
 
           # run compilation script
           cd source
+          ls -l
+          tree
+
           if [[ -n "${{ inputs.compile }}" ]]; then
               source/${{ inputs.compile }}
           fi
