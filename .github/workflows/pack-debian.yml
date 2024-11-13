@@ -95,7 +95,7 @@ jobs:
           fi
           cd ..
 
-          VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g")"."$(date -u +'%m%d.%H%M%S')
+          VERSION=$(cat os/nightly.json | jq '.version' | sed "s/\"//g")"."$(date -u +'%m%d.%H%M%S')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           ARCH=$(echo ${{ matrix.node }} | cut -d":" -f1)
           PKG_NAME=${{ inputs.package }}_${VERSION}_${ARCH}
