@@ -221,7 +221,7 @@ jobs:
           echo "BEFORE_VERSION=${BEFORE_VERSION}" >> $GITHUB_OUTPUT
           # we use different download metods (github, aplty)
           if [[ ${METHOD} == gh ]]; then
-              gh release download -p '*.deb' --repo ${URL} --dir temp
+              gh release download ${TAG} -p '*.deb' --repo ${URL} --dir temp
           elif [[ ${METHOD} == direct ]]; then
               wget -O ${SOURCE}/${{ matrix.node }}.deb ${URL}
           else
