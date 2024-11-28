@@ -133,7 +133,7 @@ jobs:
             fi
             done < source/debian.conf
           fi
-          fakeroot dpkg-deb -b output/${PKG_NAME}/
+          fakeroot dpkg-deb -Zxz -b output/${PKG_NAME}/
           cd output/${PKG_NAME}/
           tar cvfz ../${PKG_NAME}.tar.gz .
 
