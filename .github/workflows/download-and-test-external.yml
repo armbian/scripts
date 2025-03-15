@@ -94,13 +94,13 @@ jobs:
           fetch-depth: '2'
           clean: false
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v43
-        with:
-          path: os
-          files: |
-            external/*.conf
+#      - name: Get changed files
+#        id: changed-files
+#        uses: tj-actions/changed-files@v43
+#        with:
+#          path: os
+#          files: |
+#            external/*.conf
 
       - name: Build list
         id: lists
@@ -338,13 +338,13 @@ jobs:
           fetch-depth: '2'
           clean: false
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v43
-        with:
-          path: os
-          files: |
-            external/*.conf
+#      - name: Get changed files
+#        id: changed-files
+#        uses: tj-actions/changed-files@v43
+#        with:
+#          path: os
+#          files: |
+#            external/*.conf
 
       - name: "Make JSON"
         id: json
