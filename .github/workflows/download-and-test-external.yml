@@ -90,24 +90,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: armbian/os
-          path: os
           fetch-depth: '2'
           clean: false
 
       - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v43
-        with:
-          path: os
-          files: |
-            external/*.conf
+        id: files
+        uses: UplandJacob/retrieve-changed-files@v4
 
       - name: Build list
         id: lists
         run: |
 
-          MATRIX=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
-          [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && MATRIX=$(find os/external/*.conf -printf '%f\n' | cut -d"." -f1)
+          MATRIX=$(echo "${{ steps.files.outputs.all }}"  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
+          [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && MATRIX=$(find external/*.conf -printf '%f\n' | cut -d"." -f1)
           echo "matrix=$(for x in $(echo "${MATRIX}"); do echo $x; done|jq -cnR '[inputs | select(length>0)]' | jq -c)" >> $GITHUB_OUTPUT
 
   download:
@@ -334,17 +329,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: armbian/os
-          path: os
           fetch-depth: '2'
           clean: false
 
       - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v43
-        with:
-          path: os
-          files: |
-            external/*.conf
+        id: files
+        uses: UplandJacob/retrieve-changed-files@v4
 
       - name: "Make JSON"
         id: json
@@ -355,12 +345,12 @@ jobs:
           dockerimages=("debian:bookworm" "debian:trixie" "ubuntu:jammy" "ubuntu:noble")
 
           # read packages and loop them
-          packages=$(echo ${{ steps.changed-files.outputs.all_changed_files }}  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
-          [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && packages=($(grep -rw os/external/*.conf -e amd64 | grep -v haos | cut -d"/" -f3 | cut -d"." -f1))
+          packages=$(echo "${{ steps.files.outputs.all }}"  | tr " " "\n" | cut -d"." -f1 | cut -d"/" -f2)
+          [[ "${{ inputs.REFERENCE }}" =~ ^(main|)$ ]] && packages=($(grep -rw external/*.conf -e amd64 | grep -v haos | cut -d"/" -f3 | cut -d"." -f1))
           for i in "${packages[@]}"; do
 
               # read config file
-              . os/external/${i}.conf
+              . external/${i}.conf
 
               # for now, we can only do amd64 test installs
               if [[ -n "${INSTALL}"  && "${ARCH}" == *amd64* ]]; then
