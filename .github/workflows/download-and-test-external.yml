@@ -218,6 +218,7 @@ jobs:
 
           # update and get version
           sudo apt update
+          sudo apt search ${INSTALL%% *}
           BEFORE_VERSION=$(sudo apt search ${INSTALL%% *} 2>/dev/null | grep "^${INSTALL%% *}"/ | cut -d" " -f2 | cut -d":" -f2 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' || true)
           echo "BEFORE_VERSION=${BEFORE_VERSION}" >> $GITHUB_OUTPUT
           # we use different download metods (github, aplty)
