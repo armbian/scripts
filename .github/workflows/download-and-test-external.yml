@@ -198,6 +198,7 @@ jobs:
 
           APTLY_CONF="-max-tries=3 "
           [[ "${CHECKSUM}" == "ignore" ]] && APTLY_CONF+="-ignore-checksums "
+          [[ "${SIGNATURES}" == "ignore" ]] && APTLY_CONF+="-ignore-signatures "
 
           # add armbian repository key
           wget https://apt.armbian.com/armbian.key -O key
