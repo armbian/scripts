@@ -301,7 +301,7 @@ jobs:
           fi
 
       - name: "Deploy to stable server. Old: ${{ steps.calculate.outputs.BEFORE_VERSION }} - New: ${{ steps.calculate.outputs.AFTER_VERSION }}"
-        #if: ${{ steps.calculate.outputs.BEFORE_VERSION != steps.calculate.outputs.AFTER_VERSION }}
+        if: ${{ steps.calculate.outputs.BEFORE_VERSION != steps.calculate.outputs.AFTER_VERSION }}
         run: |
 
           rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
