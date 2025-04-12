@@ -40,7 +40,14 @@ jobs:
           sudo gpg --dearmor < key | sudo tee /usr/share/keyrings/armbian.gpg > /dev/null
           sudo chmod go+r /usr/share/keyrings/armbian.gpg
           RELEASE=$(cat /etc/os-release | grep UBUNTU_CODENAME | cut -d"=" -f2)
-          sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://beta.armbian.com $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | sudo tee /etc/apt/sources.list.d/armbian.list
+          cat <<- EOF | tee /etc/apt/sources.list.d/armbian.sources
+          Types: deb
+          URIs: https://beta.armbian.com
+          Suites: ${RELEASE}
+          Components: main ${RELEASE}-utils ${RELEASE}-desktop
+          Architectures: $(dpkg --print-architecture)
+          Signed-By: /usr/share/keyrings/armbian.gpg
+          EOF
           sudo apt-get update
           CURRENT=$(apt search --names-only 'linux-image-current-x86' 2> /dev/null | grep Armbian | grep -oE "(\w*[.]\w*)*" | head -1)
           EDGE=$(apt search --names-only 'linux-image-edge-x86' 2> /dev/null | grep Armbian | grep -oE "(\w*[.]\w*)*" | head -1)
@@ -48,7 +55,7 @@ jobs:
           echo "EDGE=${EDGE}" >> $GITHUB_ENV
       - name: Get runners capacity
         run: |
-          
+
           echo "ABc= $CURRENT $EDGE"
           sudo apt-get -y install datamash
           LIST=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
@@ -70,7 +77,7 @@ jobs:
 
           # add smoke test success
           #gh run download --name status --repo github.com/armbian/scripts
-          #jq '.SMOKE += "'$(cat success)'%"' runners_capacity.json > tmp.json          
+          #jq '.SMOKE += "'$(cat success)'%"' runners_capacity.json > tmp.json
           #cp tmp.json runners_capacity.json
           #cat runners_capacity.json
 
@@ -82,7 +89,7 @@ jobs:
           #| xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g' | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 5 sum 2,3 --output-delimiter=, \
           #| LC_ALL=C awk -F , -v OFS=\| '$3/=1024' | cut -d"." -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
 
-          # header and footer are edited at GitHub          
+          # header and footer are edited at GitHub
           cat scripts/.github/header.inc > scripts/README.md
           echo -en "\n\n" >> scripts/README.md
           #cat label.tmp >> scripts/README.md
