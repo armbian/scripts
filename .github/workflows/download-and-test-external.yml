@@ -50,7 +50,7 @@ env:
   PR_NUMBER: ${{ github.event.number }}
 
 jobs:
--o StrictHostKeychecking=no
+
   start:
     runs-on: ${{ inputs.BUILD_RUNNER }}
     name: "Mirror"
