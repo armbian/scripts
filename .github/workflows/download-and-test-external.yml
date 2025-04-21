@@ -50,7 +50,7 @@ env:
   PR_NUMBER: ${{ github.event.number }}
 
 jobs:
-
+-o StrictHostKeychecking=no
   start:
     runs-on: ${{ inputs.BUILD_RUNNER }}
     name: "Mirror"
@@ -304,12 +304,12 @@ jobs:
         if: ${{ steps.calculate.outputs.BEFORE_VERSION != steps.calculate.outputs.AFTER_VERSION }}
         run: |
 
-          rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
+          rsync -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
 
       - name: "Deploy to beta server"
         run: |
 
-          rsync -e "ssh -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
+          rsync -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
 
       - name: Build testing repository
         run: |
