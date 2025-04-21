@@ -84,7 +84,7 @@ jobs:
       - name: Remove temporally repositories
         run: |
 
-          ssh ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }} "rm -rf /var/www/netcup.armbian.com/html/artifacts/*"
+          ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }} ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }} "rm -rf storage/artifacts/*"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -304,12 +304,12 @@ jobs:
         if: ${{ steps.calculate.outputs.BEFORE_VERSION != steps.calculate.outputs.AFTER_VERSION }}
         run: |
 
-          rsync -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs
+          rsync -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:storage/debs
 
       - name: "Deploy to beta server"
         run: |
 
-          rsync -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:/incoming/debs-beta
+          rsync -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" -arvc build/output/debs-beta/ ${{ secrets.HOST_UPLOAD_USER }}@${{ secrets.HOST_UPLOAD }}:storage/debs-beta
 
       - name: Build testing repository
         run: |
@@ -320,7 +320,9 @@ jobs:
           mkdir -p output/repository/public
           sed -i 's|"gpgProvider": ".*"|"gpgProvider": "gpg2"|g' tools/repository/aptly.conf
           tools/repository/repo -i output/debs-beta -c update -p ${{ secrets.GPG_PASSPHRASE1 }}
-          rsync -arvc --rsync-path="mkdir -p /var/www/netcup.armbian.com/html/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }} && rsync" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"/var/www/netcup.armbian.com/html/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
+
+          ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }} ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }} "mkdir -p storage/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
+          rsync -arvc -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"storage/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
   test:
 
