@@ -322,7 +322,7 @@ jobs:
           tools/repository/repo -i output/debs-beta -c update -p ${{ secrets.GPG_PASSPHRASE1 }}
 
           ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }} ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }} "mkdir -p storage/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
-          rsync -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"storage/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
+          rsync -arvc -e "ssh -o StrictHostKeychecking=no -p ${{ secrets.HOST_UPLOAD_PORT }}" output/repository/public/ ${{ inputs.HOST_USER }}@${{ inputs.HOST_DEPLOY }}:"storage/artifacts/${{ env.PR_NUMBER }}/${{ matrix.node }}"
 
   test:
 
