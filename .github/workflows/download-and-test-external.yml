@@ -18,7 +18,7 @@ on:
       HOST_DEPLOY:
         required: false
         type: string
-        default: "netcup.armbian.com"
+        default: "repo.armbian.com"
       HOST_USER:
         required: false
         type: string
