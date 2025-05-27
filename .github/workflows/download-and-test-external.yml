@@ -219,7 +219,7 @@ jobs:
           # update and get version
           sudo apt update
           sudo apt search ${INSTALL%% *}
-          BEFORE_VERSION=$(sudo apt search ${INSTALL%% *} 2>/dev/null | grep "^${INSTALL%% *}"/ | cut -d" " -f2 | cut -d":" -f2 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' || true)
+          BEFORE_VERSION=$(sudo apt search ${INSTALL%% *} 2>/dev/null | grep "^${INSTALL%% *}"/ | cut -d" " -f2 | cut -d":" -f2 || true)
           echo "BEFORE_VERSION=${BEFORE_VERSION}" >> $GITHUB_OUTPUT
           # we use different download metods (github, aplty)
           if [[ ${METHOD} == gh ]]; then
@@ -274,7 +274,7 @@ jobs:
           echo "<details><summary>Show packages</summary><p>" >> $GITHUB_STEP_SUMMARY
           echo "Before: $BEFORE_VERSION" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          AFTER_VERSION=$(find $SOURCE -type f -name "${INSTALL%% *}*.deb" -exec dpkg-deb -f {} Version \; | sort | uniq | tail -n 1 | cut -d":" -f2 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+          AFTER_VERSION=$(find $SOURCE -type f -name "${INSTALL%% *}*.deb" -exec dpkg-deb -f {} Version \; | sort | uniq | tail -n 1 | cut -d":" -f2)
 
           echo "AFTER_VERSION=${AFTER_VERSION}" >> $GITHUB_OUTPUT
 
