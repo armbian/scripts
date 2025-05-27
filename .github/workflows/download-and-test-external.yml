@@ -206,8 +206,8 @@ jobs:
           chmod go+r /usr/share/keyrings/armbian.gpg
 
           # read existing releases
-          #ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
-          ALL_RELEASES=("bookworm" "noble")
+          ALL_RELEASES=($(grep -rw build/config/distributions/*/support -ve 'eos' | cut -d"/" -f4 ))
+          #ALL_RELEASES=("bookworm" "noble")
           # recreate folder structure as we are uploading to our system
           for i in ${ALL_RELEASES[@]}; do
               mkdir -p build/output/{debs,debs-beta}/${i}
