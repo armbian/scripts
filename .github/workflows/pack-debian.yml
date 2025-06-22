@@ -36,18 +36,32 @@ on:
         type: string
 
     secrets:
-      GPG_PRIVATE_KEY:
-        required: true
-      PASSPHRASE:
-        required: true
-      SSH_KEY_TORRENTS:
+      PRIMARY_KEY:
         required: false
-      KNOWN_HOSTS_UPLOAD:
+      PRIMARY_PASS:
         required: false
+      SECONDARY_KEY:
+        required: false
+      SECONDARY_PASS:
+        required: false
+      TERTIARY_KEY:
+        required: false
+      TERTIARY_PASS:
+        required: false
+
+env:
+  PRIMARY_KEY: ${{ secrets.PRIMARY_KEY }}
+  PRIMARY_PASS: ${{ secrets.PRIMARY_PASS }}
+  SECONDARY_KEY: ${{ secrets.SECONDARY_KEY }}
+  SECONDARY_PASS: ${{ secrets.SECONDARY_PASS }}
+  TERTIARY_KEY: ${{ secrets.TERTIARY_KEY }}
+  TERTIARY_PASS: ${{ secrets.TERTIARY_PASS }}
 
 jobs:
 
   prepare:
+    name: Prepare releases
+    if: ${{ github.repository_owner == 'Armbian' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.prep.outputs.matrix }}
@@ -59,6 +73,8 @@ jobs:
           echo "matrix=[\"${{ inputs.matrix }}\"]" >> "$GITHUB_OUTPUT"
 
   build:
+    name: Build Debian packages
+    if: ${{ github.repository_owner == 'Armbian' }}
     needs: [ prepare ]
     runs-on: ubuntu-latest
     outputs:
@@ -150,15 +166,17 @@ jobs:
           path: output/*.tar.gz
 
   release:
+    name: Generate repository
+    if: ${{ github.repository_owner == 'Armbian' }}
     needs: [ prepare, build ]
-    if: "${{ always() }}"
     runs-on: ubuntu-latest
     steps:
 
-      - name: Install dependencies
-        run: |
-          echo 'man-db man-db/auto-update boolean false' | sudo debconf-set-selections
-          sudo apt-get -q -y install reprepro
+      - name: "Install dependencies"
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: reprepro
+          version: 1.0
 
       - uses: actions/download-artifact@v4
         name: Download deb artifacts
@@ -178,23 +196,42 @@ jobs:
           path: repository
           ref: repository
 
-      - name: Import GPG key
-        id: import_gpg
+      - name: Import PRIMARY GPG key
+        id: import_gpg_primary
+        if: env.PRIMARY_KEY != ''
         uses: crazy-max/ghaction-import-gpg@v6
         with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
+          gpg_private_key: ${{ secrets.PRIMARY_KEY }}
+          passphrase: ${{ secrets.PRIMARY_PASS || '' }}
 
-      - name: Configure git identity
-        working-directory: repository
+      - name: Import SECONDARY GPG key
+        id: import_gpg_secondary
+        if: env.SECONDARY_KEY != ''
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.SECONDARY_KEY }}
+          passphrase: ${{ secrets.SECONDARY_PASS || '' }}
+
+      - name: Import TERTIARY GPG key
+        id: import_gpg_tertiary
+        if: env.TERTIARY_KEY != ''
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.TERTIARY_KEY }}
+          passphrase: ${{ secrets.TERTIARY_PASS || '' }}
+
+      - name: Generate GPG_PARAMETERS array
+        id: build_gpg_parameters
+        env:
+          FPR_PRIMARY: ${{ steps.import_gpg_primary.outputs.fingerprint }}
+          FPR_SECONDARY: ${{ steps.import_gpg_secondary.outputs.fingerprint }}
+          FPR_TERTIARY: ${{ steps.import_gpg_tertiary.outputs.fingerprint }}
         run: |
-
-          echo "Testing signing" | gpg --sign --armor
-
-          gpg -K
-          echo "#"
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          GPG_PARAMETERS="--yes --armor"
+          [ -n "$FPR_PRIMARY" ] && GPG_PARAMETERS+=" -u $FPR_PRIMARY"
+          [ -n "$FPR_SECONDARY" ] && GPG_PARAMETERS+=" -u $FPR_SECONDARY"
+          [ -n "$FPR_TERTIARY" ] && GPG_PARAMETERS+=" -u $FPR_TERTIARY"
+          echo "GPG_PARAMETERS=$GPG_PARAMETERS" >> "$GITHUB_ENV"
 
       - name: Deploy packages
         run: |
@@ -214,7 +251,6 @@ jobs:
           Architectures: amd64 arm64 armhf riscv64
           Components: main
           Description: Armbian development repo
-          SignWith: DF00FAF1C577104B50BF1D0093D6889F9F0E78D5
           EOD
 
           # Determine a list of binary debs to include in the repo
@@ -222,27 +258,38 @@ jobs:
           # our build does generate different contents (in different runs) and I'd like to keep old versions around
           LIST_DEBS_NEW=""
           for ONE_DEB in ${PACKAGES_DIR}/*.deb; do
-          echo "Considering adding to repo: $ONE_DEB"
-          BASE_ONE_DEB=$(basename ${ONE_DEB})
-          EXISTING_DEB_IN_REPO=$(find ${REPO_DIR}/pool -type f -name ${BASE_ONE_DEB})
-          if [[ "a${EXISTING_DEB_IN_REPO}" == "a" ]]; then
-          echo "- New .deb to include in repo: ${BASE_ONE_DEB}"
-          LIST_DEBS_NEW="${LIST_DEBS_NEW} ${ONE_DEB}"
-          else
-          echo "- Existing .deb: ${BASE_ONE_DEB}"
-          fi
+            echo "Considering adding to repo: $ONE_DEB"
+            BASE_ONE_DEB=$(basename ${ONE_DEB})
+            EXISTING_DEB_IN_REPO=$(find ${REPO_DIR}/pool -type f -name ${BASE_ONE_DEB})
+            if [[ "a${EXISTING_DEB_IN_REPO}" == "a" ]]; then
+              echo "- New .deb to include in repo: ${BASE_ONE_DEB}"
+              LIST_DEBS_NEW="${LIST_DEBS_NEW} ${ONE_DEB}"
+            else
+              echo "- Existing .deb: ${BASE_ONE_DEB}"
+            fi
           done
 
           echo "** Final list of DEBs to include: ${LIST_DEBS_NEW}"
           if [[ "a${LIST_DEBS_NEW}a" == "aa" ]]; then
             echo "No new packages, nothing to do."
           else
-          echo "New packages, running reprepro..."
-          reprepro -b "${REPO_DIR}" includedeb stable ${LIST_DEBS_NEW}
-          echo "Repository generated at ${REPO_DIR}/"
+            echo "New packages, running reprepro..."
+            reprepro -b "${REPO_DIR}" includedeb stable ${LIST_DEBS_NEW}
+            echo "Repository generated at ${REPO_DIR}/"
           fi
 
+          echo "Sign repo with multiple keys"
+          for i in ${REPO_DIR}/dists/*/Release
+          do
+            DISTRO_PATH="$(dirname "$i")"
+            echo $DISTRO_PATH
+            gpg ${{ env.GPG_PARAMETERS }} --clear-sign -o "$DISTRO_PATH/InRelease" "$i"
+            gpg ${{ env.GPG_PARAMETERS }} --detach-sign -o "$DISTRO_PATH/Release.gpg" "$i"
+          done
+
           cd ${REPO_DIR}
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git add .
           git commit -m "Updating repo" || true
           git push origin repository || true
