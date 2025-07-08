@@ -248,7 +248,7 @@ jobs:
           Origin: armbian.github.io/configurator
           Label: armbian.github.io/configurator
           Codename: stable
-          Architectures: amd64 arm64 armhf riscv64
+          Architectures: i386 amd64 arm64 armhf riscv64
           Components: main
           Description: Armbian development repo
           EOD
