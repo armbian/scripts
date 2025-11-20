@@ -52,7 +52,7 @@ jobs:
           echo "ABc= $CURRENT $EDGE"
           sudo apt-get -y install datamash
           LIST=$(curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
-          "https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
+          "${{ secrets.NETBOX_API }}/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
           | jq -r '.results[] | .display, .vcpus, .memory, .cluster.name, .tenant.name' | sed -e 's/^\|$/"/g' \
           | xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g'  | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 4 sum 2,3 --output-delimiter=,)
           (echo "CPU|MEM";
@@ -77,7 +77,7 @@ jobs:
           #echo "|Donated by &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Virtual CPU cores |Memory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|" > label.tmp
           #echo "|--|--:|--:|" >> label.tmp
           #curl -H "Authorization: Token ${{ secrets.NETBOX_TOKEN }}" -H "Accept: application/json; indent=4" \
-          #"https://stuff.armbian.com/netbox/api/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
+          #"${{ secrets.NETBOX_API }}/virtualization/virtual-machines/?limit=500&name__empty=false&tag=github-runner" \
           #| jq -r '.results[] | .display, .vcpus, .memory, .cluster.name, .tenant.name' | sed -e 's/^\|$/"/g' \
           #| xargs -n5 -d'\n' | sed -e 's/\" \"/\",\"/g' | tr -d '"' | sed "s/,/\t/g" | datamash --sort -g 5 sum 2,3 --output-delimiter=, \
           #| LC_ALL=C awk -F , -v OFS=\| '$3/=1024' | cut -d"." -f1 | sed -e 's/$/ Gb/g' | sed -e 's/^\|$/|/g' >> label.tmp
