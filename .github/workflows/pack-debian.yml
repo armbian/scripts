@@ -278,6 +278,20 @@ jobs:
             echo "Repository generated at ${REPO_DIR}/"
           fi
 
+          # Acquire-By-Hash: apt fetches indexes by hash, so caches cannot serve stale ones.
+          # reprepro cannot do it. Keep old hashes for clients with an older InRelease.
+          for i in ${REPO_DIR}/dists/*/Release
+          do
+            DISTRO_PATH="$(dirname "$i")"
+            grep -q '^Acquire-By-Hash:' "$i" || sed -i '/^Date:/a Acquire-By-Hash: yes' "$i"
+            awk '/^SHA256:/{f=1;next} /^[^ ]/{f=0} f{print $1, $3}' "$i" | while read -r SUM FILE; do
+              [[ -f "${DISTRO_PATH}/${FILE}" ]] || continue
+              mkdir -p "${DISTRO_PATH}/$(dirname "${FILE}")/by-hash/SHA256"
+              HASHED="${DISTRO_PATH}/$(dirname "${FILE}")/by-hash/SHA256/${SUM}"
+              [[ -e "${HASHED}" ]] || cp "${DISTRO_PATH}/${FILE}" "${HASHED}"
+            done
+          done
+
           echo "Sign repo with multiple keys"
           for i in ${REPO_DIR}/dists/*/Release
           do
