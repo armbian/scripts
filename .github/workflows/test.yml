@@ -92,7 +92,14 @@ jobs:
           wget https://${{ inputs.url }}/armbian.key -O key
           gpg --dearmor < key | tee /usr/share/keyrings/armbian.gpg > /dev/null
           chmod go+r /usr/share/keyrings/armbian.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/armbian.gpg] http://${{ inputs.url }} $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | tee /etc/apt/sources.list.d/armbian.list
+          cat <<- EOF | tee /etc/apt/sources.list.d/armbian.sources
+          Types: deb
+          URIs: https://${{ inputs.url }}
+          Suites: ${RELEASE}
+          Components: main ${RELEASE}-utils ${RELEASE}-desktop
+          Architectures: $(dpkg --print-architecture)
+          Signed-By: /usr/share/keyrings/armbian.gpg
+          EOF
           apt update -y
           apt upgrade -y
 

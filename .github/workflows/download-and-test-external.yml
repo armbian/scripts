@@ -218,7 +218,14 @@ jobs:
               mkdir -p build/output/{debs,debs-beta}/extra/${i}-utils
               mkdir -p build/output/{debs,debs-beta}/extra/${i}-desktop
               # add all armbian repositories
-              echo "deb [arch=armhf,arm64,amd64,i386,riscv64 signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com ${i} main ${i}-utils ${i}-desktop" | sudo tee /etc/apt/sources.list.d/armbian-${i}.list
+              cat <<- EOF | tee /etc/apt/sources.list.d/armbian-${i}.sources
+              Types: deb
+              URIs: https://apt.armbian.com
+              Suites: ${i}
+              Components: main ${i}-utils ${i}-desktop
+              Architectures: armhf arm64 amd64 i386 riscv64
+              Signed-By: /usr/share/keyrings/armbian.gpg
+              EOF
           done
 
           # update and get version
@@ -318,7 +325,7 @@ jobs:
 
       - name: Build testing repository
         run: |
-        
+
           # read config once again
           . os/external/${{ matrix.node }}.conf
           cd build
@@ -440,7 +447,14 @@ jobs:
           wget https://${URL}/armbian.key -O key
           gpg --dearmor < key | tee /usr/share/keyrings/armbian.gpg > /dev/null
           chmod go+r /usr/share/keyrings/armbian.gpg
-          echo "deb [signed-by=/usr/share/keyrings/armbian.gpg] http://${URL} $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" | tee /etc/apt/sources.list.d/armbian.list
+          cat <<- EOF | tee /etc/apt/sources.list.d/armbian.sources
+          Types: deb
+          URIs: https://${URL}
+          Suites: $RELEASE
+          Components: main ${RELEASE}-utils ${RELEASE}-desktop
+          Signed-By: /usr/share/keyrings/armbian.gpg
+          EOF
+
           apt update -y
           apt upgrade -y
 
