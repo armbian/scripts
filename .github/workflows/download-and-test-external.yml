@@ -458,7 +458,7 @@ jobs:
     steps:
 
       - name: "Lets clean artifacts that are useless"
-        uses: geekyeggo/delete-artifact@v4
+        uses: geekyeggo/delete-artifact@v5
         with:
           name: assets-for-download
           failOnError: false
